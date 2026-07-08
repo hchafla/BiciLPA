@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Ciclismo Urbano - LPGC</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        
+        /* Menú superior de navegación */
+        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; height: 54px; }
+        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+
+        /* Contenedores principales (Mapa + Panel lateral) */
+        #app-container { display: flex; height: calc(100vh - 54px); width: 100vw; }
+        #sidebar { width: 320px; background: #2c3e50; color: #fff; padding: 20px; overflow-y: auto; z-index: 1000; box-shadow: 2px 0 5px rgba(0,0,0,0.2); }
+        #map { flex-grow: 1; height: 100%; }
+        
+        /* Tipografías y Leyendas del menú lateral */
+        h1 { font-size: 1.3rem; margin-bottom: 15px; color: #ecf0f1; border-bottom: 2px solid #34495e; padding-bottom: 10px; }
+        .legend { background: #34495e; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.4; }
+        .legend-title { font-weight: bold; margin-bottom: 8px; color: #f1c40f; font-size: 0.9rem; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
+        
+        /* Iconos de la leyenda (Círculos y Líneas) */
+        .circle-key { width: 14px; height: 14px; border-radius: 50%; margin-right: 10px; border: 2px solid #fff; }
+        .line-key { width: 20px; height: 4px; margin-right: 10px; border-radius: 2px; }
+        
+        /* Bloque inferior de información de estado */
+        .status-info { font-size: 0.8rem; color: #95a5a6; line-height: 1.4; border-top: 1px solid #34495e; padding-top: 15px; }
+        
+        /* Popups de información dentro del mapa */
+        .popup-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; display: block; }
+        .popup-bike-img { display: block; max-width: 90px; max-height: 55px; margin: 8px auto; object-fit: contain; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" class="logo">🚲 BiciLPA</a>
+            <span style="color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px;">
+                Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
+            </span>
+        </div>
+        <div>
+            <a href="index.html" class="active">Mapa en vivo</a>
+            <a href="rutas.html">Rutas Recomendadas</a>
+            <a href="normativa.html">Normativa</a>
+            <a href="talleres.html">Talleres</a>
+        </div>
+    </nav>
+
+    <div id="app-container">
+        <div id="sidebar">
+            <h1>Infraestructura y Estado</h1>
+            <p style="font-size: 0.85rem; color: #bdc3c7; margin-bottom: 20px;">Gestiona los mapas de fondo y las capas desde el panel flotante superior derecho.</p>
+            
+            <div class="legend">
+                <div class="legend-title">Servicios y Ocupación</div>
+                <div class="legend-item">
+                    <div class="circle-key" style="background: #f1c40f;"></div>
+                    <span>Sítycleta</span>
+                </div>
+                <div class="legend-item">
+                    <div class="circle-key" style="background: #2ecc71;"></div>
+                    <span>e-Sítycleta</span>
+                </div>
+                <div class="legend-item">
+                    <div class="circle-key" style="background: #e74c3c;"></div>
+                    <span>Estación vacía</span>
+                </div>
+                <div class="legend-item">
+                    <div class="circle-key" style="background: #3498db;"></div>
+                    <span>Taller mecánico</span>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-title">Vías de la Ciudad</div>
+                <div class="legend-item">
+                    <div class="line-key" style="background: #a93226;"></div>
+                    <span>Carriles-Bici</span>
+                </div>
+                <div class="legend-item">
+                    <div class="line-key" style="background: repeating-linear-gradient(90deg, #27ae60, #27ae60 4px, transparent 4px, transparent 8px);"></div>
+                    <span>Aceras-Bici (Compartido Peatón)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="line-key" style="background: repeating-linear-gradient(90deg, #2c3e50, #2c3e50 4px, transparent 4px, transparent 8px);"></div>
+                    <span>Ciclocarril / Calles 30</span>
+                </div>
+            </div>
+
+            <div class="status-info">
+                <p><strong>Filtro Unificado:</strong> Las coordenadas son exactas. Si una parada cuenta con bicis mecánicas y eléctricas simultáneamente, puedes apagar o encender las capas en el selector para verlas por separado.</p>
+            </div>
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="datos/carriles-bici.js"></script>
+    <script src="datos/aceras-bici.js"></script>
+    <script src="datos/ciclovias.js"></script>
+
+    <script>
+        // ==========================================
+        // 5.1 CONSTANTES, ENDPOINTS API Y MAPA BASE
+        // ==========================================
+        const URL_INFO = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/station_information.json';
+        const URL_STATUS = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/station_status.json';
+        const URL_TYPES = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/vehicle_types.json';
+
+        // Capas base de fondo alternables (Carto vs Satélite Esri)
+        const mapaClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        });
+
+        const mapaSatelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'
+        });
+
+        // Creación del objeto Mapa centrado en Las Palmas de Gran Canaria
+        const map = L.map('map', {
+            center: [28.128, -15.432],
+            zoom: 14,
+            layers: [mapaClaro]
+        });
+
+        // ==========================================
+        // 5.2 CREACIÓN DE CAPAS LÓGICAS (DATA LAYERS)
+        // ==========================================
+        let sityMecanicasLayer = L.layerGroup().addTo(map);
+        let sityElectricasLayer = L.layerGroup().addTo(map);
+        let sityVaciasLayer = L.layerGroup().addTo(map);
+        let talleresLayer = L.layerGroup().addTo(map);
+        let carrilesBiciLayer = L.layerGroup().addTo(map);
+        let acerasBiciLayer = L.layerGroup().addTo(map);
+        let cicloviasLayer = L.layerGroup().addTo(map);
+
+        // Control de Mapas base
+        const baseMaps = {
+            "🗺️ Mapa": mapaClaro,
+            "🛰️ Satélite": mapaSatelite
+        };
+
+        // Control de Capas superpuestas con nomenclatura simplificada y emojis actualizados
+        const overlayMaps = {
+            "🟡 Sítycleta": sityMecanicasLayer,
+            "🟢 e-Sítycleta": sityElectricasLayer,
+            "🔴 Sítycleta Vacía": sityVaciasLayer,
+            "🔵 Talleres": talleresLayer,
+            "🟥 Carriles-Bici": carrilesBiciLayer,
+            "🟩 Aceras-Bici": acerasBiciLayer,
+            "⬛ Ciclocarril": cicloviasLayer
+        };
+
+        L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+
+        // ==========================================
+        // 5.3 CARGA DE INFRAESTRUCTURA LOCAL (GeoJSON)
+        // ==========================================
+        function cargarInfraestructura() {
+            // Carril Bici Segregado: Rojo Granate continuo (#a93226)
+            if (typeof datosCarriles !== 'undefined') {
+                L.geoJSON(datosCarriles, { 
+                    style: { color: '#a93226', weight: 4, opacity: 0.9 } 
+                }).addTo(carrilesBiciLayer);
+            }
+            
+            // Acera Bici: Verde (#27ae60) con patrón discontinuo para indicar vía compartida
+            if (typeof datosAceras !== 'undefined') {
+                L.geoJSON(datosAceras, { 
+                    style: { color: '#27ae60', weight: 4, opacity: 0.85, dashArray: '5, 8' } 
+                }).addTo(acerasBiciLayer);
+            }
+            
+            // Ciclovías: Negro Antracita (#2c3e50) discontinuo fino
+            if (typeof datosCiclovias !== 'undefined') {
+                L.geoJSON(datosCiclovias, { 
+                    style: { color: '#2c3e50', weight: 3, opacity: 0.8, dashArray: '3, 6' } 
+                }).addTo(cicloviasLayer);
+            }
+        }
+
+        // Fichero estático manual de talleres colaboradores
+        const talleresLocales = [
+            { name: "La Bici Bike Shop", lat: 28.1301, lon: -15.4452, desc: "Zona Guanarteme." },
+            { name: "Free Motion - Las Palmas", lat: 28.1345, lon: -15.4298, desc: "Calle León y Castillo." },
+            { name: "Pedelec Canarias", lat: 28.1215, lon: -15.4270, desc: "Especializados en VMP." }
+        ];
+        function cargarTalleres() {
+            talleresLocales.forEach(taller => {
+                const marker = L.circleMarker([taller.lat, taller.lon], {
+                    radius: 8.5, fillColor: '#3498db', color: '#fff', weight: 2, fillOpacity: 0.9
+                }).bindPopup(`<strong class="popup-title">🛠️ ${taller.name}</strong><p style="font-size:0.85rem;">${taller.desc}</p>`);
+                talleresLayer.addLayer(marker);
+            });
+        }
+
+        // ==========================================
+        // 5.4 CONSULTA EN TIEMPO REAL API (GBFS Nextbike)
+        // ==========================================
+        async function actualizarSitycleta(){
+            try {
+                const [resInfo, resStatus, resTypes] = await Promise.all([
+                    fetch(URL_INFO),
+                    fetch(URL_STATUS),
+                    fetch(URL_TYPES)
+                ]);
+
+                const infoData = await resInfo.json();
+                const statusData = await resStatus.json();
+                const typesData = await resTypes.json();
+
+                const infoIndex = {};
+                infoData.data.stations.forEach(station => {
+                    infoIndex[station.station_id] = station;
+                });
+
+                const metaTypesIndex = {};
+                typesData.data.vehicle_types.forEach(type => {
+                    metaTypesIndex[type.vehicle_type_id] = {
+                        propulsion: type.propulsion_type,
+                        image: type.vehicle_image ?? ''
+                    };
+                });
+
+                sityMecanicasLayer.clearLayers();
+                sityElectricasLayer.clearLayers();
+                sityVaciasLayer.clearLayers();
+
+                statusData.data.stations.forEach(status => {
+                    const info = infoIndex[status.station_id];
+                    if (!info) return;
+
+                    let mecanicas = 0;
+                    let electricas = 0;
+                    let imgMecanica = '';
+                    let imgElectrica = '';
+
+                    (status.vehicle_types_available || []).forEach(vehicle => {
+                        const meta = metaTypesIndex[vehicle.vehicle_type_id];
+                        if (!meta) return;
+
+                        if (meta.propulsion === "human") {
+                            mecanicas += vehicle.count;
+                            if (meta.image) imgMecanica = meta.image;
+                        }
+                        if (meta.propulsion === "electric_assist") {
+                            electricas += vehicle.count;
+                            if (meta.image) imgElectrica = meta.image;
+                        }
+                    });
+
+                    const huecos = status.num_docks_available ?? 0;
+                    const capacidadBase = info.capacity || 10;
+
+                    // ESTACIÓN VACÍA
+                    if (mecanicas === 0 && electricas === 0) {
+                        L.circleMarker([info.lat, info.lon], {
+                            radius: 8, fillColor: "#e74c3c", color: "#ffffff", weight: 1.5, fillOpacity: 0.9
+                        })
+                        .bindPopup(`<strong>${info.name}</strong><hr style="margin:5px 0; border:0; border-top:1px solid #eee;">❌ Sin bicicletas disponibles`)
+                        .addTo(sityVaciasLayer);
+                        return;
+                    }
+
+                    // SÍTYCLETA MECÁNICA (Coordenadas originales exactas)
+                    if (mecanicas > 0) {
+                        const ratioM = mecanicas / capacidadBase;
+                        const opacidadM = Math.min(Math.max(0.35 + ratioM * 0.65, 0.35), 1);
+                        
+                        const tagImg = imgMecanica ? `<img src="${imgMecanica}" class="popup-bike-img" alt="Bici Mecánica">` : '';
+
+                        L.circleMarker([info.lat, info.lon], {
+                            radius: 8, fillColor: "#f1c40f", color: "#ffffff", weight: 1.5, fillOpacity: opacidadM
+                        })
+                        .bindPopup(`
+                            <strong>🚲 ${info.name} (Mecánica)</strong>
+                            <hr style="margin:5px 0; border:0; border-top:1px solid #eee;">
+                            ${tagImg}
+                            Bicicletas mecánicas: <b>${mecanicas}</b><br>
+                            Anclajes libres: <b>${huecos}</b>
+                        `)
+                        .addTo(sityMecanicasLayer);
+                    }
+
+                    // E-SÍTYCLETA ELÉCTRICA (Coordenadas originales exactas)
+                    if (electricas > 0) {
+                        const ratioE = electricas / capacidadBase;
+                        const opacidadE = Math.min(Math.max(0.35 + ratioE * 0.65, 0.35), 1);
+                        
+                        const tagImg = imgElectrica ? `<img src="${imgElectrica}" class="popup-bike-img" alt="Bici Eléctrica">` : '';
+
+                        L.circleMarker([info.lat, info.lon], {
+                            radius: 8, fillColor: "#2ecc71", color: "#ffffff", weight: 1.5, fillOpacity: opacidadE
+                        })
+                        .bindPopup(`
+                            <strong>⚡ ${info.name} (Eléctrica)</strong>
+                            <hr style="margin:5px 0; border:0; border-top:1px solid #eee;">
+                            ${tagImg}
+                            Bicicletas eléctricas: <b>${electricas}</b><br>
+                            Anclajes libres: <b>${huecos}</b>
+                        `)
+                        .addTo(sityElectricasLayer);
+                    }
+                });
+                console.log("Sincronización GBFS completada con éxito.");
+            } catch (error) {
+                console.error("Fallo crítico en la llamada de red API:", error);
+            }
+        }
+
+        // ==========================================
+        // 5.5 INICIALIZACIÓN DE PROCESOS
+        // ==========================================
+        cargarInfraestructura();
+        cargarTalleres();
+        actualizarSitycleta();
+
+        // Refresco automático en segundo plano cada 60 segundos
+        setInterval(actualizarSitycleta, 60000);
+    </script>
+</body>
+</html>

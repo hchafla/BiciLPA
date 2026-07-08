@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normativa y Seguridad - Movilidad LPGC</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
+        
+        /* Navegación superior común */
+        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+
+        /* Contenedor de Contenido */
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 { color: #2c3e50; font-size: 2rem; margin-bottom: 10px; }
+        header p { color: #7f8c8d; font-size: 1.1rem; }
+
+        /* Rejilla de Categorías principales */
+        .normas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .norma-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .norma-card h3 { color: #2c3e50; margin-bottom: 12px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .norma-card p { font-size: 0.9rem; color: #555; }
+        
+        /* Sistema de Alertas / Prohibiciones Clave */
+        .prohibido { border-left: 4px solid #e74c3c; }
+        .permitido { border-left: 4px solid #2ecc71; }
+        .obligatorio { border-left: 4px solid #f59f00; }
+
+        /* Sección de Preguntas Frecuentes (Acordeón) */
+        .faq-section { background: white; border-radius: 8px; padding: 30px; border: 1px solid #e2e8f0; }
+        .faq-section h2 { color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem; }
+        
+        .faq-item { border-bottom: 1px solid #edf2f7; padding: 15px 0; cursor: pointer; }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-question { font-weight: 600; color: #2d3748; display: flex; justify-content: space-between; align-items: center; }
+        .faq-answer { display: none; margin-top: 10px; font-size: 0.95rem; color: #4a5568; padding-left: 5px; }
+        
+        /* Clase para activar el acordeón con JS simple */
+        .faq-item.open .faq-answer { display: block; }
+        .faq-item.open .faq-question { color: #2ecc71; }
+    </style>
+</head>
+<body>
+
+    <!-- Menú de Navegación del Modelo Multi-página -->
+    <nav>
+        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
+        <div>
+            <a href="index.html">Mapa en Vivo</a>
+            <a href="rutas.html">Rutas Recomendadas</a>
+            <a href="normativa.html" class="active">Normativa</a>
+            <a href="talleres.html">Talleres</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Manual de Supervivencia Legal</h1>
+            <p>La ordenanza municipal de Las Palmas de Gran Canaria resumida de forma directa y sin tecnicismos.</p>
+        </header>
+
+        <!-- Bloques de Reglas Rápidas -->
+        <div class="normas-grid">
+            <div class="norma-card prohibido">
+                <h3>❌ Circular por Aceras</h3>
+                <p>Está estrictamente prohibido rodar por aceras, paseos peatonales y zonas de preferencia peatonal (salvo señalización expresa o aceras-bici pintadas).</p>
+            </div>
+            <div class="norma-card obligatorio">
+                <h3>⚠️ Casco y Elementos</h3>
+                <p>El casco es obligatorio para menores de 16 años en bicis y obligatorio siempre para todos los usuarios de VMP (patinetes eléctricos). Luces obligatorias de noche.</p>
+            </div>
+            <div class="norma-card permitido">
+                <h3>✅ Ciclocarriles 30</h3>
+                <p>En las calles de un solo carril limitadas a 30 km/h, tienes derecho a circular por el centro del carril. Los coches tienen prohibido acosarte o adelantarte sin cambiar de carril.</p>
+            </div>
+        </div>
+
+        <!-- Preguntas Frecuentes Desplegables -->
+        <div class="faq-section">
+            <h2>Preguntas Frecuentes (FAQ)</h2>
+            
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Me pueden multar por ir con auriculares? <span>+</span></div>
+                <div class="faq-answer">
+                    Sí. Está totalmente prohibido conducir bicicletas o VMP utilizando auriculares conectados a receptores o reproductores de sonido, así como el uso del teléfono móvil. La sanción económica es idéntica a la de un conductor de coche.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Dónde puedo candar mi bicicleta de forma legal? <span>+</span></div>
+                <div class="faq-answer">
+                    Debes utilizar prioritariamente los aparcabicis en forma de "U invertida" distribuidos por la ciudad. Está prohibido amarrar la bici a árboles, semáforos, farolas o mobiliario urbano si entorpece el paso peatonal o puede dañar los elementos públicos.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Qué pasa con la Avenida Marítima? ¿Se puede circular? <span>+</span></div>
+                <div class="faq-answer">
+                    El paseo peatonal de la Avenida Marítima está prohibido para bicis y patinetes. Debes utilizar obligatoriamente el carril bici segregado bidireccional que va paralelo a la autovía.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función simple para abrir/cerrar los acordeones de la normativa
+        function toggleFaq(elemento) {
+            elemento.classList.toggle('open');
+            const span = elemento.querySelector('.faq-question span');
+            span.textContent = elemento.classList.contains('open') ? '−' : '+';
+        }
+    </script>
+</body>
+</html>

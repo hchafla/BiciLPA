@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutas Seguras - Movilidad LPGC</title>
+    
+    <!-- Hojas de estilo de Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; }
+        
+        /* Navegación superior común */
+        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+
+        /* Contenedor Principal de Rutas */
+        .rutas-container { display: flex; height: calc(100vh - 54px); width: 100vw; }
+        
+        /* Panel Izquierdo: Tarjetas de rutas */
+        .rutas-sidebar { width: 400px; background: white; padding: 20px; overflow-y: auto; box-shadow: 2px 0 5px rgba(0,0,0,0.05); }
+        .ruta-card { background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s ease; }
+        .ruta-card:hover { border-color: #3498db; background: #f0f7fc; }
+        .ruta-card.active { border-color: #2ecc71; background: #f4fbf7; }
+        
+        .ruta-title { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
+        .ruta-meta { display: flex; gap: 10px; font-size: 0.8rem; color: #7f8c8d; margin-bottom: 10px; }
+        .tag-dificultad { padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .facil { background: #e8f8f0; color: #2ecc71; }
+        .moderado { background: #fff9db; color: #f59f00; }
+        
+        /* Panel Derecho: Mapa descriptivo */
+        #map-rutas { flex-grow: 1; height: 100%; }
+        
+        /* Indicaciones escritas dentro de la tarjeta activa */
+        .indicaciones { display: none; font-size: 0.85rem; color: #555; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; line-height: 1.4; }
+        .ruta-card.active .indicaciones { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- Menú de Navegación del Modelo Multi-página -->
+    <nav>
+        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
+        <div>
+            <a href="index.html">Mapa en Vivo</a>
+            <a href="rutas.html" class="active">Rutas Recomendadas</a>
+            <a href="normativa.html">Normativa</a>
+            <a href="talleres.html">Talleres</a>
+        </div>
+    </nav>
+
+    <div class="rutas-container">
+        <!-- Listado de guías locales -->
+        <div class="rutas-sidebar">
+            <h2 style="margin-bottom: 15px; font-size: 1.3rem; color: #2c3e50;">Guías de Trayecto Urbano</h2>
+            <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 20px;">Rutas seleccionadas para moverte de forma segura minimizando el conflicto con el tráfico pesado.</p>
+            
+            <!-- Ruta 1 -->
+            <div class="ruta-card active" onclick="seleccionarRuta('eje-central')">
+                <div class="ruta-title">Eje Central: Conexión Norte-Sur</div>
+                <div class="ruta-meta">
+                    <span class="tag-dificultad facil">Fácil</span>
+                    <span>Distancia: 6.2 km</span>
+                    <span>Desnivel: Plano</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #555;">La arteria ciclista principal. Conecta la zona del Puerto con Triana/Vegueta utilizando casi en su totalidad carriles segregados.</p>
+                <div class="indicaciones">
+                    <strong>Consejos de la calle:</strong><br>
+                    • Ideal para novatos.<br>
+                    • Cuidado en el tramo de Alcaravaneras con peatones despistados cruzando al carril bici.<br>
+                    • El paso por la Base Naval suele tener alta densidad en hora punta.
+                </div>
+            </div>
+
+            <!-- Ruta 2 -->
+            <div class="ruta-card" onclick="seleccionarRuta('subida-ciudad-alta')">
+                <div class="ruta-title">Conexión Baja-Alta (Evitando pendientes)</div>
+                <div class="ruta-meta">
+                    <span class="tag-dificultad moderado">Moderado</span>
+                    <span>Distancia: 3.8 km</span>
+                    <span>Desnivel: +110m</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #555;">Alternativa optimizada para subir hacia Escaleritas minimizando las rampas más duras y usando calles calmadas.</p>
+                <div class="indicaciones">
+                    <strong>Consejos de la calle:</strong><br>
+                    • Se recomienda el uso de asistencia eléctrica si vas con carga.<br>
+                    • Aprovecha las calles de prioridad peatonal en la subida trasera antes de incorporarte al eje de Escaleritas.
+                </div>
+            </div>
+        </div>
+
+        <!-- El visor de la ruta -->
+        <div id="map-rutas"></div>
+    </div>
+
+    <!-- Scripts de Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializar mapa de rutas centrado en la ciudad
+        const map = L.map('map-rutas').setView([28.128, -15.432], 13);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Capa dinámica para dibujar el trazado de la ruta seleccionada
+        let rutaActivaLayer = L.layerGroup().addTo(map);
+
+        // Esta función simula el cambio de ruta en el mapa al hacer clic en las tarjetas de la izquierda
+        function seleccionarRuta(idRuta) {
+            // Cambiar clase activa en la interfaz visual (UI)
+            document.querySelectorAll('.ruta-card').forEach(card => card.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Limpiar el trazado anterior
+            rutaActivaLayer.clearLayers();
+
+            if (idRuta === 'eje-central') {
+                // Aquí es donde en el siguiente paso leeremos tu archivo .geojson específico
+                // De momento simulamos una línea básica en el mapa
+                const lineaEjeCentral = L.polyline([
+                    [28.142, -15.426], // Puerto
+                    [28.130, -15.429], // Alcaravaneras
+                    [28.115, -15.418], // San Telmo
+                    [28.102, -15.415]  // Vegueta
+                ], {color: '#2ecc71', weight: 5}).addTo(rutaActivaLayer);
+                
+                map.fitBounds(lineaEjeCentral.getBounds());
+            } else if (idRuta === 'subida-ciudad-alta') {
+                const lineaSubida = L.polyline([
+                    [28.121, -15.427], // Zona Baja
+                    [28.123, -15.435], // Subida progresiva
+                    [28.125, -15.442]  // Escaleritas
+                ], {color: '#f59f00', weight: 5}).addTo(rutaActivaLayer);
+                
+                map.fitBounds(lineaSubida.getBounds());
+            }
+        }
+
+        // Cargar la primera ruta por defecto al entrar
+        seleccionarRuta('eje-central');
+    </script>
+</body>
+</html>

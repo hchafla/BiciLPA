@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talleres y Tiendas - Movilidad LPGC</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
+        
+        /* Navegación superior común */
+        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+
+        /* Contenedor de Contenido */
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 { color: #2c3e50; font-size: 2rem; margin-bottom: 10px; }
+        header p { color: #7f8c8d; font-size: 1.1rem; }
+
+        /* Barra de Filtros */
+        .filter-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .filter-btn { background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .filter-btn:hover { border-color: #3498db; color: #3498db; }
+        .filter-btn.active { background: #3498db; color: white; border-color: #3498db; }
+
+        /* Rejilla de Talleres */
+        .talleres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .taller-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .taller-header { margin-bottom: 15px; }
+        .taller-name { font-size: 1.2rem; color: #2c3e50; font-weight: bold; margin-bottom: 5px; }
+        .taller-zone { font-size: 0.85rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .taller-body p { font-size: 0.9rem; color: #555; margin-bottom: 15px; }
+        
+        /* Etiquetas de Especialidad */
+        .tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; background: #f1f5f9; color: #475569; }
+        .tag.special { background: #e0f2fe; color: #0369a1; }
+
+        /* Botones de Acción */
+        .taller-actions { display: flex; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+        .btn-action { flex: 1; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .btn-map { background: #f1f5f9; color: #334155; }
+        .btn-map:hover { background: #e2e8f0; }
+        .btn-call { background: #2ecc71; color: white; }
+        .btn-call:hover { background: #27ae60; }
+    </style>
+</head>
+<body>
+
+    <!-- Menú de Navegación del Modelo Multi-página -->
+    <nav>
+        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
+        <div>
+            <a href="index.html">Mapa en Vivo</a>
+            <a href="rutas.html">Rutas Recomendadas</a>
+            <a href="normativa.html">Normativa</a>
+            <a href="talleres.html" class="active">Talleres</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Talleres y Soporte Técnico</h1>
+            <p>Servicios locales de confianza para reparar, poner a punto o equipar tu bici o patinete eléctrico.</p>
+        </header>
+
+        <!-- Filtros de categoría -->
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filtrarTalleres('all')">Todos</button>
+            <button class="filter-btn" onclick="filtrarTalleres('bici')">Bicicletas</button>
+            <button class="filter-btn" onclick="filtrarTalleres('vmp')">Patinetes (VMP)</button>
+        </div>
+
+        <!-- Listado de Tarjetas -->
+        <div class="talleres-grid">
+            
+            <!-- Taller 1 -->
+            <div class="taller-card" data-tipo="bici">
+                <div class="taller-header">
+                    <span class="taller-zone">Guanarteme</span>
+                    <div class="taller-name">La Bici Bike Shop</div>
+                </div>
+                <div class="taller-body">
+                    <div class="tags-container">
+                        <span class="tag special">Mecánica Rápida</span>
+                        <span class="tag">Urbana</span>
+                        <span class="tag">Carretera</span>
+                    </div>
+                    <p>Excelente taller de barrio muy enfocado a soluciones inmediatas para el ciclista del día a día. Trato muy cercano y precios ajustados.</p>
+                </div>
+                <div class="taller-actions">
+                    <a href="#" class="btn-action btn-map">📍 Ver Mapa</a>
+                    <a href="tel:#" class="btn-action btn-call">📞 Llamar</a>
+                </div>
+            </div>
+
+            <!-- Taller 2 -->
+            <div class="taller-card" data-tipo="bici">
+                <div class="taller-header">
+                    <span class="taller-zone">Eje Central / León y Castillo</span>
+                    <div class="taller-name">Free Motion - Las Palmas</div>
+                </div>
+                <div class="taller-body">
+                    <div class="tags-container">
+                        <span class="tag special">Taller Avanzado</span>
+                        <span class="tag">E-Bikes</span>
+                        <span class="tag">Accesorios</span>
+                    </div>
+                    <p>Infraestructura técnica potente situada en plena arteria ciclista. Ideal para reparaciones complejas y componentes de gama alta.</p>
+                </div>
+                <div class="taller-actions">
+                    <a href="#" class="btn-action btn-map">📍 Ver Mapa</a>
+                    <a href="tel:#" class="btn-action btn-call">📞 Llamar</a>
+                </div>
+            </div>
+
+            <!-- Taller 3 -->
+            <div class="taller-card" data-tipo="vmp">
+                <div class="taller-header">
+                    <span class="taller-zone">Zona Central / Arenales</span>
+                    <div class="taller-name">Pedelec Canarias</div>
+                </div>
+                <div class="taller-body">
+                    <div class="tags-container">
+                        <span class="tag special">Patinetes Eléctricos</span>
+                        <span class="tag">Baterías</span>
+                        <span class="tag">Electrónica</span>
+                    </div>
+                    <p>Referencia en la ciudad para movilidad eléctrica urbana. El lugar idóneo si necesitas reparar la electrónica o ruedas de un VMP.</p>
+                </div>
+                <div class="taller-actions">
+                    <a href="#" class="btn-action btn-map">📍 Ver Mapa</a>
+                    <a href="tel:#" class="btn-action btn-call">📞 Llamar</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Lógica de filtrado en el frontend mediante data-attributes
+        function filtrarTalleres(categoria) {
+            // Actualizar estado del botón de filtro activo
+            document.querySelectorAll('.filter-bar button').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Mostrar u ocultar tarjetas según el tipo
+            const tarjetas = document.querySelectorAll('.taller-card');
+            tarjetas.forEach(tarjeta => {
+                const tipoTaller = tarjeta.getAttribute('data-tipo');
+                
+                if (categoria === 'all' || tipoTaller === categoria) {
+                    tarjeta.style.display = 'flex';
+                } else {
+                    tarjeta.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
