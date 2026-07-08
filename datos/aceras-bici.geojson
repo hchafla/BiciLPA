@@ -1,4 +1,4 @@
-{
+const datosAceras = { 
     "type": "FeatureCollection",
     "features": [
         {
@@ -393,4 +393,4 @@
             }
         }
     ]
-}
+};
