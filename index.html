@@ -190,7 +190,12 @@
             "🟧​ Ciclocarril": cicloviasLayer
         };
 
-        L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+        // Detecta si la pantalla es móvil (menos de 768px) para colapsar el selector automáticamente
+const esMovil = window.innerWidth <= 768;
+
+L.control.layers(baseMaps, overlayMaps, { 
+    collapsed: esMovil // Se cierra solo en móviles, se queda abierto en escritorio
+}).addTo(map);
 
         // ==========================================
         // 5.3 CARGA DE INFRAESTRUCTURA LOCAL (GeoJSON)
