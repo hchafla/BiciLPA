@@ -9,18 +9,19 @@
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body, html { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; overflow: hidden; }
         
         /* Menú superior de navegación */
         nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; height: 54px; }
         nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+        .nav-slogan { color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px; }
 
         /* Contenedores principales (Mapa + Panel lateral) */
         #app-container { display: flex; height: calc(100vh - 54px); width: 100vw; }
         #sidebar { width: 320px; background: #2c3e50; color: #fff; padding: 20px; overflow-y: auto; z-index: 1000; box-shadow: 2px 0 5px rgba(0,0,0,0.2); }
-        #map { flex-grow: 1; height: 100%; }
+        #map { flex-grow: 1; height: 100%; width: 100%; }
         
         /* Tipografías y Leyendas del menú lateral */
         h1 { font-size: 1.3rem; margin-bottom: 15px; color: #ecf0f1; border-bottom: 2px solid #34495e; padding-bottom: 10px; }
@@ -38,6 +39,31 @@
         /* Popups de información dentro del mapa */
         .popup-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; display: block; }
         .popup-bike-img { display: block; max-width: 90px; max-height: 55px; margin: 8px auto; object-fit: contain; }
+
+        /* ==========================================
+           MEDIA QUERY: DISEÑO RESPONSIVE PARA MÓVILES
+           ========================================== */
+        @media (max-width: 768px) {
+            body, html { overflow: auto; }
+            
+            /* Ajustes de Navegación Móvil */
+            nav { flex-direction: column; height: auto; padding: 10px; gap: 8px; }
+            .nav-slogan { display: none; } /* Ocultar eslogan para ganar espacio crítico */
+            nav a { margin: 0 8px; font-size: 0.9rem; }
+            
+            /* Reestructuración de Contenedores */
+            #app-container { flex-direction: column; height: calc(100vh - 78px); }
+            
+            /* El mapa se prioriza en la mitad superior */
+            #map { height: 60vh; flex-grow: 0; }
+            
+            /* El panel pasa abajo con scroll independiente */
+            #sidebar { width: 100%; height: 40vh; box-shadow: 0 -2px 5px rgba(0,0,0,0.2); padding: 15px; }
+            
+            /* Optimización de elementos de la interfaz flotante de Leaflet */
+            .leaflet-top, .leaflet-bottom { z-index: 1001; }
+            .leaflet-control-layers { font-size: 11px !important; max-width: 140px; }
+        }
     </style>
 </head>
 <body>
@@ -45,13 +71,13 @@
     <nav>
         <div style="display: flex; align-items: center; gap: 15px;">
             <a href="index.html" class="logo">🚲 BiciLPA</a>
-            <span style="color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px;">
+            <span class="nav-slogan">
                 Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
             </span>
         </div>
         <div>
             <a href="index.html" class="active">Mapa en vivo</a>
-            <a href="rutas.html">Rutas Recomendadas</a>
+            <a href="rutas.html">Rutas</a>
             <a href="normativa.html">Normativa</a>
             <a href="talleres.html">Talleres</a>
         </div>
@@ -184,7 +210,7 @@
                 }).addTo(acerasBiciLayer);
             }
             
-            // Ciclovías: Negro Antracita (#2c3e50) discontinuo fino
+            // Ciclovías: Naranja Intenso (#FF4500) discontinuo para alto contraste en satélite
             if (typeof datosCiclovias !== 'undefined') {
                 L.geoJSON(datosCiclovias, { 
                     style: { color: '#FF4500', weight: 3, opacity: 0.8, dashArray: '3, 6' } 
