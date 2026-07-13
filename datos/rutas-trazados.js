@@ -1,7 +1,7 @@
 // datos/rutas-trazados.js
 
 const datosRutasTrazados = {
-    "eje-central-av-maritima": {
+    "santa-catalina-san-telmo": {
         "nombre": "Eje Central · Avenida Marítima",
         "geojson": {
             "type": "FeatureCollection",
