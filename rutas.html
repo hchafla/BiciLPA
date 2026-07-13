@@ -34,16 +34,24 @@
         
         .ruta-title { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
         .ruta-subtitle { font-size: 0.95rem; color: #34495e; margin-bottom: 8px; }
-        .ruta-meta { display: flex; gap: 10px; font-size: 0.8rem; color: #7f8c8d; margin-bottom: 10px; }
-        .tag-dificultad { 
+        .ruta-meta { 
+    display: flex; 
+    gap: 10px; 
+    font-size: 0.8rem; 
+    color: #7f8c8d; 
+    margin-bottom: 10px; 
+    align-items: center; /* Alinea todos los elementos verticalmente al centro */
+    flex-wrap: wrap;    /* Evita que se rompan los textos si no caben en pantallas pequeñas */
+}
+      .tag-dificultad { 
     padding: 2px 6px; 
     border-radius: 4px; 
     font-weight: bold; 
-    text-transform: uppercase; 
+    text-transform: uppercase;
     
-    /* Tus nuevas propiedades añadidas aquí: */
-    display: inline-block;
-    width: 85px;
+   /* Nueva estructura limpia sin romper la línea */
+    flex-shrink: 0;      /* Impide que la etiqueta se encoja o deforme */
+    width: 90px;         /* Ajustado a 90px para que "MODERADO" quepa holgadamente */
     text-align: center;
 }
         .facil { background: #e8f8f0; color: #2ecc71; }
