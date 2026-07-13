@@ -60,9 +60,9 @@
             <h2 style="margin-bottom: 15px; font-size: 1.3rem; color: #2c3e50;">Guías de Trayecto Urbano</h2>
             <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 20px;">Rutas seleccionadas para moverte de forma segura minimizando el conflicto con el tráfico pesado.</p>
             
-            <!-- Ruta 1 -->
-            <div class="ruta-card active" onclick="seleccionarRuta('eje-central')">
-                <div class="ruta-title">Eje Central: Conexión Norte-Sur</div>
+            <!-- Ruta 1: Definida con su identificador real -->
+            <div class="ruta-card active" onclick="seleccionarRuta('santa-catalina-san-telmo', event)">
+                <div class="ruta-title">Santa Catalina - San Telmo</div>
                 <div class="ruta-meta">
                     <span class="tag-dificultad facil">Fácil</span>
                     <span>Distancia: 6.2 km</span>
@@ -77,8 +77,8 @@
                 </div>
             </div>
 
-            <!-- Ruta 2 -->
-            <div class="ruta-card" onclick="seleccionarRuta('subida-ciudad-alta')">
+            <!-- Ruta 2: ID listo para cuando metas su trazado -->
+            <div class="ruta-card" onclick="seleccionarRuta('subida-ciudad-alta', event)">
                 <div class="ruta-title">Conexión Baja-Alta (Evitando pendientes)</div>
                 <div class="ruta-meta">
                     <span class="tag-dificultad moderado">Moderado</span>
@@ -98,8 +98,9 @@
         <div id="map-rutas"></div>
     </div>
 
-    <!-- Scripts de Leaflet -->
+    <!-- Scripts de Leaflet y Datos de Trazados -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="datos/rutas-trazados.js"></script>
     <script>
         // Inicializar mapa de rutas centrado en la ciudad
         const map = L.map('map-rutas').setView([28.128, -15.432], 13);
@@ -108,42 +109,64 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // Capa dinámica para dibujar el trazado de la ruta seleccionada
+        // Capa dinámica única para dibujar el trazado y puntos activos
         let rutaActivaLayer = L.layerGroup().addTo(map);
 
-        // Esta función simula el cambio de ruta en el mapa al hacer clic en las tarjetas de la izquierda
-        function seleccionarRuta(idRuta) {
-            // Cambiar clase activa en la interfaz visual (UI)
+        function seleccionarRuta(idRuta, e) {
+            // Cambiar clase activa en la interfaz visual (UI) si se dispara mediante click
             document.querySelectorAll('.ruta-card').forEach(card => card.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if (e && e.currentTarget) {
+                e.currentTarget.classList.add('active');
+            } else {
+                // Caso de carga inicial automática sin evento explícito
+                const tarjetaInicial = document.querySelector(`.ruta-card[onclick*="'${idRuta}'"]`);
+                if (tarjetaInicial) tarjetaInicial.classList.add('active');
+            }
             
-            // Limpiar el trazado anterior
+            // Limpiar el trazado anterior del mapa
             rutaActivaLayer.clearLayers();
 
-            if (idRuta === 'eje-central') {
-                // Aquí es donde en el siguiente paso leeremos tu archivo .geojson específico
-                // De momento simulamos una línea básica en el mapa
-                const lineaEjeCentral = L.polyline([
-                    [28.142, -15.426], // Puerto
-                    [28.130, -15.429], // Alcaravaneras
-                    [28.115, -15.418], // San Telmo
-                    [28.102, -15.415]  // Vegueta
-                ], {color: '#2ecc71', weight: 5}).addTo(rutaActivaLayer);
-                
-                map.fitBounds(lineaEjeCentral.getBounds());
-            } else if (idRuta === 'subida-ciudad-alta') {
-                const lineaSubida = L.polyline([
-                    [28.121, -15.427], // Zona Baja
-                    [28.123, -15.435], // Subida progresiva
-                    [28.125, -15.442]  // Escaleritas
-                ], {color: '#f59f00', weight: 5}).addTo(rutaActivaLayer);
-                
-                map.fitBounds(lineaSubida.getBounds());
+            // Validar que la ruta exista en la variable global cargada desde el .js
+            const ruta = datosRutasTrazados[idRuta];
+            if (!ruta || !ruta.geojson) {
+                console.warn(`No se han encontrado datos geográficos para el ID: ${idRuta}`);
+                return;
+            }
+
+            // Procesar y renderizar el GeoJSON estructurado
+            const capaGeoJSON = L.geoJSON(ruta.geojson, {
+                style: function(feature) {
+                    return {
+                        color: idRuta.includes('ciudad-alta') ? '#f59f00' : '#2ecc71',
+                        weight: 5,
+                        opacity: 0.85
+                    };
+                },
+                pointToLayer: function(feature, latlng) {
+                    if (feature.properties && feature.properties.tipo === 'advertencia') {
+                        return L.circleMarker(latlng, {
+                            radius: 9,
+                            fillColor: '#e74c3c',
+                            color: '#ffffff',
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.9
+                        }).bindPopup(`<strong>⚠️ ¡Atención!</strong><br>${feature.properties.descripcion}`);
+                    }
+                    return L.marker(latlng);
+                }
+            }).addTo(rutaActivaLayer);
+
+            // Ajustar el encuadre del mapa automáticamente a los límites de las coordenadas reales
+            if (capaGeoJSON.getBounds().isValid()) {
+                map.fitBounds(capaGeoJSON.getBounds(), { padding: [30, 30] });
             }
         }
 
-        // Cargar la primera ruta por defecto al entrar
-        seleccionarRuta('eje-central');
+        // Cargar la primera ruta por defecto al inicializar la estructura DOM
+        document.addEventListener("DOMContentLoaded", function() {
+            seleccionarRuta('santa-catalina-san-telmo');
+        });
     </script>
 </body>
 </html>
