@@ -27,11 +27,19 @@
         .ruta-card:hover { border-color: #3498db; background: #f0f7fc; }
         .ruta-card.active { border-color: #2ecc71; background: #f4fbf7; }
         
+        /* Color del borde de la tarjeta activa según dificultad */
+        .ruta-card.active:has(.facil) { border-color: #2ecc71; background: #f4fbf7; }
+        .ruta-card.active:has(.moderado) { border-color: #f59f00; background: #fdfaf2; }
+        .ruta-card.active:has(.dificil) { border-color: #e74c3c; background: #fdf3f2; }
+        
         .ruta-title { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
+        .ruta-subtitle { font-size: 0.95rem; color: #34495e; margin-bottom: 8px; }
         .ruta-meta { display: flex; gap: 10px; font-size: 0.8rem; color: #7f8c8d; margin-bottom: 10px; }
         .tag-dificultad { padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
         .facil { background: #e8f8f0; color: #2ecc71; }
         .moderado { background: #fff9db; color: #f59f00; }
+        .dificil { background: #fde8e8; color: #e74c3c; }
+        .descripcion-ruta { font-size: 0.85rem; color: #555; line-height: 1.4; margin-bottom: 10px; }
         
         /* Panel Derecho: Mapa descriptivo */
         #map-rutas { flex-grow: 1; height: 100%; }
@@ -60,84 +68,66 @@
             <h2 style="margin-bottom: 15px; font-size: 1.3rem; color: #2c3e50;">Guías de Trayecto Urbano</h2>
             <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 20px;">Rutas seleccionadas para moverte de forma segura minimizando el conflicto con el tráfico pesado.</p>
             
-            <!-- Ruta 1: Definida con su identificador real -->
-           <div class="ruta-card active" onclick="seleccionarRuta('santa-catalina-san-telmo', event)">
+            <!-- Ruta 1 -->
+            <div class="ruta-card active" onclick="seleccionarRuta('santa-catalina-san-telmo', event)">
+                <div class="ruta-title">
+                    Eje Central · Avenida Marítima
+                </div>
+                <div class="ruta-subtitle">
+                    Parque Santa Catalina ⬌ Parque San Telmo
+                </div>
+                <div class="ruta-meta">
+                    <span class="tag-dificultad facil">Fácil</span>
+                    <span>📏 4,8 km</span>
+                    <span>⏱️ 18-25 min</span>
+                    <span>⬆️ Llana</span>
+                </div>
+                <div class="ruta-meta">
+                    <span>🚲 Ideal para principiantes</span>
+                    <span>🛣️ Carril bici segregado</span>
+                </div>
+                <p class="descripcion-ruta">
+                    La principal columna vertebral del ciclismo urbano en Las Palmas de Gran Canaria. Conecta Santa Catalina con Triana, y viceversa de forma rápida, cómoda y completamente por carril bici, enlazando con estaciones de Sítycleta, otros carriles bici y numerosos puntos de interés de la ciudad.
+                </p>
+                <div class="indicaciones">
+                    <strong>💡 Biciconsejos</strong><br><br>
+                    🚲 <strong>Perfecta para estrenarse en la ciudad.</strong><br>
+                    ⚠️ <strong>Precaución en Alcaravaneras:</strong> peatones cruzando el carril bici y vehículos entrando y saliendo del Club Náutico.<br>
+                    ❗ <strong>Fin del carril bici:</strong> a la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta. Para continuar hacia León y Castillo es necesario incorporarse a la calzada.<br>
+                    🌬️ <strong>Viento:</strong> en días de alisio el recorrido hacia Santa Catalina puede resultar más exigente.
+                </div>
+            </div>
 
-  <div class="ruta-title">
-    Eje Central · Avenida Marítima
-</div>
-
-<div class="ruta-subtitle">
-    Parque Santa Catalina ⬌ Parque San Telmo
-</div>
-
-<div class="ruta-meta">
-    <span class="tag-dificultad facil">Fácil</span>
-    <span>📏 4,8 km</span>
-    <span>⏱️ 18-25 min</span>
-    <span>⬆️ Llana</span>
-</div>
-
-<div class="ruta-meta">
-    <span>🚲 Ideal para principiantes</span>
-    <span>🛣️ Carril bici segregado</span>
-</div>
-
-<p class="descripcion-ruta">
-    La principal columna vertebral del ciclismo urbano en Las Palmas de Gran Canaria. Conecta Santa Catalina con Triana, y viceversa de forma rápida, cómoda y completamente por carril bici, enlazando con estaciones de Sítycleta, otros carriles bici y numerosos puntos de interés de la ciudad.
-</p>
-    
-   <div class="indicaciones">
-    <strong>💡 Biciconsejos</strong><br><br>
-
-    🚲 <strong>Perfecta para estrenarse en la ciudad.</strong><br>
-
-    ⚠️ <strong>Precaución en Alcaravaneras:</strong> peatones cruzando el carril bici y vehículos entrando y saliendo del Club Náutico.<br>
-
-    ❗ <strong>Fin del carril bici:</strong> a la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta. Para continuar hacia León y Castillo es necesario incorporarse a la calzada.<br>
-
-    🌬️ <strong>Viento:</strong> en días de alisio el recorrido hacia Santa Catalina puede resultar más exigente.
-</div>
-               
-
-</div>
-
-            <!-- Ruta 2: ID listo para cuando metas su trazado -->
-            <div class="ruta-title">
-    Eje Ciudad Baja - Ciudad Alta
-</div>
-
-<div class="ruta-subtitle">
-    Castillo de Mata ⮕ Parque del Canódromo
-</div>
-
-<div class="ruta-meta">
-    <span class="tag-dificultad moderado">Moderado</span>
-    <span>📏 3,9 km</span>
-    <span>⏱️ 12-13 min ⚡ · 20 min 🚲 </span>
-    <span>⬆️ +115 m</span>
-</div>
-
-<div class="ruta-meta">
-    <span>⚡ Ideal para eSítycleta</span>
-    <span>⛰️ Pendiente moderada</span>
-    <span>🛣️ Ciclovía 30 (calzada compartida)</span>
-</div>
-
-<p class="descripcion-ruta">
-    La forma más cómoda de conectar la ciudad baja con la ciudad alta siguiendo el itinerario ciclista existente. Une dos estaciones de eSítycleta mediante un recorrido continuo que evita las rampas más exigentes y permite acceder cómodamente a los barrios de Escaleritas y Schamann.
-</p>
-
-<div class="indicaciones">
-    <strong>💡 Biciconsejos</strong><br><br>
-
-    ⚡ <strong>Muy recomendable con bici eléctrica:</strong> la asistencia eléctrica hace que la subida resulte cómoda para la mayoría de usuarios.<br>
-
-    🚲 <strong>Con bicicleta convencional:</strong> requiere una condición física mínima, especialmente en la subida por el Paseo de San Antonio.<br>
-
-    🚦 <strong>Vía compartida:</strong> aunque el límite es de 30 km/h, algunos vehículos circulan a mayor velocidad. Mantén una posición visible en el carril y extrema la precaución en la subida del Paseo de San Antonio.<br>
-    
-</div>
+            <!-- Ruta 2 -->
+            <div class="ruta-card" onclick="seleccionarRuta('castillo-mata-canodromo', event)">
+                <div class="ruta-title">
+                    Eje Ciudad Baja - Ciudad Alta
+                </div>
+                <div class="ruta-subtitle">
+                    Castillo de Mata ⮕ Parque del Canódromo
+                </div>
+                <div class="ruta-meta">
+                    <span class="tag-dificultad moderado">Moderado</span>
+                    <span>📏 3,9 km</span>
+                    <span>⏱️ 12-13 min ⚡ · 20 min 🚲 </span>
+                    <span>⬆️ +115 m</span>
+                </div>
+                <div class="ruta-meta">
+                    <span>⚡ Ideal para eSítycleta</span>
+                    <span>⛰️ Pendiente moderada</span>
+                    <span>🛣️ Ciclovía 30 (calzada compartida)</span>
+                </div>
+                <p class="descripcion-ruta">
+                    La forma más cómoda de conectar la ciudad baja con la ciudad alta siguiendo el itinerario ciclista existente. Une dos estaciones de eSítycleta mediante un recorrido continuo que evita las rampas más exigentes y permite acceder cómodamente a los barrios de Escaleritas y Schamann.
+                </p>
+                <div class="indicaciones">
+                    <strong>💡 Biciconsejos</strong><br><br>
+                    ⚡ <strong>Muy recomendable con bici eléctrica:</strong> la asistencia eléctrica hace que la subida resulte cómoda para la mayoría de usuarios.<br>
+                    🚲 <strong>Con bicicleta convencional:</strong> requiere una condición física mínima, especialmente en la subida por el Paseo de San Antonio.<br>
+                    🚦 <strong>Vía compartida:</strong> aunque el límite es de 30 km/h, algunos vehículos circulan a mayor velocidad. Mantén una posición visible en el carril y extrema la precaución en la subida del Paseo de San Antonio.<br>
+                </div>
+            </div>
+        </div>
 
         <!-- El visor de la ruta -->
         <div id="map-rutas"></div>
@@ -156,6 +146,23 @@
 
         // Capa dinámica única para dibujar el trazado y puntos activos
         let rutaActivaLayer = L.layerGroup().addTo(map);
+
+        function obtenerColorPorDificultad(idRuta) {
+            // Buscamos la tarjeta en el HTML usando el ID que se pasa en el onclick
+            const tarjeta = document.querySelector(`.ruta-card[onclick*="'${idRuta}'"]`);
+            if (!tarjeta) return '#3498db'; // Azul por defecto si no encuentra la tarjeta
+
+            // Comprobamos qué etiqueta de dificultad tiene dentro
+            if (tarjeta.querySelector('.facil')) {
+                return '#2ecc71'; // Verde
+            } else if (tarjeta.querySelector('.moderado')) {
+                return '#f59f00'; // Amarillo/Naranja mostaza
+            } else if (tarjeta.querySelector('.dificil')) {
+                return '#e74c3c'; // Rojo
+            }
+            
+            return '#3498db';
+        }
 
         function seleccionarRuta(idRuta, e) {
             // Cambiar clase activa en la interfaz visual (UI) si se dispara mediante click
@@ -178,11 +185,14 @@
                 return;
             }
 
+            // Obtener dinámicamente el color según la tarjeta HTML
+            const colorTrazado = obtenerColorPorDificultad(idRuta);
+
             // Procesar y renderizar el GeoJSON estructurado
             const capaGeoJSON = L.geoJSON(ruta.geojson, {
                 style: function(feature) {
                     return {
-                        color: idRuta.includes('ciudad-alta') ? '#f59f00' : '#2ecc71',
+                        color: colorTrazado,
                         weight: 5,
                         opacity: 0.85
                     };
