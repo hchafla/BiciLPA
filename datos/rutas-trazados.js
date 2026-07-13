@@ -1,14 +1,16 @@
 // datos/rutas-trazados.js
 
 const datosRutasTrazados = {
-    "santa-catalina-san-telmo": {
-        "nombre": "Santa Catalina - San Telmo",
+    "eje-central-av-maritima": {
+        "nombre": "Eje Central · Avenida Marítima",
         "geojson": {
             "type": "FeatureCollection",
             "features": [
                 {
                     "type": "Feature",
-                    "properties": { "tipo": "linea" },
+                    "properties": {
+                        "tipo": "linea"
+                    },
                     "geometry": {
                         "type": "LineString",
                         "coordinates": [
@@ -23,7 +25,7 @@ const datosRutasTrazados = {
                             [-15.4281339, 28.1391026],
                             [-15.4285203, 28.1385396],
                             [-15.4288732, 28.1379766],
-                            [-15.428816, 28.1372728],
+                            [-15.4288816, 28.1372728],
                             [-15.428804, 28.1352003],
                             [-15.4288886, 28.1347899],
                             [-15.4291678, 28.134111],
@@ -35,6 +37,7 @@ const datosRutasTrazados = {
                             [-15.4296786, 28.1294319],
                             [-15.4295526, 28.1290571],
                             [-15.4294196, 28.1287444],
+                            [-15.4285115, 28.1276009],
                             [-15.4275866, 28.1261564],
                             [-15.4261894, 28.1242532],
                             [-15.4255316, 28.1233377],
@@ -56,8 +59,7 @@ const datosRutasTrazados = {
                             [-15.415463, 28.1099417],
                             [-15.4157116, 28.1100809],
                             [-15.4159452, 28.1101177],
-                            [-15.4161215, 28.1099417],
-                            [-15.4163717, 28.1097593]
+                            [-15.4161215, 28.1099417]
                         ]
                     }
                 },
@@ -70,6 +72,17 @@ const datosRutasTrazados = {
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-15.4295016, 28.1330401]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "tipo": "advertencia",
+                        "descripcion": "Fin del carril bici"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-15.4161417, 28.1099303]
                     }
                 }
             ]
