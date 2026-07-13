@@ -212,9 +212,12 @@
                 }
             }).addTo(rutaActivaLayer);
 
-            // Ajustar el encuadre del mapa automáticamente a los límites de las coordenadas reales
+            // Ajustar el encuadre limitando el zoom máximo para evitar acercamientos agresivos
             if (capaGeoJSON.getBounds().isValid()) {
-                map.fitBounds(capaGeoJSON.getBounds(), { padding: [30, 30] });
+                map.fitBounds(capaGeoJSON.getBounds(), { 
+                    padding: [30, 30],
+                    maxZoom: 15 // Impide que el mapa pase de zoom 15 en trayectos cortos
+                });
             }
         }
 
