@@ -224,7 +224,7 @@ const datosRutasTrazados = {
                             [-15.4253581, 28.1113314],
                             [-15.4245615, 28.110639],
                             [-15.4242267, 28.110347],
-                            [-15.4239227, 28.1101179],
+                            [-15.4243922, 28.1101179],
                             [-15.4237341, 28.1099855],
                             [-15.4234936, 28.1098158],
                             [-15.4232473, 28.1096495],
@@ -247,4 +247,30 @@ const datosRutasTrazados = {
         }
     } 
 
-}; // Fin absoluto del archivo. No tocar esta línea.
+}; // Fin de datosRutasTrazados
+
+// =========================================================================
+// TRADUCTOR DE GEOJSON A LAT/LNG PARA LEAFLET (Evita tocar el HTML)
+// =========================================================================
+const rutasTrazados = (() => {
+    const procesadas = {};
+    
+    for (const key in datosRutasTrazados) {
+        if (Object.prototype.hasOwnProperty.call(datosRutasTrazados, key)) {
+            const geojson = datosRutasTrazados[key].geojson;
+            
+            // Buscar la feature de tipo "linea" dentro del FeatureCollection
+            const lineaFeature = geojson.features.find(f => f.properties && f.properties.tipo === "linea");
+            
+            if (lineaFeature && lineaFeature.geometry && lineaFeature.geometry.coordinates) {
+                // GeoJSON guarda [Long, Lat]. Leaflet necesita [Lat, Long].
+                // Mapeamos e invertimos el orden automáticamente.
+                procesadas[key] = lineaFeature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            } else {
+                procesadas[key] = [];
+            }
+        }
+    }
+    
+    return procesadas;
+})();
