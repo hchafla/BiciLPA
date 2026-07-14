@@ -68,6 +68,31 @@ const datosRutasTrazados = {
             ]
         }
     }, // <-- ESTA COMA ES OBLIGATORIA para separar una ruta de otra
+    {
+                    "type": "Feature",
+                    "properties": {
+                        "tipo": "advertencia",
+                        "descripcion": "Cuidado con entrada y salida de coches + peatones cruzando el carril"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-15.4295016, 28.1330401]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "tipo": "advertencia",
+                        "descripcion": "Fin del carril bici"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-15.4161417, 28.1099303]
+                    }
+                }
+            ]
+        }
+    },
 
     // ==========================================
     // RUTA 2: Castillo de Mata - Canódromo
