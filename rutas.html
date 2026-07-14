@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutas Seguras - Movilidad LPGC</title>
+    <title>Rutas Seguras - BiciLPA</title>
     
     <!-- Hojas de estilo de Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -105,23 +105,30 @@
             max-height: calc(100% - 30px);
             background: rgba(255, 255, 255, 0.96); 
             padding: 20px; 
-            overflow-y: auto; 
+            overflow: hidden; /* Cambiado a hidden para que el scroll solo ocurra dentro del contenedor de tarjetas */
             box-shadow: -2px 0 15px rgba(0,0,0,0.15); 
             border-radius: 12px;
             z-index: 500;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94), opacity 0.3s ease, max-height 0.3s ease;
             transform: translateX(120%);
             opacity: 0;
             backdrop-filter: blur(8px);
             border: 1px solid rgba(226, 232, 240, 0.8);
+            display: flex;
+            flex-direction: column;
         }
         .rutas-sidebar.visible {
             transform: translateX(0);
             opacity: 1;
         }
 
-        /* Botón para cerrar y limpiar ruta activa */
-        .btn-cerrar-sidebar {
+        /* Estado Minimizado en Escritorio */
+        .rutas-sidebar.minimized {
+            transform: translateY(calc(100% - 75px)) !important; /* Baja la tarjeta dejando solo la cabecera visible */
+        }
+
+        /* Botón para Minimizar / Expandir */
+        .btn-toggle-sidebar {
             position: absolute;
             top: 15px;
             right: 15px;
@@ -130,8 +137,7 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            font-size: 1.2rem;
-            line-height: 28px;
+            font-size: 0.8rem;
             color: #64748b;
             cursor: pointer;
             z-index: 10;
@@ -140,9 +146,16 @@
             justify-content: center;
             transition: all 0.2s ease;
         }
-        .btn-cerrar-sidebar:hover {
+        .btn-toggle-sidebar:hover {
             background: #e2e8f0;
             color: #334155;
+        }
+
+        /* Contenedor de Tarjetas interno con scroll */
+        #contenedor-tarjetas {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
         }
 
         /* Tarjetas de ruta */
@@ -153,7 +166,7 @@
         .ruta-card[data-eje-grupo="baja-alta"] { border-color: #FF851B; }
         .ruta-card[data-eje-grupo="alta-baja"] { border-color: #B10DC9; }
         
-        .ruta-title { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
+        .ruta-title { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; padding-right: 15px; }
         .ruta-subtitle { font-size: 0.95rem; color: #34495e; margin-bottom: 8px; }
         .ruta-meta { 
             display: flex; 
@@ -205,16 +218,12 @@
                 box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
                 z-index: 2000;
                 transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
-                padding: 10px 20px 80px 20px; 
-                display: flex;
-                flex-direction: column;
+                padding: 10px 20px 30px 20px; 
             }
             #contenedor-tarjetas {
-                overflow-y: auto;
-                flex-grow: 1;
                 -webkit-overflow-scrolling: touch;
             }
+            /* Tirador táctil visual */
             .rutas-sidebar::before {
                 content: "";
                 display: block;
@@ -224,16 +233,22 @@
                 border-radius: 3px;
                 margin: 0 auto 15px auto;
                 flex-shrink: 0;
+                cursor: pointer;
             }
-            .btn-cerrar-sidebar {
+            .btn-toggle-sidebar {
                 top: 20px;
                 right: 20px;
             }
+            
+            /* Los 3 estados del panel en móvil */
             .rutas-sidebar.visible {
-                transform: translateY(60%); 
+                transform: translateY(55%); /* Estado Medio (Colapsado): Muestra título y botones principales */
             }
             .rutas-sidebar.expanded {
-                transform: translateY(0%);
+                transform: translateY(0%); /* Estado Completo (Abierto): Ocupa toda la pantalla asignada */
+            }
+            .rutas-sidebar.minimized {
+                transform: translateY(calc(100% - 75px)) !important; /* Estado Mínimo (Escondido): Solo asoma el título */
             }
         }
     </style>
@@ -267,7 +282,8 @@
     <div class="rutas-container">
         <!-- Panel Derecho Flotante -->
         <div class="rutas-sidebar" id="rutas-sidebar">
-            <button class="btn-cerrar-sidebar" onclick="cerrarDetallesRuta()">&times;</button>
+            <!-- Botón para Minimizar / Restaurar la vista rápida -->
+            <button class="btn-toggle-sidebar" id="btn-toggle-sidebar" onclick="toggleMinimizar()">▼</button>
             
             <div id="contenedor-tarjetas">
                 
@@ -383,8 +399,15 @@
                 btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
             });
 
+            // Limpiar mapa y esconder la sidebar por completo antes de seleccionar ruta
             rutaActivaLayer.clearLayers();
-            document.getElementById('rutas-sidebar').classList.remove('visible', 'expanded');
+            const sidebar = document.getElementById('rutas-sidebar');
+            sidebar.classList.remove('visible', 'expanded', 'minimized');
+            if (esDispositivoMovil()) {
+                sidebar.style.transform = 'translateY(100%)';
+            } else {
+                sidebar.style.transform = 'translateX(120%)';
+            }
 
             const carrusel = document.getElementById('rutas-carrusel');
             carrusel.innerHTML = ''; 
@@ -428,10 +451,14 @@
             });
 
             const sidebar = document.getElementById('rutas-sidebar');
+            sidebar.classList.remove('minimized', 'expanded');
             sidebar.classList.add('visible');
+            
+            // Actualizar icono del botón de minimizado
+            document.getElementById('btn-toggle-sidebar').innerText = '▼';
+
             if (esDispositivoMovil()) {
-                sidebar.classList.remove('expanded');
-                sidebar.style.transform = 'translateY(60%)'; 
+                sidebar.style.transform = 'translateY(55%)'; // Altura colapsada inicial
             } else {
                 sidebar.style.transform = ''; 
             }
@@ -472,24 +499,35 @@
         }
 
         // ==========================================
-        // NUEVA FUNCIÓN: CERRAR Y LIMPIAR RUTA
+        // CONTROL DE MINIMIZADO (CONSERVA RUTA EN MAPA)
         // ==========================================
-        function cerrarDetallesRuta() {
+        function toggleMinimizar() {
             const sidebar = document.getElementById('rutas-sidebar');
-            sidebar.classList.remove('visible', 'expanded');
-            if (esDispositivoMovil()) {
-                sidebar.style.transform = 'translateY(100%)'; 
+            const btn = document.getElementById('btn-toggle-sidebar');
+
+            if (sidebar.classList.contains('minimized')) {
+                // Restaurar a su estado original visible
+                sidebar.classList.remove('minimized');
+                btn.innerText = '▼';
+                if (esDispositivoMovil()) {
+                    sidebar.classList.remove('expanded');
+                    sidebar.style.transform = 'translateY(55%)';
+                } else {
+                    sidebar.style.transform = '';
+                }
+            } else {
+                // Minimizar por completo (esconder tarjeta pero conservar trazado en mapa)
+                sidebar.classList.add('minimized');
+                sidebar.classList.remove('expanded');
+                btn.innerText = '▲';
+                if (esDispositivoMovil()) {
+                    sidebar.style.transform = 'translateY(calc(100% - 75px))'; // Solo asoma el título
+                }
             }
-
-            document.querySelectorAll('.carrusel-item').forEach(item => {
-                item.classList.remove('active');
-            });
-
-            rutaActivaLayer.clearLayers();
         }
 
         // ==========================================
-        // GESTIÓN TÁCTIL MÓVIL (BOTTOM SHEET)
+        // GESTIÓN TÁCTIL MÓVIL (BOTTOM SHEET MULTI-ESTADO)
         // ==========================================
         const sidebar = document.getElementById('rutas-sidebar');
         let startY = 0, currentY = 0, isDragging = false;
@@ -500,6 +538,7 @@
             if (!esDispositivoMovil()) return;
             const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
             
+            // Solo arrastramos si el scroll interno del usuario está arriba del todo
             if (contenedorTarjetas.scrollTop > 0) return;
 
             startY = e.touches[0].clientY;
@@ -512,12 +551,17 @@
             currentY = e.touches[0].clientY;
             const deltaY = currentY - startY;
 
+            // Bloquear arrastre excesivo hacia arriba si ya está expandido
             if (deltaY < 0 && sidebar.classList.contains('expanded')) return;
 
             if (sidebar.classList.contains('expanded')) {
                 sidebar.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
+            } else if (sidebar.classList.contains('minimized')) {
+                // Arrastrar desde minimizado hacia arriba
+                sidebar.style.transform = `translateY(calc(100% - 75px + ${deltaY}px))`;
             } else {
-                sidebar.style.transform = `translateY(calc(60% + ${deltaY}px))`;
+                // Arrastrar desde el punto medio (collapsed)
+                sidebar.style.transform = `translateY(calc(55% + ${deltaY}px))`;
             }
         });
 
@@ -527,28 +571,45 @@
             sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94)';
             
             const deltaY = currentY - startY;
+            const btn = document.getElementById('btn-toggle-sidebar');
 
+            // Umbral mínimo de píxeles para cambiar de estado (80px)
             if (Math.abs(deltaY) > 80) {
                 if (deltaY < 0) {
-                    sidebar.classList.add('expanded');
-                    sidebar.style.transform = 'translateY(0%)';
-                } else {
-                    if (sidebar.classList.contains('expanded')) {
-                        sidebar.classList.remove('expanded');
-                        sidebar.style.transform = 'translateY(60%)';
+                    // DESLIZAR HACIA ARRIBA
+                    if (sidebar.classList.contains('minimized')) {
+                        // De minimizado pasa a colapsado (punto medio)
+                        sidebar.classList.remove('minimized');
+                        sidebar.style.transform = 'translateY(55%)';
+                        btn.innerText = '▼';
                     } else {
-                        cerrarDetallesRuta();
+                        // De colapsado pasa a expandido (pantalla completa)
+                        sidebar.classList.add('expanded');
+                        sidebar.style.transform = 'translateY(0%)';
+                        btn.innerText = '▼';
+                    }
+                } else {
+                    // DESLIZAR HACIA ABAJO
+                    if (sidebar.classList.contains('expanded')) {
+                        // De expandido pasa a colapsado (punto medio)
+                        sidebar.classList.remove('expanded');
+                        sidebar.style.transform = 'translateY(55%)';
+                        btn.innerText = '▼';
+                    } else {
+                        // De colapsado pasa a minimizado (solo título visible, mantiene ruta en mapa)
+                        sidebar.classList.add('minimized');
+                        sidebar.style.transform = 'translateY(calc(100% - 75px))';
+                        btn.innerText = '▲';
                     }
                 }
             } else {
+                // Si el movimiento es muy pequeño, restauramos el estado visual real correspondiente
                 if (sidebar.classList.contains('expanded')) {
                     sidebar.style.transform = 'translateY(0%)';
+                } else if (sidebar.classList.contains('minimized')) {
+                    sidebar.style.transform = 'translateY(calc(100% - 75px))';
                 } else {
-                    if (sidebar.classList.contains('visible')) {
-                        sidebar.style.transform = 'translateY(60%)';
-                    } else {
-                        sidebar.style.transform = 'translateY(100%)';
-                    }
+                    sidebar.style.transform = 'translateY(55%)';
                 }
             }
         });
