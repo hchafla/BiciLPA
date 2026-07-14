@@ -185,7 +185,7 @@
         <div id="contenedor-tarjetas"></div>
     </aside>
 
-    <!-- 1. Importación de Datos (Rutas de información y Trazados GeoJSON) -->
+    <!-- 1. Importación de Datos (Asegúrate de que estos nombres de archivo y rutas coinciden exactamente) -->
     <script src="rutas-info.js"></script>
     <script src="rutas-trazados.js"></script>
 
@@ -206,11 +206,10 @@
         let startY = 0;
         let currentY = 0;
         let isDragging = false;
-        let capaRutaActiva = null; // Guardará la capa GeoJSON actualmente dibujada
+        let capaRutaActiva = null; 
 
         const esDispositivoMovil = () => window.innerWidth < 768;
 
-        // --- NOMBRES LEGIBLES PARA LOS EJES ---
         const nombresEjes = {
             central: "Eje Central",
             bajaAlta: "Conexión Baja - Alta",
@@ -219,24 +218,28 @@
 
         // --- RENDERIZADO DINÁMICO ESTRUCTURADO ---
         function renderizarRutas() {
-            // Verificación preventiva de datos
-            if (typeof rutas === 'undefined' || typeof datosRutasTrazados === 'undefined') {
-                console.error("Error: No se han cargado 'rutas-info.js' o 'rutas-trazados.js' correctamente.");
-                contenedorTarjetas.innerHTML = '<p style="color:red; padding:10px;">Error al inicializar datos.</p>';
+            // Buscamos tanto en el ámbito global directo como en el objeto 'window'
+            const datosRutas = window.rutas || (typeof rutas !== 'undefined' ? rutas : null);
+            const trazados = window.datosRutasTrazados || (typeof datosRutasTrazados !== 'undefined' ? datosRutasTrazados : null);
+
+            if (!datosRutas || !trazados) {
+                console.error("Error: No se han encontrado 'rutas' o 'datosRutasTrazados'.");
+                contenedorTarjetas.innerHTML = `
+                    <div style="color:#ef4444; padding:15px; font-size:0.9rem; background:#fef2f2; border-radius:8px; border: 1px solid #fee2e2;">
+                        <strong>Error al inicializar datos</strong><br>
+                        No se han podido cargar los archivos <code style="background:#f3f4f6; padding:2px 4px; border-radius:4px;">rutas-info.js</code> o <code style="background:#f3f4f6; padding:2px 4px; border-radius:4px;">rutas-trazados.js</code>.
+                    </div>`;
                 return;
             }
 
             let htmlAcumulado = '';
 
-            // Recorremos el objeto agrupado por Eje
-            for (const keyEje in rutas) {
+            for (const keyEje in datosRutas) {
                 const nombreMostrarEje = nombresEjes[keyEje] || keyEje;
-                const subRutas = rutas[keyEje];
+                const subRutas = datosRutas[keyEje];
 
-                // Añadimos el separador visual del eje
                 htmlAcumulado += `<div class="eje-seccion-titulo">${nombreMostrarEje}</div>`;
 
-                // Recorremos las rutas individuales dentro de este eje
                 for (const idRuta in subRutas) {
                     const datosRuta = subRutas[idRuta];
                     htmlAcumulado += `
@@ -251,44 +254,38 @@
             contenedorTarjetas.innerHTML = htmlAcumulado;
         }
 
-        // --- SELECCIÓN Y SINCRONIZACIÓN DE RUTA Y MAPA ---
         function seleccionarRuta(idRuta) {
-            console.log(`Seleccionando ruta por ID único: ${idRuta}`);
+            const datosRutas = window.rutas || (typeof rutas !== 'undefined' ? rutas : null);
+            const trazados = window.datosRutasTrazados || (typeof datosRutasTrazados !== 'undefined' ? datosRutasTrazados : null);
+            
+            if (!datosRutas || !trazados) return;
 
-            // 1. Quitar resaltado de cualquier otra tarjeta y aplicarlo a la actual
             document.querySelectorAll('.tarjeta-ruta').forEach(tarjeta => {
                 tarjeta.classList.remove('activa');
             });
             const tarjetaSeleccionada = document.getElementById(`tarjeta-${idRuta}`);
             if (tarjetaSeleccionada) tarjetaSeleccionada.classList.add('activa');
 
-            // 2. Limpiar trazado anterior en el mapa si existiera
             if (capaRutaActiva) {
                 map.removeLayer(capaRutaActiva);
             }
 
-            // 3. Buscar el trazado GeoJSON correspondiente en rutas-trazados.js
-            const trazadoGeoJSON = datosRutasTrazados[idRuta];
+            const trazadoGeoJSON = trazados[idRuta];
 
             if (trazadoGeoJSON) {
-                // Pintar el nuevo trazado en el mapa
                 capaRutaActiva = L.geoJSON(trazadoGeoJSON, {
                     style: {
-                        color: '#10b981', // Verde esmeralda para la ruta activa
+                        color: '#10b981', 
                         weight: 6,
                         opacity: 0.85
                     }
                 }).addTo(map);
 
-                // Autoajustar el zoom del mapa para encuadrar perfectamente la ruta seleccionada
                 map.fitBounds(capaRutaActiva.getBounds(), {
                     padding: [50, 50]
                 });
-            } else {
-                console.warn(`No se encontró trazado geométrico para el ID: ${idRuta}`);
             }
 
-            // Si está en móvil, colapsamos ligeramente el panel para dejar ver el mapa y la ruta pintada
             if (esDispositivoMovil()) {
                 sidebar.classList.remove('expanded');
                 sidebar.style.transform = 'translateY(55%)';
@@ -296,8 +293,11 @@
             }
         }
 
-        // Ejecutar el renderizado estructurado al iniciar la aplicación
-        renderizarRutas();
+        // --- INICIALIZACIÓN SEGURA ---
+        // Esperamos a que la ventana y todos los scripts externos estén listos
+        window.addEventListener('load', () => {
+            renderizarRutas();
+        });
 
 
         // --- CONTROL DE UI Y GESTOS TÁCTILES ---
