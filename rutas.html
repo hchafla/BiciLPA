@@ -274,86 +274,8 @@
             <!-- Tirador visual táctil para arrastrar en móviles -->
             <div class="drag-handle" id="drag-handle"></div>
             
-            <div id="contenedor-tarjetas">
-                
-                <!-- Ruta 1 (Eje Central) -->
-                <div class="ruta-card" data-eje-grupo="central" data-id="santa-catalina-san-telmo">
-                    <div class="ruta-title" onclick="toggleMinimizar()">Eje Central · Avenida Marítima</div>
-                    <div class="ruta-subtitle">Parque Santa Catalina ⬌ Parque San Telmo</div>
-                    <div class="ruta-meta">
-                        <span class="tag-dificultad facil">Fácil</span>
-                        <span>📏 4,8 km</span>
-                        <span>⏱️ 18-25 min</span>
-                        <span>⬆️ Llana</span>
-                    </div>
-                    <div class="ruta-meta">
-                        <span>🚲 Ideal para principiantes</span>
-                        <span>🛣️ Carril bici segregado</span>
-                    </div>
-                    <p class="descripcion-ruta">
-                        La principal columna vertebral del ciclismo urbano en Las Palmas de Gran Canaria. Conecta Santa Catalina con Triana, y viceversa de forma rápida, cómoda y completamente por carril bici, enlazando con estaciones de Sítycleta.
-                    </p>
-                    <div class="indicaciones">
-                        <strong>💡 Biciconsejos</strong><br><br>
-                        🚲 <strong>Perfecta para estrenarse en la ciudad.</strong><br>
-                        ⚠️ <strong>Precaución en Alcaravaneras:</strong> peatones cruzando el carril bici.<br>
-                        ❗ <strong>Fin del carril bici:</strong> a la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta.<br>
-                        🌬️ <strong>Viento:</strong> de cara en dirección norte.
-                    </div>
-                </div>
-
-                <!-- Ruta 2 (Ciudad Baja -> Ciudad Alta) -->
-                <div class="ruta-card" data-eje-grupo="baja-alta" data-id="castillo-mata-canodromo">
-                    <div class="ruta-title" onclick="toggleMinimizar()">Eje Ciudad Baja · Ciudad Alta</div>
-                    <div class="ruta-subtitle">Castillo de Mata ⮕ Parque del Canódromo</div>
-                    <div class="ruta-meta">
-                        <span class="tag-dificultad moderado">Moderado</span>
-                        <span>📏 3,9 km</span>
-                        <span>⏱️ 12-13 min ⚡ · 20 min 🚲 </span>
-                        <span>⬆️ +115 m</span>
-                    </div>
-                    <div class="ruta-meta">
-                        <span>⚡ Ideal para eSítycleta</span>
-                        <span>⛰️ Pendiente moderada</span>
-                        <span>🛣️ Ciclovía 30 (calzada compartida)</span>
-                    </div>
-                    <p class="descripcion-ruta">
-                        La forma más cómoda de conectar la ciudad baja con la ciudad alta siguiendo el itinerario ciclista existente. Une dos estaciones de eSítycleta mediante un recorrido continuo que evita las rampas más exigentes.
-                    </p>
-                    <div class="indicaciones">
-                        <strong>💡 Biciconsejos</strong><br><br>
-                        ⚡ <strong>Muy recomendable con bici eléctrica.</strong><br>
-                        🚲 <strong>Con bici convencional:</strong> requiere una condición física mínima, especialmente en la subida por el Paseo de San Antonio.<br>
-                        🚦 <strong>Vía compartida:</strong> aunque el límite es de 30 km/h, mantén una posición visible en el carril.
-                    </div>
-                </div>
-            
-                <!-- Ruta 3 (Ciudad Alta -> Ciudad Baja) -->
-                <div class="ruta-card" data-eje-grupo="alta-baja" data-id="canodromo-castillo-mata">
-                    <div class="ruta-title" onclick="toggleMinimizar()">Eje Ciudad Alta · Ciudad Baja</div>
-                    <div class="ruta-subtitle">Parque del Canódromo ⮕ Castillo de Mata</div>
-                    <div class="ruta-meta">
-                        <span class="tag-dificultad facil">Fácil</span>
-                        <span>📏 3,9 km</span>
-                        <span>⏱️ 10-12 min</span>
-                        <span>⬇️ Descenso</span>
-                    </div>
-                    <div class="ruta-meta">
-                        <span>🚲 Descenso cómodo</span>
-                        <span>🛣️ Ciclovía 30 + Calzada + Carril bici</span>
-                    </div>
-                    <p class="descripcion-ruta">
-                        Recorrido hacia ciudad baja. Gracias al descenso prácticamente continuo, permite llegar a Castillo de Mata de forma rápida y cómoda, siendo una opción ideal para bicicletas convencionales.
-                    </p>
-                    <div class="indicaciones">
-                        <strong>💡 Biciconsejos</strong><br><br>
-                        💡 <strong>Atajo recomendado:</strong> el recorrido abandona momentáneamente el itinerario para bajar por la calle Pepe García Fajardo.<br>
-                        ⚠️ <strong>Control de velocidad:</strong> aunque la inercia te invite a acelerar, modera la velocidad.<br>
-                        🚦 <strong>Atención en las intersecciones:</strong> los coches pueden no prever tu velocidad en descenso.
-                    </div>
-                </div>
-
-            </div>
+            <!-- Contenedor de Tarjetas (Se poblará dinámicamente) -->
+            <div id="contenedor-tarjetas"></div>
         </div>
 
         <!-- El visor de la ruta -->
@@ -362,6 +284,7 @@
 
     <!-- Scripts de Leaflet y Datos de Trazados -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="datos/rutas-info.js"></script>
     <script src="datos/rutas-trazados.js"></script>
     <script>
         // Inicializar mapa de rutas centrado en la ciudad
@@ -381,6 +304,55 @@
             'baja-alta': '#FF851B', 
             'alta-baja': '#B10DC9'  
         };
+
+        // =========================================================
+        // CARGA DINÁMICA DE TARJETAS DESDE rutas-info.js
+        // =========================================================
+        function cargarTarjetasDinamicas() {
+            const contenedor = document.getElementById('contenedor-tarjetas');
+            contenedor.innerHTML = ''; // Limpiar contenedor estático
+
+            // Recorremos las rutas definidas en el objeto global de rutas-info.js
+            Object.keys(datosRutasInfo).forEach(idRuta => {
+                const info = datosRutasInfo[idRuta];
+                
+                const card = document.createElement('div');
+                card.className = 'ruta-card';
+                card.setAttribute('data-eje-grupo', info.ejeGrupo);
+                card.setAttribute('data-id', idRuta);
+
+                // Determinar clase de dificultad
+                const dificultadClase = info.dificultad.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Normaliza "fácil" a "facil"
+
+                // Construcción exacta del bloque HTML original
+                card.innerHTML = `
+                    <div class="ruta-title" onclick="toggleMinimizar()">${info.titulo}</div>
+                    <div class="ruta-subtitle">${info.subtitulo}</div>
+                    <div class="ruta-meta">
+                        <span class="tag-dificultad ${dificultadClase}">${info.dificultad}</span>
+                        <span>📏 ${info.distancia}</span>
+                        <span>⏱️ ${info.tiempo}</span>
+                        <span>${info.desnivel}</span>
+                    </div>
+                    <div class="ruta-meta">
+                        <span>${info.tagIdeal}</span>
+                        <span>${info.tagTipoVia}</span>
+                    </div>
+                    <p class="descripcion-ruta">
+                        ${info.descripcion}
+                    </p>
+                    <div class="indicaciones">
+                        <strong>💡 Biciconsejos</strong><br><br>
+                        ${info.consejos}
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
+        }
+
+        // Ejecutar la carga antes de interactuar
+        cargarTarjetasDinamicas();
 
         // 1. FILTRADO DE EJES Y GENERACIÓN DE SUB-BOTONES
         function filtrarEje(ejeId) {
