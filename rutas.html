@@ -211,6 +211,42 @@
                 transform: translateY(0%);
             }
         }
+        /* Botón de cerrar para la sidebar */
+        .btn-cerrar-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f1f5f9;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            line-height: 28px;
+            color: #64748b;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .btn-cerrar-sidebar:hover {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        /* Ajustes de espaciado interno para las tarjetas debido al botón de cierre */
+        .ruta-card {
+            padding-right: 30px; /* Evita que el texto de la tarjeta solape con el botón de cierre */
+        }
+
+        @media (max-width: 768px) {
+            .btn-cerrar-sidebar {
+                top: 20px; /* Ajuste para que cuadre bien con el tirador táctil del móvil */
+                right: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -242,6 +278,13 @@
     <div class="rutas-container">
         <!-- Panel Derecho Flotante (Contenedor de tarjeta activa) -->
         <div class="rutas-sidebar" id="rutas-sidebar">
+            <!-- Panel Derecho Flotante (Contenedor de tarjeta activa) -->
+<div class="rutas-sidebar" id="rutas-sidebar">
+    <!-- NUEVO: Botón para cerrar y limpiar ruta activa -->
+    <button class="btn-cerrar-sidebar" onclick="cerrarDetallesRuta()">&times;</button>
+    
+    <div id="contenedor-tarjetas">
+        <!-- ... aquí van tus rutas ... -->
             <div id="contenedor-tarjetas">
                 
                 <!-- Ruta 1 (Eje Central) -->
@@ -456,6 +499,26 @@
         }
 
         // ==========================================
+        // NUEVA FUNCIÓN: CERRAR Y LIMPIAR RUTA
+        // ==========================================
+        function cerrarDetallesRuta() {
+            // 1. Ocultar el panel de detalles por completo
+            const sidebar = document.getElementById('rutas-sidebar');
+            sidebar.classList.remove('visible', 'expanded');
+            if (esDispositivoMovil()) {
+                sidebar.style.transform = 'translateY(100%)'; // Ocultar abajo del todo
+            }
+
+            // 2. Deseleccionar la ruta activa en el carrusel horizontal
+            document.querySelectorAll('.carrusel-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // 3. Limpiar los trazados del mapa
+            rutaActivaLayer.clearLayers();
+        }
+
+        // ==========================================
         // GESTIÓN TÁCTIL MÓVIL (BOTTOM SHEET)
         // ==========================================
         const sidebar = document.getElementById('rutas-sidebar');
@@ -466,11 +529,13 @@
         sidebar.addEventListener('touchstart', (e) => {
             if (!esDispositivoMovil()) return;
             const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
+            
+            // Solo iniciamos el arrastre si el usuario está arriba del todo del scroll interno
             if (contenedorTarjetas.scrollTop > 0) return;
 
             startY = e.touches[0].clientY;
             isDragging = true;
-            sidebar.style.transition = 'none';
+            sidebar.style.transition = 'none'; // Desactivar transiciones CSS para el arrastre en tiempo real
         });
 
         sidebar.addEventListener('touchmove', (e) => {
@@ -478,13 +543,10 @@
             currentY = e.touches[0].clientY;
             const deltaY = currentY - startY;
 
+            // Bloquear arrastre hacia arriba si el panel ya está totalmente expandido
             if (deltaY < 0 && sidebar.classList.contains('expanded')) return;
 
-            if (deltaY > 0 && !sidebar.classList.contains('expanded')) {
-                sidebar.style.transform = `translateY(calc(60% + ${deltaY * 0.2}px))`;
-                return;
-            }
-
+            // Arrastre proporcional dinámico
             if (sidebar.classList.contains('expanded')) {
                 sidebar.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
             } else {
@@ -496,18 +558,38 @@
             if (!isDragging) return;
             isDragging = false;
             sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94)';
+            
             const deltaY = currentY - startY;
 
-            if (Math.abs(deltaY) > 50) {
+            // Umbral de 80px de movimiento rápido/deslizamiento para cambiar de estado
+            if (Math.abs(deltaY) > 80) {
                 if (deltaY < 0) {
+                    // Deslizar hacia arriba -> Expandir a pantalla completa
                     sidebar.classList.add('expanded');
                     sidebar.style.transform = 'translateY(0%)';
                 } else {
-                    sidebar.classList.remove('expanded');
-                    sidebar.style.transform = 'translateY(60%)';
+                    // Deslizar hacia abajo
+                    if (sidebar.classList.contains('expanded')) {
+                        // Si estaba expandido, baja a la mitad (modo colapsado)
+                        sidebar.classList.remove('expanded');
+                        sidebar.style.transform = 'translateY(60%)';
+                    } else {
+                        // Si ya estaba colapsado, se oculta por completo abajo del todo
+                        cerrarDetallesRuta();
+                    }
                 }
             } else {
-                sidebar.style.transform = sidebar.classList.contains('expanded') ? 'translateY(0%)' : 'translateY(60%)';
+                // Si el movimiento no supera el umbral, se restaura al estado en el que estaba
+                if (sidebar.classList.contains('expanded')) {
+                    sidebar.style.transform = 'translateY(0%)';
+                } else {
+                    // Si el panel es visible pero no expandido, mantenerlo colapsado a la mitad
+                    if (sidebar.classList.contains('visible')) {
+                        sidebar.style.transform = 'translateY(60%)';
+                    } else {
+                        sidebar.style.transform = 'translateY(100%)';
+                    }
+                }
             }
         });
     </script>
