@@ -107,3 +107,9 @@ const datosRutasInfo = {
         ]
     }
 };
+
+// =========================================================================
+// EXPOSICIÓN DE LA VARIABLE GLOBAL REQUERIDA POR EL HTML
+// =========================================================================
+// Mapea directamente el objeto al nombre exacto que espera el script del mapa.
+const rutasInfo = datosRutasInfo;
