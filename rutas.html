@@ -2,559 +2,392 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rutas Recomendadas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPGC en Bici - Rutas Recomendadas</title>
     
-    <!-- Hojas de estilo de Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        html, body { 
+        /* Estilos Generales y Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            background-color: #f4f4f4;
+        }
+
+        /* Contenedor del Mapa */
+        #map {
             width: 100%;
             height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
-            background: #f8f9fa; 
-            color: #333; 
-            overflow: hidden; /* Evita cualquier scroll global en la página */
-        }
-        
-        /* Navegación superior común */
-        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; position: relative; z-index: 1000; }
-        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
-        nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
-        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
-
-        /* Contenedor de Menús (Fijo arriba) */
-        .header-menus {
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            position: relative;
-            z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        /* 1. Submenú de Ejes */
-        .ejes-submenu {
-            padding: 10px 20px 5px 20px;
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            scrollbar-width: none; /* Ocultar scrollbar en Firefox */
-        }
-        .ejes-submenu::-webkit-scrollbar { display: none; } /* Ocultar en Chrome/Safari */
-
-        .eje-btn {
-            background: #f1f5f9;
-            border: 2px solid #e2e8f0;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #475569;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .eje-btn[data-eje="central"]:hover, .eje-btn[data-eje="central"].active { background: #0074D9; color: white; border-color: #0074D9; }
-        .eje-btn[data-eje="norte"]:hover, .eje-btn[data-eje="norte"].active { background: #2ECC40; color: white; border-color: #2ECC40; }
-        .eje-btn[data-eje="baja-alta"]:hover, .eje-btn[data-eje="baja-alta"].active { background: #FF851B; color: white; border-color: #FF851B; }
-        .eje-btn[data-eje="alta-baja"]:hover, .eje-btn[data-eje="alta-baja"].active { background: #B10DC9; color: white; border-color: #B10DC9; }
-
-        /* 2. Carrusel de Rutas */
-        .rutas-carrusel {
-            padding: 5px 20px 10px 20px;
-            display: none; 
-            gap: 8px;
-            overflow-x: auto;
-            border-top: 1px dashed #e2e8f0;
-            background: #f8fafc;
-            scrollbar-width: none;
-        }
-        .rutas-carrusel::-webkit-scrollbar { display: none; }
-
-        .carrusel-item {
-            background: white;
-            border: 1px solid #cbd5e1;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #334155;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .carrusel-item:hover { border-color: #94a3b8; background: #f1f5f9; }
-        
-        .carrusel-item.active[data-eje-grupo="central"] { background: #0074D9; color: white; border-color: #0074D9; }
-        .carrusel-item.active[data-eje-grupo="norte"] { background: #2ECC40; color: white; border-color: #2ECC40; }
-        .carrusel-item.active[data-eje-grupo="baja-alta"] { background: #FF851B; color: white; border-color: #FF851B; }
-        .carrusel-item.active[data-eje-grupo="alta-baja"] { background: #B10DC9; color: white; border-color: #B10DC9; }
-
-        /* Contenedor Principal de Rutas */
-        .rutas-container { 
-            display: flex; 
-            position: relative;
-            height: calc(100vh - 155px); 
-            width: 100vw; 
-            overflow: hidden;
-        }
-
-        /* Visor de mapa */
-        #map-rutas { width: 100%; height: 100%; z-index: 10; }
-        
-        /* Panel Derecho Flotante (Escritorio) */
-        .rutas-sidebar { 
             position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 380px; 
-            max-height: calc(100% - 30px);
-            background: rgba(255, 255, 255, 0.96); 
-            padding: 20px; 
-            overflow: hidden;
-            box-shadow: -2px 0 15px rgba(0,0,0,0.15); 
-            border-radius: 12px;
-            z-index: 500;
-            transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94), opacity 0.3s ease;
-            transform: translateX(120%);
-            opacity: 0;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Estructura Base del Panel (Móvil First / Bottom Sheet) */
+        #rutas-sidebar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
-        }
-        
-        /* Tirador táctil visual (Solo visible/útil en móvil, oculto por defecto en escritorio) */
-        .drag-handle {
-            display: none;
+            transform: translateY(55%); /* Posición colapsada por defecto */
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            will-change: transform;
         }
 
-        .rutas-sidebar.visible {
-            transform: translateX(0);
-            opacity: 1;
+        /* Tirador para arrastre táctil (Móvil) */
+        #drag-handle {
+            width: 50px;
+            height: 6px;
+            background: #ccc;
+            margin: 12px auto 6px auto;
+            border-radius: 3px;
+            cursor: grab;
+            flex-shrink: 0;
         }
 
-        /* Estado Minimizado en Escritorio (Muestra solo la cabecera/título arriba) */
-        .rutas-sidebar.minimized {
-            transform: translateY(calc(100% - 75px)) !important; 
+        #drag-handle:active {
+            cursor: grabbing;
         }
 
-        /* Contenedor de Tarjetas interno con scroll */
-        #contenedor-tarjetas {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding-right: 5px;
-        }
-
-        /* Tarjetas de ruta */
-        .ruta-card { display: none; background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; cursor: default; }
-        
-        .ruta-card[data-eje-grupo="central"] { border-color: #0074D9; }
-        .ruta-card[data-eje-grupo="norte"] { border-color: #2ECC40; }
-        .ruta-card[data-eje-grupo="baja-alta"] { border-color: #FF851B; }
-        .ruta-card[data-eje-grupo="alta-baja"] { border-color: #B10DC9; }
-        
-        .ruta-title { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; cursor: pointer; }
-        .ruta-subtitle { font-size: 0.95rem; color: #34495e; margin-bottom: 8px; }
-        .ruta-meta { 
-            display: flex; 
-            gap: 10px; 
-            font-size: 0.8rem; 
-            color: #7f8c8d; 
-            margin-bottom: 10px; 
-            align-items: center; 
-            flex-wrap: wrap;    
-        }
-        .tag-dificultad { 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            text-transform: uppercase;
-            flex-shrink: 0;      
-            width: 90px;         
+        /* Cabecera del Panel */
+        .ruta-title {
+            padding: 10px 20px 15px 20px;
             text-align: center;
+            cursor: pointer;
+            user-select: none;
+            flex-shrink: 0;
         }
-        .facil { background: #e8f8f0; color: #2ecc71; }
-        .moderado { background: #fff9db; color: #f59f00; }
-        .dificil { background: #fde8e8; color: #e74c3c; }
-        .descripcion-ruta { font-size: 0.85rem; color: #555; line-height: 1.4; margin-bottom: 10px; }
-        .indicaciones { font-size: 0.85rem; color: #555; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; line-height: 1.4; }
 
-        /* ==========================================
-           ADAPTACIÓN MÓVIL ESTRICTA (EVITA BALANCEO)
-           ========================================== */
-        @media (max-width: 768px) {
-            .rutas-container {
-                height: calc(100vh - 150px);
-                width: 100%;
-            }
-            
-            /* Posicionamiento y dimensiones estrictas de la tarjeta móvil */
-            .rutas-sidebar {
-                position: fixed;
-                top: auto;
-                bottom: 0;
-                right: 0;
-                left: 0;
-                width: 100%; /* Ocupa el ancho exacto del dispositivo */
-                height: 75vh; 
-                max-height: 75vh;
-                border-radius: 20px 20px 0 0;
-                box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
-                z-index: 2000;
-                transform: translateY(100%);
-                padding: 10px 20px 30px 20px; 
-                backdrop-filter: blur(10px);
-                border-left: none;
-                border-right: none;
-                border-bottom: none;
+        .ruta-title h3 {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 700;
+        }
+
+        /* Contenedor de Tarjetas */
+        #contenedor-tarjetas {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 20px 20px 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Títulos de los Ejes (Categorías) */
+        .eje-seccion-titulo {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #777;
+            margin: 15px 0 8px 0;
+            font-weight: 700;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 4px;
+        }
+
+        /* Tarjeta de Ruta */
+        .tarjeta-ruta {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .tarjeta-ruta:hover {
+            border-color: #aaa;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .tarjeta-ruta:active {
+            transform: scale(0.98);
+        }
+
+        .tarjeta-ruta.activa {
+            border-color: #10b981; /* Resaltado verde si está seleccionada en el mapa */
+            background-color: #f0fdf4;
+        }
+
+        .tarjeta-ruta h4 {
+            font-size: 1rem;
+            color: #222;
+            margin-bottom: 5px;
+        }
+
+        .tarjeta-ruta p {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Adaptación a Pantallas de Escritorio */
+        @media (min-width: 768px) {
+            #rutas-sidebar {
+                top: 20px;
+                left: 20px;
+                bottom: auto;
+                width: 380px;
+                height: calc(100% - 40px);
+                border-radius: 16px;
+                transform: translateY(0) !important; /* Desactiva el colapso vertical de móvil */
+                box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
             }
 
-            /* Tirador táctil exclusivo de móvil */
-            .drag-handle {
-                display: block;
-                width: 40px;
-                height: 5px;
-                background: #cbd5e1;
-                border-radius: 3px;
-                margin: 0 auto 15px auto;
-                flex-shrink: 0;
-                cursor: grab;
+            #drag-handle {
+                display: none; /* No hay arrastre vertical en escritorio */
             }
 
-            #contenedor-tarjetas {
-                -webkit-overflow-scrolling: touch;
+            .ruta-title {
+                text-align: left;
+                padding: 20px 20px 10px 20px;
             }
-            
-            /* Los 3 estados del panel en móvil */
-            .rutas-sidebar.visible {
-                transform: translateY(55%); /* Estado Medio (Colapsado) */
-            }
-            .rutas-sidebar.expanded {
-                transform: translateY(0%); /* Estado Completo (Abierto) */
-            }
-            .rutas-sidebar.minimized {
-                transform: translateY(calc(100% - 75px)) !important; /* Estado Mínimo (Minimizado) */
+
+            /* Comportamiento minimizar en escritorio (se oculta lateralmente) */
+            #rutas-sidebar.minimized {
+                transform: translateX(calc(-100% - 40px)) !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Menú de Navegación del Modelo Multi-página -->
-    <nav>
-        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
-        <div>
-            <a href="index.html">Mapa en Vivo</a>
-            <a href="rutas.html" class="active">Rutas Recomendadas</a>
-            <a href="normativa.html">Normativa</a>
-            <a href="talleres.html">Talleres</a>
+    <!-- Mapa Leaflet -->
+    <div id="map"></div>
+
+    <!-- Panel Lateral / Bottom Sheet -->
+    <aside id="rutas-sidebar">
+        <div id="drag-handle"></div>
+        <div class="ruta-title" onclick="toggleMinimizar()">
+            <h3>Rutas Recomendadas</h3>
         </div>
-    </nav>
+        <!-- Inyección dinámica desde JS basada en estructura de Ejes -->
+        <div id="contenedor-tarjetas"></div>
+    </aside>
 
-    <div class="header-menus">
-        <!-- 1. Submenú de Filtrado de Ejes -->
-        <div class="ejes-submenu">
-            <button class="eje-btn" data-eje="central" onclick="filtrarEje('central')">Eje Central</button>
-            <button class="eje-btn" data-eje="norte" onclick="filtrarEje('norte')">Eje Norte</button>
-            <button class="eje-btn" data-eje="baja-alta" onclick="filtrarEje('baja-alta')">Ciudad Baja ➔ Ciudad Alta</button>
-            <button class="eje-btn" data-eje="alta-baja" onclick="filtrarEje('alta-baja')">Ciudad Alta ➔ Ciudad Baja</button>
-        </div>
+    <!-- 1. Importación de Datos (Rutas de información y Trazados GeoJSON) -->
+    <script src="rutas-info.js"></script>
+    <script src="rutas-trazados.js"></script>
 
-        <!-- 2. Carrusel horizontal de Rutas -->
-        <div class="rutas-carrusel" id="rutas-carrusel"></div>
-    </div>
+    <!-- 2. Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    <div class="rutas-container">
-        <!-- Panel Derecho Flotante / Bottom Sheet Móvil -->
-        <div class="rutas-sidebar" id="rutas-sidebar">
-            <!-- Tirador visual táctil para arrastrar en móviles -->
-            <div class="drag-handle" id="drag-handle"></div>
-            
-            <!-- Contenedor de Tarjetas (Se poblará dinámicamente) -->
-            <div id="contenedor-tarjetas"></div>
-        </div>
-
-        <!-- El visor de la ruta -->
-        <div id="map-rutas"></div>
-    </div>
-
-    <!-- Scripts de Leaflet y Datos de Trazados -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="datos/rutas-info.js"></script>
-    <script src="datos/rutas-trazados.js"></script>
     <script>
-        // Inicializar mapa de rutas centrado en la ciudad
-        const map = L.map('map-rutas').setView([28.128, -15.432], 13);
-        
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap'
+        // Inicialización de Leaflet (Centrado en Las Palmas de Gran Canaria)
+        const map = L.map('map').setView([28.1272, -15.4314], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Capa dinámica única para dibujar el trazado y puntos activos
-        let rutaActivaLayer = L.layerGroup().addTo(map);
+        const sidebar = document.getElementById('rutas-sidebar');
+        const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
+        
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+        let capaRutaActiva = null; // Guardará la capa GeoJSON actualmente dibujada
 
-        // Paleta de colores unificada por eje
-        const coloresEjes = {
-            'central': '#0074D9',   
-            'norte': '#2ECC40',     
-            'baja-alta': '#FF851B', 
-            'alta-baja': '#B10DC9'  
+        const esDispositivoMovil = () => window.innerWidth < 768;
+
+        // --- NOMBRES LEGIBLES PARA LOS EJES ---
+        const nombresEjes = {
+            central: "Eje Central",
+            bajaAlta: "Conexión Baja - Alta",
+            altaBaja: "Conexión Alta - Baja"
         };
 
-        // =========================================================
-        // CARGA DINÁMICA DE TARJETAS DESDE rutas-info.js
-        // =========================================================
-        function cargarTarjetasDinamicas() {
-            const contenedor = document.getElementById('contenedor-tarjetas');
-            contenedor.innerHTML = ''; // Limpiar contenedor estático
-
-            // Recorremos las rutas definidas en el objeto global de rutas-info.js
-            Object.keys(datosRutasInfo).forEach(idRuta => {
-                const info = datosRutasInfo[idRuta];
-                
-                const card = document.createElement('div');
-                card.className = 'ruta-card';
-                card.setAttribute('data-eje-grupo', info.ejeGrupo);
-                card.setAttribute('data-id', idRuta);
-
-                // Determinar clase de dificultad
-                const dificultadClase = info.dificultad.toLowerCase()
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Normaliza "fácil" a "facil"
-
-                // Construcción exacta del bloque HTML original
-                card.innerHTML = `
-                    <div class="ruta-title" onclick="toggleMinimizar()">${info.titulo}</div>
-                    <div class="ruta-subtitle">${info.subtitulo}</div>
-                    <div class="ruta-meta">
-                        <span class="tag-dificultad ${dificultadClase}">${info.dificultad}</span>
-                        <span>📏 ${info.distancia}</span>
-                        <span>⏱️ ${info.tiempo}</span>
-                        <span>${info.desnivel}</span>
-                    </div>
-                    <div class="ruta-meta">
-                        <span>${info.tagIdeal}</span>
-                        <span>${info.tagTipoVia}</span>
-                    </div>
-                    <p class="descripcion-ruta">
-                        ${info.descripcion}
-                    </p>
-                    <div class="indicaciones">
-                        <strong>💡 Biciconsejos</strong><br><br>
-                        ${info.consejos}
-                    </div>
-                `;
-                contenedor.appendChild(card);
-            });
-        }
-
-        // Ejecutar la carga antes de interactuar
-        cargarTarjetasDinamicas();
-
-        // 1. FILTRADO DE EJES Y GENERACIÓN DE SUB-BOTONES
-        function filtrarEje(ejeId) {
-            document.querySelectorAll('.eje-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
-            });
-
-            // Limpiar mapa y esconder la sidebar por completo antes de seleccionar ruta
-            rutaActivaLayer.clearLayers();
-            const sidebar = document.getElementById('rutas-sidebar');
-            sidebar.classList.remove('visible', 'expanded', 'minimized');
-            if (esDispositivoMovil()) {
-                sidebar.style.transform = 'translateY(100%)';
-            } else {
-                sidebar.style.transform = 'translateX(120%)';
-            }
-
-            const carrusel = document.getElementById('rutas-carrusel');
-            carrusel.innerHTML = ''; 
-            carrusel.style.display = 'flex'; 
-
-            const tarjetasDisponibles = document.querySelectorAll(`.ruta-card[data-eje-grupo="${ejeId}"]`);
-            
-            tarjetasDisponibles.forEach(tarjeta => {
-                const idRuta = tarjeta.getAttribute('data-id');
-                const tituloRuta = tarjeta.querySelector('.ruta-title').innerText;
-                
-                const item = document.createElement('div');
-                item.className = 'carrusel-item';
-                item.setAttribute('data-id-ruta', idRuta);
-                item.setAttribute('data-eje-grupo', ejeId);
-                item.innerText = tituloRuta;
-                item.onclick = () => seleccionarRuta(idRuta);
-                
-                carrusel.appendChild(item);
-            });
-
-            if (tarjetasDisponibles.length === 0) {
-                carrusel.style.display = 'none';
-            }
-
-            map.setView([28.128, -15.432], 13);
-        }
-
-        // 2. SELECCIÓN DE UNA RUTA ESPECÍFICA
-        function seleccionarRuta(idRuta) {
-            document.querySelectorAll('.carrusel-item').forEach(item => {
-                item.classList.toggle('active', item.getAttribute('data-id-ruta') === idRuta);
-            });
-
-            document.querySelectorAll('.ruta-card').forEach(card => {
-                if (card.getAttribute('data-id') === idRuta) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            const sidebar = document.getElementById('rutas-sidebar');
-            sidebar.classList.remove('minimized', 'expanded');
-            sidebar.classList.add('visible');
-
-            if (esDispositivoMovil()) {
-                sidebar.style.transform = 'translateY(55%)'; // Altura colapsada inicial
-            } else {
-                sidebar.style.transform = ''; 
-            }
-
-            rutaActivaLayer.clearLayers();
-            const ruta = datosRutasTrazados[idRuta];
-            if (!ruta || !ruta.geojson) {
-                console.warn(`No se han encontrado datos geográficos para el ID: ${idRuta}`);
+        // --- RENDERIZADO DINÁMICO ESTRUCTURADO ---
+        function renderizarRutas() {
+            // Verificación preventiva de datos
+            if (typeof rutas === 'undefined' || typeof datosRutasTrazados === 'undefined') {
+                console.error("Error: No se han cargado 'rutas-info.js' o 'rutas-trazados.js' correctamente.");
+                contenedorTarjetas.innerHTML = '<p style="color:red; padding:10px;">Error al inicializar datos.</p>';
                 return;
             }
 
-            const tarjeta = document.querySelector(`.ruta-card[data-id="${idRuta}"]`);
-            const grupoEje = tarjeta ? tarjeta.getAttribute('data-eje-grupo') : 'central';
-            const colorTrazado = coloresEjes[grupoEje] || '#3498db';
+            let htmlAcumulado = '';
 
-            const capaGeoJSON = L.geoJSON(ruta.geojson, {
-                style: function() {
-                    return { color: colorTrazado, weight: 6, opacity: 0.90 };
-                },
-                pointToLayer: function(feature, latlng) {
-                    if (feature.properties && feature.properties.tipo === 'advertencia') {
-                        return L.circleMarker(latlng, {
-                            radius: 9,
-                            fillColor: '#e74c3c',
-                            color: '#ffffff',
-                            weight: 2,
-                            opacity: 1,
-                            fillOpacity: 0.9
-                        }).bindPopup(`<strong>⚠️ ¡Atención!</strong><br>${feature.properties.descripcion}`);
-                    }
-                    return L.marker(latlng);
+            // Recorremos el objeto agrupado por Eje
+            for (const keyEje in rutas) {
+                const nombreMostrarEje = nombresEjes[keyEje] || keyEje;
+                const subRutas = rutas[keyEje];
+
+                // Añadimos el separador visual del eje
+                htmlAcumulado += `<div class="eje-seccion-titulo">${nombreMostrarEje}</div>`;
+
+                // Recorremos las rutas individuales dentro de este eje
+                for (const idRuta in subRutas) {
+                    const datosRuta = subRutas[idRuta];
+                    htmlAcumulado += `
+                        <div class="tarjeta-ruta" id="tarjeta-${idRuta}" onclick="seleccionarRuta('${idRuta}')">
+                            <h4>${datosRuta.titulo}</h4>
+                            <p>${datosRuta.descripcion}</p>
+                        </div>
+                    `;
                 }
-            }).addTo(rutaActivaLayer);
+            }
 
-            if (capaGeoJSON.getBounds().isValid()) {
-                map.fitBounds(capaGeoJSON.getBounds(), { padding: [40, 40], maxZoom: 15 });
+            contenedorTarjetas.innerHTML = htmlAcumulado;
+        }
+
+        // --- SELECCIÓN Y SINCRONIZACIÓN DE RUTA Y MAPA ---
+        function seleccionarRuta(idRuta) {
+            console.log(`Seleccionando ruta por ID único: ${idRuta}`);
+
+            // 1. Quitar resaltado de cualquier otra tarjeta y aplicarlo a la actual
+            document.querySelectorAll('.tarjeta-ruta').forEach(tarjeta => {
+                tarjeta.classList.remove('activa');
+            });
+            const tarjetaSeleccionada = document.getElementById(`tarjeta-${idRuta}`);
+            if (tarjetaSeleccionada) tarjetaSeleccionada.classList.add('activa');
+
+            // 2. Limpiar trazado anterior en el mapa si existiera
+            if (capaRutaActiva) {
+                map.removeLayer(capaRutaActiva);
+            }
+
+            // 3. Buscar el trazado GeoJSON correspondiente en rutas-trazados.js
+            const trazadoGeoJSON = datosRutasTrazados[idRuta];
+
+            if (trazadoGeoJSON) {
+                // Pintar el nuevo trazado en el mapa
+                capaRutaActiva = L.geoJSON(trazadoGeoJSON, {
+                    style: {
+                        color: '#10b981', // Verde esmeralda para la ruta activa
+                        weight: 6,
+                        opacity: 0.85
+                    }
+                }).addTo(map);
+
+                // Autoajustar el zoom del mapa para encuadrar perfectamente la ruta seleccionada
+                map.fitBounds(capaRutaActiva.getBounds(), {
+                    padding: [50, 50]
+                });
+            } else {
+                console.warn(`No se encontró trazado geométrico para el ID: ${idRuta}`);
+            }
+
+            // Si está en móvil, colapsamos ligeramente el panel para dejar ver el mapa y la ruta pintada
+            if (esDispositivoMovil()) {
+                sidebar.classList.remove('expanded');
+                sidebar.style.transform = 'translateY(55%)';
+                setTimeout(() => map.invalidateSize(), 310);
             }
         }
 
-        // ==========================================
-        // CONTROL DE MINIMIZADO (HACIENDO CLICK EN EL TÍTULO EN ESCRITORIO)
-        // ==========================================
-        function toggleMinimizar() {
-            const sidebar = document.getElementById('rutas-sidebar');
+        // Ejecutar el renderizado estructurado al iniciar la aplicación
+        renderizarRutas();
 
-            if (sidebar.classList.contains('minimized')) {
-                sidebar.classList.remove('minimized');
-                if (esDispositivoMovil()) {
+
+        // --- CONTROL DE UI Y GESTOS TÁCTILES ---
+
+        function toggleMinimizar() {
+            if (esDispositivoMovil()) {
+                if (sidebar.classList.contains('expanded')) {
                     sidebar.classList.remove('expanded');
                     sidebar.style.transform = 'translateY(55%)';
                 } else {
-                    sidebar.style.transform = '';
+                    sidebar.classList.add('expanded');
+                    sidebar.style.transform = 'translateY(0%)';
                 }
             } else {
-                sidebar.classList.add('minimized');
-                sidebar.classList.remove('expanded');
-                if (esDispositivoMovil()) {
-                    sidebar.style.transform = 'translateY(calc(100% - 75px))'; 
-                }
+                sidebar.classList.toggle('minimized');
             }
+            
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 310);
         }
-
-        // ==========================================
-        // GESTIÓN TÁCTIL MÓVIL OPTIMIZADA (BOTTOM SHEET)
-        // ==========================================
-        const sidebar = document.getElementById('rutas-sidebar');
-        let startY = 0, currentY = 0, isDragging = false;
-
-        function esDispositivoMovil() { return window.innerWidth <= 768; }
 
         sidebar.addEventListener('touchstart', (e) => {
             if (!esDispositivoMovil()) return;
-            const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
-            
-            // Solo iniciamos el gesto si el usuario arrastra desde el tirador superior
-            // o si el contenedor de las tarjetas está al principio de su scroll
+
             if (e.target.id === 'drag-handle' || contenedorTarjetas.scrollTop <= 0) {
                 startY = e.touches[0].clientY;
+                currentY = startY; 
                 isDragging = true;
                 sidebar.style.transition = 'none'; 
             }
-        });
+        }, { passive: true });
 
         sidebar.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            currentY = e.touches[0].clientY;
-            const deltaY = currentY - startY;
 
-            // Evitar comportamiento por defecto del scroll elástico de iOS que rompe el layout
-            if (e.cancelable) e.preventDefault();
+            const clientY = e.touches[0].clientY;
+            const deltaY = clientY - startY;
 
-            if (sidebar.classList.contains('expanded')) {
-                sidebar.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
-            } else if (sidebar.classList.contains('minimized')) {
-                sidebar.style.transform = `translateY(calc(100% - 75px + ${deltaY}px))`;
-            } else {
-                sidebar.style.transform = `translateY(calc(55% + ${deltaY}px))`;
+            if (deltaY < 0 && sidebar.classList.contains('expanded')) {
+                return; 
             }
-        }, { passive: false });
 
-        sidebar.addEventListener('touchend', () => {
+            let translation = deltaY;
+            if (!sidebar.classList.contains('expanded')) {
+                const baseTranslation = window.innerHeight * 0.8 * 0.55;
+                translation = baseTranslation + deltaY;
+            }
+
+            if (translation < 0) translation = 0;
+
+            sidebar.style.transform = `translateY(${translation}px)`;
+        }, { passive: true });
+
+        sidebar.addEventListener('touchend', (e) => {
             if (!isDragging) return;
             isDragging = false;
-            sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94)';
             
-            const deltaY = currentY - startY;
+            sidebar.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+            
+            const endY = e.changedTouches[0].clientY;
+            const distanciaArrastrada = startY - endY; 
 
-            // Umbral mínimo para conmutar estados (70px)
-            if (Math.abs(deltaY) > 70) {
-                if (deltaY < 0) {
-                    // Deslizar hacia arriba
-                    if (sidebar.classList.contains('minimized')) {
-                        sidebar.classList.remove('minimized');
-                        sidebar.style.transform = 'translateY(55%)';
-                    } else {
-                        sidebar.classList.add('expanded');
-                        sidebar.style.transform = 'translateY(0%)';
-                    }
-                } else {
-                    // Deslizar hacia abajo
-                    if (sidebar.classList.contains('expanded')) {
-                        sidebar.classList.remove('expanded');
-                        sidebar.style.transform = 'translateY(55%)';
-                    } else {
-                        sidebar.classList.add('minimized');
-                        sidebar.style.transform = 'translateY(calc(100% - 75px))';
-                    }
-                }
+            if (distanciaArrastrada > 75) {
+                sidebar.classList.add('expanded');
+                sidebar.style.transform = 'translateY(0%)';
+            } else if (distanciaArrastrada < -75) {
+                sidebar.classList.remove('expanded');
+                sidebar.style.transform = 'translateY(55%)';
             } else {
-                // Restaurar el estado en caso de gestos pequeños
                 if (sidebar.classList.contains('expanded')) {
                     sidebar.style.transform = 'translateY(0%)';
-                } else if (sidebar.classList.contains('minimized')) {
-                    sidebar.style.transform = 'translateY(calc(100% - 75px))';
                 } else {
                     sidebar.style.transform = 'translateY(55%)';
                 }
             }
+
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 310);
+        });
+
+        window.addEventListener('resize', () => {
+            sidebar.style.transform = '';
+            sidebar.style.transition = '';
+            sidebar.classList.remove('expanded', 'minimized');
+            
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 150);
         });
     </script>
 </body>
