@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutas Seguras - Movilidad LPGC</title>
+    <title>Rutas recomendadas - BiciLPA</title>
     
     <!-- Hojas de estilo de Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -18,18 +18,25 @@
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
 
-        /* Submenú de Ejes */
-        .ejes-submenu {
+        /* Contenedor de Menús (Fijo arriba) */
+        .header-menus {
             background: #ffffff;
             border-bottom: 1px solid #e2e8f0;
-            padding: 10px 20px;
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
             position: relative;
             z-index: 1000;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
+        /* 1. Submenú de Ejes */
+        .ejes-submenu {
+            padding: 10px 20px 5px 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: none; /* Ocultar scrollbar en Firefox */
+        }
+        .ejes-submenu::-webkit-scrollbar { display: none; } /* Ocultar en Chrome/Safari */
+
         .eje-btn {
             background: #f1f5f9;
             border: 2px solid #e2e8f0;
@@ -42,36 +49,67 @@
             transition: all 0.2s ease;
             white-space: nowrap;
         }
-        /* Colores dinámicos para los botones de eje activos */
         .eje-btn[data-eje="central"]:hover, .eje-btn[data-eje="central"].active { background: #0074D9; color: white; border-color: #0074D9; }
         .eje-btn[data-eje="norte"]:hover, .eje-btn[data-eje="norte"].active { background: #2ECC40; color: white; border-color: #2ECC40; }
         .eje-btn[data-eje="baja-alta"]:hover, .eje-btn[data-eje="baja-alta"].active { background: #FF851B; color: white; border-color: #FF851B; }
         .eje-btn[data-eje="alta-baja"]:hover, .eje-btn[data-eje="alta-baja"].active { background: #B10DC9; color: white; border-color: #B10DC9; }
 
+        /* 2. NUEVO: Carrusel de Rutas (Aparece al seleccionar eje) */
+        .rutas-carrusel {
+            padding: 5px 20px 10px 20px;
+            display: none; /* Se activa por JS */
+            gap: 8px;
+            overflow-x: auto;
+            border-top: 1px dashed #e2e8f0;
+            background: #f8fafc;
+            scrollbar-width: none;
+        }
+        .rutas-carrusel::-webkit-scrollbar { display: none; }
+
+        .carrusel-item {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .carrusel-item:hover { border-color: #94a3b8; background: #f1f5f9; }
+        
+        /* Estilos dinámicos para la ruta activa en el carrusel */
+        .carrusel-item.active[data-eje-grupo="central"] { background: #0074D9; color: white; border-color: #0074D9; }
+        .carrusel-item.active[data-eje-grupo="norte"] { background: #2ECC40; color: white; border-color: #2ECC40; }
+        .carrusel-item.active[data-eje-grupo="baja-alta"] { background: #FF851B; color: white; border-color: #FF851B; }
+        .carrusel-item.active[data-eje-grupo="alta-baja"] { background: #B10DC9; color: white; border-color: #B10DC9; }
+
         /* Contenedor Principal de Rutas */
         .rutas-container { 
             display: flex; 
             position: relative;
-            height: calc(100vh - 110px); /* Ajustado para dar espacio a la navbar y el submenú */
+            height: calc(100vh - 155px); /* Ajustado para dar cabida a ambos menús superiores */
             width: 100vw; 
         }
 
-        /* El visor de la ruta (Ocupa el 100% de base) */
+        /* Visor de mapa */
         #map-rutas { width: 100%; height: 100%; z-index: 10; }
         
-        /* Panel Derecho Flotante */
+        /* Panel Derecho Flotante (Visor de detalles de la ruta seleccionada) */
         .rutas-sidebar { 
             position: absolute;
             top: 15px;
             right: 15px;
             width: 380px; 
             max-height: calc(100% - 30px);
-            background: rgba(255, 255, 255, 0.95); 
+            background: rgba(255, 255, 255, 0.96); 
             padding: 20px; 
             overflow-y: auto; 
             box-shadow: -2px 0 15px rgba(0,0,0,0.15); 
             border-radius: 12px;
-            z-index: 500; /* Por encima de los controles de Leaflet */
+            z-index: 500;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
             transform: translateX(120%);
             opacity: 0;
@@ -83,15 +121,14 @@
             opacity: 1;
         }
 
-        /* Tarjetas de rutas */
-        .ruta-card { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s ease; }
-        .ruta-card:hover { border-color: #cbd5e1; background: #f8fafc; }
+        /* Tarjetas de ruta (Ahora solo se muestra la que está activa) */
+        .ruta-card { display: none; background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; cursor: default; }
         
-        /* Estilos específicos de bordes activos según el color de su eje asignado */
-        .ruta-card.active[data-eje-grupo="central"] { border-color: #0074D9; background: #f4f9fd; }
-        .ruta-card.active[data-eje-grupo="norte"] { border-color: #2ECC40; background: #f4fbf5; }
-        .ruta-card.active[data-eje-grupo="baja-alta"] { border-color: #FF851B; background: #fffcf9; }
-        .ruta-card.active[data-eje-grupo="alta-baja"] { border-color: #B10DC9; background: #fdf5fd; }
+        /* Bordes de tarjetas personalizadas según el eje activo */
+        .ruta-card[data-eje-grupo="central"] { border-color: #0074D9; }
+        .ruta-card[data-eje-grupo="norte"] { border-color: #2ECC40; }
+        .ruta-card[data-eje-grupo="baja-alta"] { border-color: #FF851B; }
+        .ruta-card[data-eje-grupo="alta-baja"] { border-color: #B10DC9; }
         
         .ruta-title { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
         .ruta-subtitle { font-size: 0.95rem; color: #34495e; margin-bottom: 8px; }
@@ -118,24 +155,22 @@
         .dificil { background: #fde8e8; color: #e74c3c; }
         .descripcion-ruta { font-size: 0.85rem; color: #555; line-height: 1.4; margin-bottom: 10px; }
         
-        /* Indicaciones escritas dentro de la tarjeta activa */
-        .indicaciones { display: none; font-size: 0.85rem; color: #555; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; line-height: 1.4; }
-        .ruta-card.active .indicaciones { display: block; }
+        /* Indicaciones abiertas por defecto porque ya solo se muestra la tarjeta seleccionada */
+        .indicaciones { font-size: 0.85rem; color: #555; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; line-height: 1.4; }
 
-        /* Media Query para pantallas móviles */
         /* ==========================================
            ADAPTACIÓN MÓVIL (TIPO GOOGLE MAPS)
            ========================================== */
         @media (max-width: 768px) {
-            /* Forzar que el contenedor principal no haga scroll global */
             body, html {
                 position: fixed;
                 width: 100%;
                 height: 100%;
                 overflow: hidden;
             }
-
-            /* Panel lateral transformado en Bottom Sheet */
+            .rutas-container {
+                height: calc(100vh - 150px);
+            }
             .rutas-sidebar {
                 position: fixed;
                 top: auto;
@@ -143,31 +178,22 @@
                 right: 0;
                 left: 0;
                 width: 100%;
-                /* Altura máxima para dejar siempre un 10% de mapa visible arriba */
-                height: 85vh; 
-                max-height: 85vh;
+                height: 75vh; 
+                max-height: 75vh;
                 border-radius: 20px 20px 0 0;
                 box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
-                z-index: 2000; /* Asegurar que quede sobre todo control del mapa */
-                
-                /* Comportamiento de arrastre */
-                transform: translateY(100%); /* Oculto por defecto */
+                z-index: 2000;
+                transform: translateY(100%);
                 transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
-                
-                /* Añadir padding extra abajo para evitar barras del navegador móvil (safari/chrome) */
                 padding: 10px 20px 80px 20px; 
                 display: flex;
                 flex-direction: column;
             }
-
-            /* Forzar scroll interno solo para las tarjetas, no para todo el panel */
             #contenedor-tarjetas {
                 overflow-y: auto;
                 flex-grow: 1;
-                -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+                -webkit-overflow-scrolling: touch;
             }
-
-            /* Añadimos un tirador visual arriba en el móvil (indicador de que se puede arrastrar) */
             .rutas-sidebar::before {
                 content: "";
                 display: block;
@@ -178,16 +204,14 @@
                 margin: 0 auto 15px auto;
                 flex-shrink: 0;
             }
-
-            /* Tres estados del panel controlado por JS */
             .rutas-sidebar.visible {
-                transform: translateY(65%); /* Estado inicial: Solo asoma la cabecera/primera tarjeta */
+                transform: translateY(60%); /* Asoma lo justo para ver el título */
             }
             .rutas-sidebar.expanded {
-                transform: translateY(0%); /* Desplegado por completo hacia arriba */
+                transform: translateY(0%);
             }
         }
-            </style>
+    </style>
 </head>
 <body>
 
@@ -202,22 +226,26 @@
         </div>
     </nav>
 
-    <!-- Submenú de Filtrado de Ejes -->
-    <div class="ejes-submenu">
-        <button class="eje-btn" data-eje="central" onclick="filtrarEje('central')">Eje Central</button>
-        <button class="eje-btn" data-eje="norte" onclick="filtrarEje('norte')">Eje Norte</button>
-        <button class="eje-btn" data-eje="baja-alta" onclick="filtrarEje('baja-alta')">Ciudad Baja ➔ Ciudad Alta</button>
-        <button class="eje-btn" data-eje="alta-baja" onclick="filtrarEje('alta-baja')">Ciudad Alta ➔ Ciudad Baja</button>
+    <div class="header-menus">
+        <!-- 1. Submenú de Filtrado de Ejes -->
+        <div class="ejes-submenu">
+            <button class="eje-btn" data-eje="central" onclick="filtrarEje('central')">Eje Central</button>
+            <button class="eje-btn" data-eje="norte" onclick="filtrarEje('norte')">Eje Norte</button>
+            <button class="eje-btn" data-eje="baja-alta" onclick="filtrarEje('baja-alta')">Ciudad Baja ➔ Ciudad Alta</button>
+            <button class="eje-btn" data-eje="alta-baja" onclick="filtrarEje('alta-baja')">Ciudad Alta ➔ Ciudad Baja</button>
+        </div>
+
+        <!-- 2. NUEVO: Carrusel horizontal de Rutas (se rellena dinámicamente) -->
+        <div class="rutas-carrusel" id="rutas-carrusel"></div>
     </div>
 
     <div class="rutas-container">
-        <!-- Panel Derecho Flotante de tarjetas -->
+        <!-- Panel Derecho Flotante (Contenedor de tarjeta activa) -->
         <div class="rutas-sidebar" id="rutas-sidebar">
-            <h2 id="sidebar-titulo" style="margin-bottom: 10px; font-size: 1.2rem; color: #2c3e50;">Rutas del Eje</h2>
             <div id="contenedor-tarjetas">
                 
                 <!-- Ruta 1 (Eje Central) -->
-                <div class="ruta-card" data-eje-grupo="central" data-id="santa-catalina-san-telmo" onclick="seleccionarRuta('santa-catalina-san-telmo', event)">
+                <div class="ruta-card" data-eje-grupo="central" data-id="santa-catalina-san-telmo">
                     <div class="ruta-title">Eje Central · Avenida Marítima</div>
                     <div class="ruta-subtitle">Parque Santa Catalina ⬌ Parque San Telmo</div>
                     <div class="ruta-meta">
@@ -243,7 +271,7 @@
                 </div>
 
                 <!-- Ruta 2 (Ciudad Baja -> Ciudad Alta) -->
-                <div class="ruta-card" data-eje-grupo="baja-alta" data-id="castillo-mata-canodromo" onclick="seleccionarRuta('castillo-mata-canodromo', event)">
+                <div class="ruta-card" data-eje-grupo="baja-alta" data-id="castillo-mata-canodromo">
                     <div class="ruta-title">Eje Ciudad Baja · Ciudad Alta</div>
                     <div class="ruta-subtitle">Castillo de Mata ⮕ Parque del Canódromo</div>
                     <div class="ruta-meta">
@@ -269,7 +297,7 @@
                 </div>
             
                 <!-- Ruta 3 (Ciudad Alta -> Ciudad Baja) -->
-                <div class="ruta-card" data-eje-grupo="alta-baja" data-id="canodromo-castillo-mata" onclick="seleccionarRuta('canodromo-castillo-mata', event)">
+                <div class="ruta-card" data-eje-grupo="alta-baja" data-id="canodromo-castillo-mata">
                     <div class="ruta-title">Eje Ciudad Alta · Ciudad Baja</div>
                     <div class="ruta-subtitle">Parque del Canódromo ⮕ Castillo de Mata</div>
                     <div class="ruta-meta">
@@ -316,93 +344,95 @@
 
         // Paleta de colores unificada por eje
         const coloresEjes = {
-            'central': '#0074D9',   // Azul
-            'norte': '#2ECC40',     // Verde
-            'baja-alta': '#FF851B', // Naranja/Rojo
-            'alta-baja': '#B10DC9'  // Púrpura
+            'central': '#0074D9',   
+            'norte': '#2ECC40',     
+            'baja-alta': '#FF851B', 
+            'alta-baja': '#B10DC9'  
         };
 
-        // Filtrado por eje seleccionado
+        // 1. FILTRADO DE EJES Y GENERACIÓN DE SUB-BOTONES
         function filtrarEje(ejeId) {
-            // 1. Cambiar visualización del menú de botones superior
+            // Activar botón del eje pulsado
             document.querySelectorAll('.eje-btn').forEach(btn => {
-                if(btn.getAttribute('data-eje') === ejeId) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+                btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
             });
 
-            // 2. Limpiar capas anteriores y desmarcar activas de la interfaz
+            // Limpiar mapa y ocultar sidebar de detalles
             rutaActivaLayer.clearLayers();
-            document.querySelectorAll('.ruta-card').forEach(card => card.classList.remove('active'));
+            document.getElementById('rutas-sidebar').classList.remove('visible', 'expanded');
 
-            // 3. Filtrar las tarjetas en el panel lateral
-            let coincidencias = 0;
+            // Limpiar y poblar el carrusel horizontal con las rutas correspondientes
+            const carrusel = document.getElementById('rutas-carrusel');
+            carrusel.innerHTML = ''; 
+            carrusel.style.display = 'flex'; // Mostrar el carrusel
+
+            const tarjetasDisponibles = document.querySelectorAll(`.ruta-card[data-eje-grupo="${ejeId}"]`);
+            
+            tarjetasDisponibles.forEach(tarjeta => {
+                const idRuta = tarjeta.getAttribute('data-id');
+                const tituloRuta = tarjeta.querySelector('.ruta-title').innerText;
+                
+                // Crear botón de carrusel interactivo
+                const item = document.createElement('div');
+                item.className = 'carrusel-item';
+                item.setAttribute('data-id-ruta', idRuta);
+                item.setAttribute('data-eje-grupo', ejeId);
+                item.innerText = tituloRuta;
+                item.onclick = () => seleccionarRuta(idRuta);
+                
+                carrusel.appendChild(item);
+            });
+
+            // Si no hay rutas en este eje, ocultar el carrusel
+            if (tarjetasDisponibles.length === 0) {
+                carrusel.style.display = 'none';
+            }
+
+            // Re-centrar el mapa limpiamente
+            map.setView([28.128, -15.432], 13);
+        }
+
+        // 2. SELECCIÓN DE UNA RUTA ESPECÍFICA (Desde el carrusel o inicializador)
+        function seleccionarRuta(idRuta) {
+            // Destacar botón seleccionado en el carrusel horizontal
+            document.querySelectorAll('.carrusel-item').forEach(item => {
+                item.classList.toggle('active', item.getAttribute('data-id-ruta') === idRuta);
+            });
+
+            // Ocultar todas las tarjetas de detalles y mostrar SOLO la que corresponde
             document.querySelectorAll('.ruta-card').forEach(card => {
-                if (card.getAttribute('data-eje-grupo') === ejeId) {
+                if (card.getAttribute('data-id') === idRuta) {
                     card.style.display = 'block';
-                    coincidencias++;
                 } else {
                     card.style.display = 'none';
                 }
             });
 
-            // Actualizar título del panel lateral según el eje seleccionado
-            const titulos = {
-                'central': 'Eje Central',
-                'norte': 'Eje Norte',
-                'baja-alta': 'Subidas (Ciudad Baja ➔ Alta)',
-                'alta-baja': 'Bajadas (Ciudad Alta ➔ Baja)'
-            };
-            document.getElementById('sidebar-titulo').innerText = titulos[ejeId] || 'Rutas del Eje';
-
-            // 4. Mostrar u ocultar el panel flotante lateral según si hay rutas
+            // Mostrar el panel de detalles lateral (Bottom sheet en móviles)
             const sidebar = document.getElementById('rutas-sidebar');
-            if (coincidencias > 0) {
-                sidebar.classList.add('visible');
+            sidebar.classList.add('visible');
+            if (esDispositivoMovil()) {
+                sidebar.classList.remove('expanded');
+                sidebar.style.transform = 'translateY(60%)'; // Mostrar la cabecera arriba en móvil
             } else {
-                sidebar.classList.remove('visible');
+                sidebar.style.transform = ''; // Reset CSS inline en escritorio
             }
 
-            // Opcional: Re-centrar el mapa con la vista general de la ciudad
-            map.setView([28.128, -15.432], 13);
-        }
-
-        // Selección y renderizado de una ruta específica
-        function seleccionarRuta(idRuta, e) {
-            // 1. Cambiar clase activa en la interfaz visual (UI)
-            document.querySelectorAll('.ruta-card').forEach(card => card.classList.remove('active'));
-            if (e && e.currentTarget) {
-                e.currentTarget.classList.add('active');
-            } else {
-                const tarjeta = document.querySelector(`.ruta-card[data-id="${idRuta}"]`);
-                if (tarjeta) tarjeta.classList.add('active');
-            }
-            
-            // 2. Limpiar el trazado anterior del mapa
+            // Dibujar trazado GeoJSON en el mapa
             rutaActivaLayer.clearLayers();
-
-            // 3. Validar que la ruta exista en la variable global cargada desde el .js
             const ruta = datosRutasTrazados[idRuta];
             if (!ruta || !ruta.geojson) {
                 console.warn(`No se han encontrado datos geográficos para el ID: ${idRuta}`);
                 return;
             }
 
-            // 4. Obtener el color unificado según su eje de procedencia
             const tarjeta = document.querySelector(`.ruta-card[data-id="${idRuta}"]`);
             const grupoEje = tarjeta ? tarjeta.getAttribute('data-eje-grupo') : 'central';
             const colorTrazado = coloresEjes[grupoEje] || '#3498db';
 
-            // 5. Procesar y renderizar el GeoJSON estructurado
             const capaGeoJSON = L.geoJSON(ruta.geojson, {
-                style: function(feature) {
-                    return {
-                        color: colorTrazado,
-                        weight: 6,
-                        opacity: 0.90
-                    };
+                style: function() {
+                    return { color: colorTrazado, weight: 6, opacity: 0.90 };
                 },
                 pointToLayer: function(feature, latlng) {
                     if (feature.properties && feature.properties.tipo === 'advertencia') {
@@ -419,136 +449,67 @@
                 }
             }).addTo(rutaActivaLayer);
 
-            // 6. Ajustar el encuadre limitando el zoom máximo
+            // Ajustar encuadre del mapa
             if (capaGeoJSON.getBounds().isValid()) {
-                map.fitBounds(capaGeoJSON.getBounds(), { 
-                    padding: [40, 40],
-                    maxZoom: 15
-                });
+                map.fitBounds(capaGeoJSON.getBounds(), { padding: [40, 40], maxZoom: 15 });
             }
         }
 
-        // Ya no cargamos ninguna ruta por defecto al inicializar para dejar el mapa limpio
-        document.addEventListener("DOMContentLoaded", function() {
-            // El mapa se inicia despejado. Esperando a que el usuario pulse un eje.
-        });
         // ==========================================
         // GESTIÓN TÁCTIL MÓVIL (BOTTOM SHEET)
         // ==========================================
         const sidebar = document.getElementById('rutas-sidebar');
-        let startY = 0;
-        let currentY = 0;
-        let isDragging = false;
+        let startY = 0, currentY = 0, isDragging = false;
 
-        // Detectar si estamos en un dispositivo móvil
-        function esDispositivoMovil() {
-            return window.innerWidth <= 768;
-        }
+        function esDispositivoMovil() { return window.innerWidth <= 768; }
 
-        // Evento de inicio del toque
         sidebar.addEventListener('touchstart', (e) => {
             if (!esDispositivoMovil()) return;
-            
-            // Solo arrastramos si el scroll interno está arriba del todo,
-            // de lo contrario el usuario simplemente quiere deslizar dentro de las tarjetas.
             const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
             if (contenedorTarjetas.scrollTop > 0) return;
 
             startY = e.touches[0].clientY;
             isDragging = true;
-            sidebar.style.transition = 'none'; // Quitar transiciones durante el arrastre libre
+            sidebar.style.transition = 'none';
         });
 
-        // Evento de movimiento
         sidebar.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            
             currentY = e.touches[0].clientY;
             const deltaY = currentY - startY;
 
-            // Si arrastramos hacia arriba (deltaY negativo) y el panel ya está expandido, no hacer nada
-            if (deltaY < 0 && sidebar.classList.contains('expanded')) {
-                return;
-            }
+            if (deltaY < 0 && sidebar.classList.contains('expanded')) return;
 
-            // Si arrastramos hacia abajo (deltaY positivo) y está colapsado, no dejar bajar infinitamente
             if (deltaY > 0 && !sidebar.classList.contains('expanded')) {
-                // Pequeña resistencia al arrastrar hacia abajo del todo
-                sidebar.style.transform = `translateY(calc(65% + ${deltaY * 0.2}px))`;
+                sidebar.style.transform = `translateY(calc(60% + ${deltaY * 0.2}px))`;
                 return;
             }
 
-            // Arrastre libre proporcional
             if (sidebar.classList.contains('expanded')) {
                 sidebar.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
             } else {
-                sidebar.style.transform = `translateY(calc(65% + ${deltaY}px))`;
+                sidebar.style.transform = `translateY(calc(60% + ${deltaY}px))`;
             }
         });
 
-        // Evento de fin del toque
-        sidebar.addEventListener('touchend', (e) => {
+        sidebar.addEventListener('touchend', () => {
             if (!isDragging) return;
             isDragging = false;
-            
-            // Devolver la transición fluida
             sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94)';
-            
             const deltaY = currentY - startY;
 
-            // Umbral de píxeles para decidir si se expande o se colapsa (50px de movimiento)
             if (Math.abs(deltaY) > 50) {
                 if (deltaY < 0) {
-                    // Deslizó hacia arriba -> Expandir
                     sidebar.classList.add('expanded');
                     sidebar.style.transform = 'translateY(0%)';
                 } else {
-                    // Deslizó hacia abajo -> Colapsar (modo pestaña visible)
                     sidebar.classList.remove('expanded');
-                    sidebar.style.transform = 'translateY(65%)';
+                    sidebar.style.transform = 'translateY(60%)';
                 }
             } else {
-                // Si el movimiento fue muy sutil, restaurar estado actual
-                if (sidebar.classList.contains('expanded')) {
-                    sidebar.style.transform = 'translateY(0%)';
-                } else {
-                    sidebar.style.transform = 'translateY(65%)';
-                }
+                sidebar.style.transform = sidebar.classList.contains('expanded') ? 'translateY(0%)' : 'translateY(60%)';
             }
         });
-
-        // Modificamos ligeramente la función filtrarEje existente para adaptarla
-        const originalFiltrarEje = filtrarEje;
-        filtrarEje = function(ejeId) {
-            // Ejecutamos la lógica que ya teníamos escrita
-            originalFiltrarEje(ejeId);
-
-            // Si es móvil, nos aseguramos de que el panel empiece colapsado mostrando cabeceras,
-            // pero NO oculto del todo (65%).
-            if (esDispositivoMovil()) {
-                sidebar.classList.remove('expanded');
-                sidebar.style.transform = 'translateY(65%)';
-                
-                // Hacemos scroll arriba automático en la lista de tarjetas al cambiar de eje
-                document.getElementById('contenedor-tarjetas').scrollTop = 0;
-            } else {
-                // En escritorio limpiamos transformaciones inline que puedan quedar del móvil
-                sidebar.style.transform = '';
-            }
-        };
-
-        // Modificamos también la selección de ruta para móviles
-        const originalSeleccionarRuta = seleccionarRuta;
-        seleccionarRuta = function(idRuta, e) {
-            originalSeleccionarRuta(idRuta, e);
-            
-            // Si el usuario pica en una ruta específica desde el móvil, colapsamos el panel ligeramente
-            // para que pueda ver el trazado del mapa sin que la tarjeta gigante le tape toda la pantalla.
-            if (esDispositivoMovil()) {
-                sidebar.classList.remove('expanded');
-                sidebar.style.transform = 'translateY(65%)';
-            }
-        };
     </script>
 </body>
 </html>
