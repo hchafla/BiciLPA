@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rutas Recomendadas</title>
+    <title>BiciLPA · Rutas</title>
     
     <!-- Hojas de estilo de Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -132,6 +132,11 @@
             display: none;
         }
 
+        /* Gradiente de desvanecimiento inferior (Oculto por defecto en escritorio) */
+        .fade-overlay {
+            display: none;
+        }
+
         .rutas-sidebar.visible {
             transform: translateX(0);
             opacity: 1;
@@ -206,7 +211,7 @@
                 box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
                 z-index: 2000;
                 transform: translateY(100%);
-                padding: 10px 20px 30px 20px; 
+                padding: 10px 20px 25px 20px; /* Reducimos ligeramente padding inferior */
                 backdrop-filter: blur(10px);
                 border-left: none;
                 border-right: none;
@@ -223,6 +228,35 @@
                 margin: 0 auto 15px auto;
                 flex-shrink: 0;
                 cursor: grab;
+            }
+
+            /* Gradiente activo solo en móvil para ocultar visualmente la parte inferior */
+            .fade-overlay {
+                display: block;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 55px;
+                /* Degradado de transparente a blanco puro para fundirse con la tarjeta */
+                background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.98) 85%);
+                z-index: 2100;
+                pointer-events: none; /* Deja pasar los clicks al scroll de atrás */
+                transition: opacity 0.25s ease;
+                opacity: 0; /* Por defecto invisible (cuando está minimizado) */
+            }
+
+            .rutas-sidebar.visible.expanded .fade-overlay {
+                opacity: 0; /* Ocultamos el degradado al expandir para no tapar los biciconsejos */
+            }
+
+            .rutas-sidebar.visible:not(.expanded):not(.minimized) .fade-overlay {
+                opacity: 1; /* Activo únicamente en el estado intermedio (deslizado medio) */
+            }
+
+            /* Forzamos espaciado estratégico para que "Biciconsejos" asome (Scroll Peeking) */
+            .descripcion-ruta {
+                margin-bottom: 25px; /* Crea el hueco ideal para que asome el título de biciconsejos */
             }
 
             #contenedor-tarjetas {
@@ -276,6 +310,9 @@
             
             <!-- Contenedor donde se inyectarán dinámicamente las tarjetas -->
             <div id="contenedor-tarjetas"></div>
+
+            <!-- Capa de desvanecimiento dinámico -->
+            <div class="fade-overlay" id="fade-overlay"></div>
         </div>
 
         <!-- El visor de la ruta -->
@@ -310,7 +347,7 @@
                 textoDificultad = 'Difícil';
             }
 
-            // Crear etiquetas secundarias HTML (ej. Ideal para principiantes, etc.)
+            // Crear etiquetas secundarias HTML
             const HTMLetiquetas = r.etiquetas.map(etiqueta => `<span>${etiqueta}</span>`).join('\n');
 
             // Crear consejos HTML dinámicamente respetando el formato visual anterior
@@ -411,7 +448,7 @@
             map.setView([28.128, -15.432], 13);
         }
 
-        // 2. SELECCIÓN DE UNA RUTA ESPECÍFICA
+        // 2. SELECCIÓN DE UNA RUTA ESPECÍFICA (MODIFICADA PARA INICIAR MINIMIZADA)
         function seleccionarRuta(idRuta) {
             document.querySelectorAll('.carrusel-item').forEach(item => {
                 item.classList.toggle('active', item.getAttribute('data-id-ruta') === idRuta);
@@ -425,7 +462,7 @@
                 }
             });
 
-           const sidebar = document.getElementById('rutas-sidebar');
+            const sidebar = document.getElementById('rutas-sidebar');
             
             if (esDispositivoMovil()) {
                 // En móvil: inicia en estado minimizado para priorizar el mapa
