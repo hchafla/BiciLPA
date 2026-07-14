@@ -425,13 +425,17 @@
                 }
             });
 
-            const sidebar = document.getElementById('rutas-sidebar');
-            sidebar.classList.remove('minimized', 'expanded');
-            sidebar.classList.add('visible');
-
+           const sidebar = document.getElementById('rutas-sidebar');
+            
             if (esDispositivoMovil()) {
-                sidebar.style.transform = 'translateY(55%)'; // Altura colapsada inicial
+                // En móvil: inicia en estado minimizado para priorizar el mapa
+                sidebar.classList.remove('expanded');
+                sidebar.classList.add('visible', 'minimized');
+                sidebar.style.transform = 'translateY(calc(100% - 75px))';
             } else {
+                // En escritorio: panel lateral desplegado
+                sidebar.classList.remove('minimized', 'expanded');
+                sidebar.classList.add('visible');
                 sidebar.style.transform = ''; 
             }
 
