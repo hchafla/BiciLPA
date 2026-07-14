@@ -10,27 +10,88 @@
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; overflow: hidden; }
         
         /* Navegación superior común */
-        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; position: relative; z-index: 1000; }
         nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
 
+        /* Submenú de Ejes */
+        .ejes-submenu {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            position: relative;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .eje-btn {
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        /* Colores dinámicos para los botones de eje activos */
+        .eje-btn[data-eje="central"]:hover, .eje-btn[data-eje="central"].active { background: #0074D9; color: white; border-color: #0074D9; }
+        .eje-btn[data-eje="norte"]:hover, .eje-btn[data-eje="norte"].active { background: #2ECC40; color: white; border-color: #2ECC40; }
+        .eje-btn[data-eje="baja-alta"]:hover, .eje-btn[data-eje="baja-alta"].active { background: #FF851B; color: white; border-color: #FF851B; }
+        .eje-btn[data-eje="alta-baja"]:hover, .eje-btn[data-eje="alta-baja"].active { background: #B10DC9; color: white; border-color: #B10DC9; }
+
         /* Contenedor Principal de Rutas */
-        .rutas-container { display: flex; height: calc(100vh - 54px); width: 100vw; }
+        .rutas-container { 
+            display: flex; 
+            position: relative;
+            height: calc(100vh - 110px); /* Ajustado para dar espacio a la navbar y el submenú */
+            width: 100vw; 
+        }
+
+        /* El visor de la ruta (Ocupa el 100% de base) */
+        #map-rutas { width: 100%; height: 100%; z-index: 10; }
         
-        /* Panel Izquierdo: Tarjetas de rutas */
-        .rutas-sidebar { width: 400px; background: white; padding: 20px; overflow-y: auto; box-shadow: 2px 0 5px rgba(0,0,0,0.05); }
-        .ruta-card { background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s ease; }
-        .ruta-card:hover { border-color: #3498db; background: #f0f7fc; }
-        .ruta-card.active { border-color: #2ecc71; background: #f4fbf7; }
+        /* Panel Derecho Flotante */
+        .rutas-sidebar { 
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 380px; 
+            max-height: calc(100% - 30px);
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 20px; 
+            overflow-y: auto; 
+            box-shadow: -2px 0 15px rgba(0,0,0,0.15); 
+            border-radius: 12px;
+            z-index: 500; /* Por encima de los controles de Leaflet */
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            transform: translateX(120%);
+            opacity: 0;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .rutas-sidebar.visible {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Tarjetas de rutas */
+        .ruta-card { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s ease; }
+        .ruta-card:hover { border-color: #cbd5e1; background: #f8fafc; }
         
-        /* Color del borde de la tarjeta activa según dificultad */
-        .ruta-card.active:has(.facil) { border-color: #2ecc71; background: #f4fbf7; }
-        .ruta-card.active:has(.moderado) { border-color: #f59f00; background: #fdfaf2; }
-        .ruta-card.active:has(.dificil) { border-color: #e74c3c; background: #fdf3f2; }
+        /* Estilos específicos de bordes activos según el color de su eje asignado */
+        .ruta-card.active[data-eje-grupo="central"] { border-color: #0074D9; background: #f4f9fd; }
+        .ruta-card.active[data-eje-grupo="norte"] { border-color: #2ECC40; background: #f4fbf5; }
+        .ruta-card.active[data-eje-grupo="baja-alta"] { border-color: #FF851B; background: #fffcf9; }
+        .ruta-card.active[data-eje-grupo="alta-baja"] { border-color: #B10DC9; background: #fdf5fd; }
         
         .ruta-title { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
         .ruta-subtitle { font-size: 0.95rem; color: #34495e; margin-bottom: 8px; }
@@ -57,12 +118,26 @@
         .dificil { background: #fde8e8; color: #e74c3c; }
         .descripcion-ruta { font-size: 0.85rem; color: #555; line-height: 1.4; margin-bottom: 10px; }
         
-        /* Panel Derecho: Mapa descriptivo */
-        #map-rutas { flex-grow: 1; height: 100%; }
-        
         /* Indicaciones escritas dentro de la tarjeta activa */
         .indicaciones { display: none; font-size: 0.85rem; color: #555; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; line-height: 1.4; }
         .ruta-card.active .indicaciones { display: block; }
+
+        /* Media Query para pantallas móviles */
+        @media (max-width: 768px) {
+            .rutas-sidebar {
+                position: absolute;
+                top: auto;
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                width: auto;
+                max-height: 40%;
+                transform: translateY(120%);
+            }
+            .rutas-sidebar.visible {
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -78,101 +153,99 @@
         </div>
     </nav>
 
+    <!-- Submenú de Filtrado de Ejes -->
+    <div class="ejes-submenu">
+        <button class="eje-btn" data-eje="central" onclick="filtrarEje('central')">Eje Central</button>
+        <button class="eje-btn" data-eje="norte" onclick="filtrarEje('norte')">Eje Norte</button>
+        <button class="eje-btn" data-eje="baja-alta" onclick="filtrarEje('baja-alta')">Ciudad Baja ➔ Ciudad Alta</button>
+        <button class="eje-btn" data-eje="alta-baja" onclick="filtrarEje('alta-baja')">Ciudad Alta ➔ Ciudad Baja</button>
+    </div>
+
     <div class="rutas-container">
-        <!-- Listado de guías locales -->
-        <div class="rutas-sidebar">
-            <h2 style="margin-bottom: 15px; font-size: 1.3rem; color: #2c3e50;">Guías de Trayecto Urbano</h2>
-            <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 20px;">Rutas seleccionadas para moverte de forma segura minimizando el conflicto con el tráfico pesado.</p>
+        <!-- Panel Derecho Flotante de tarjetas -->
+        <div class="rutas-sidebar" id="rutas-sidebar">
+            <h2 id="sidebar-titulo" style="margin-bottom: 10px; font-size: 1.2rem; color: #2c3e50;">Rutas del Eje</h2>
+            <div id="contenedor-tarjetas">
+                
+                <!-- Ruta 1 (Eje Central) -->
+                <div class="ruta-card" data-eje-grupo="central" data-id="santa-catalina-san-telmo" onclick="seleccionarRuta('santa-catalina-san-telmo', event)">
+                    <div class="ruta-title">Eje Central · Avenida Marítima</div>
+                    <div class="ruta-subtitle">Parque Santa Catalina ⬌ Parque San Telmo</div>
+                    <div class="ruta-meta">
+                        <span class="tag-dificultad facil">Fácil</span>
+                        <span>📏 4,8 km</span>
+                        <span>⏱️ 18-25 min</span>
+                        <span>⬆️ Llana</span>
+                    </div>
+                    <div class="ruta-meta">
+                        <span>🚲 Ideal para principiantes</span>
+                        <span>🛣️ Carril bici segregado</span>
+                    </div>
+                    <p class="descripcion-ruta">
+                        La principal columna vertebral del ciclismo urbano en Las Palmas de Gran Canaria. Conecta Santa Catalina con Triana, y viceversa de forma rápida, cómoda y completamente por carril bici, enlazando con estaciones de Sítycleta.
+                    </p>
+                    <div class="indicaciones">
+                        <strong>💡 Biciconsejos</strong><br><br>
+                        🚲 <strong>Perfecta para estrenarse en la ciudad.</strong><br>
+                        ⚠️ <strong>Precaución en Alcaravaneras:</strong> peatones cruzando el carril bici.<br>
+                        ❗ <strong>Fin del carril bici:</strong> a la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta.<br>
+                        🌬️ <strong>Viento:</strong> de cara en dirección norte.
+                    </div>
+                </div>
+
+                <!-- Ruta 2 (Ciudad Baja -> Ciudad Alta) -->
+                <div class="ruta-card" data-eje-grupo="baja-alta" data-id="castillo-mata-canodromo" onclick="seleccionarRuta('castillo-mata-canodromo', event)">
+                    <div class="ruta-title">Eje Ciudad Baja · Ciudad Alta</div>
+                    <div class="ruta-subtitle">Castillo de Mata ⮕ Parque del Canódromo</div>
+                    <div class="ruta-meta">
+                        <span class="tag-dificultad moderado">Moderado</span>
+                        <span>📏 3,9 km</span>
+                        <span>⏱️ 12-13 min ⚡ · 20 min 🚲 </span>
+                        <span>⬆️ +115 m</span>
+                    </div>
+                    <div class="ruta-meta">
+                        <span>⚡ Ideal para eSítycleta</span>
+                        <span>⛰️ Pendiente moderada</span>
+                        <span>🛣️ Ciclovía 30 (calzada compartida)</span>
+                    </div>
+                    <p class="descripcion-ruta">
+                        La forma más cómoda de conectar la ciudad baja con la ciudad alta siguiendo el itinerario ciclista existente. Une dos estaciones de eSítycleta mediante un recorrido continuo que evita las rampas más exigentes.
+                    </p>
+                    <div class="indicaciones">
+                        <strong>💡 Biciconsejos</strong><br><br>
+                        ⚡ <strong>Muy recomendable con bici eléctrica.</strong><br>
+                        🚲 <strong>Con bici convencional:</strong> requiere una condición física mínima, especialmente en la subida por el Paseo de San Antonio.<br>
+                        🚦 <strong>Vía compartida:</strong> aunque el límite es de 30 km/h, mantén una posición visible en el carril.
+                    </div>
+                </div>
             
-            <!-- Ruta 1 -->
-            <div class="ruta-card active" data-id="santa-catalina-san-telmo" data-dificultad="facil" onclick="seleccionarRuta('santa-catalina-san-telmo', event)">
-                <div class="ruta-title">
-                    Eje Central · Avenida Marítima
+                <!-- Ruta 3 (Ciudad Alta -> Ciudad Baja) -->
+                <div class="ruta-card" data-eje-grupo="alta-baja" data-id="canodromo-castillo-mata" onclick="seleccionarRuta('canodromo-castillo-mata', event)">
+                    <div class="ruta-title">Eje Ciudad Alta · Ciudad Baja</div>
+                    <div class="ruta-subtitle">Parque del Canódromo ⮕ Castillo de Mata</div>
+                    <div class="ruta-meta">
+                        <span class="tag-dificultad facil">Fácil</span>
+                        <span>📏 3,9 km</span>
+                        <span>⏱️ 10-12 min</span>
+                        <span>⬇️ Descenso</span>
+                    </div>
+                    <div class="ruta-meta">
+                        <span>🚲 Descenso cómodo</span>
+                        <span>🛣️ Ciclovía 30 + Calzada + Carril bici</span>
+                    </div>
+                    <p class="descripcion-ruta">
+                        Recorrido hacia ciudad baja. Gracias al descenso prácticamente continuo, permite llegar a Castillo de Mata de forma rápida y cómoda, siendo una opción ideal para bicicletas convencionales.
+                    </p>
+                    <div class="indicaciones">
+                        <strong>💡 Biciconsejos</strong><br><br>
+                        💡 <strong>Atajo recomendado:</strong> el recorrido abandona momentáneamente el itinerario para bajar por la calle Pepe García Fajardo.<br>
+                        ⚠️ <strong>Control de velocidad:</strong> aunque la inercia te invite a acelerar, modera la velocidad.<br>
+                        🚦 <strong>Atención en las intersecciones:</strong> los coches pueden no prever tu velocidad en descenso.
+                    </div>
                 </div>
-                <div class="ruta-subtitle">
-                    Parque Santa Catalina ⬌ Parque San Telmo
-                </div>
-                <div class="ruta-meta">
-                    <span class="tag-dificultad facil">Fácil</span>
-                    <span>📏 4,8 km</span>
-                    <span>⏱️ 18-25 min</span>
-                    <span>⬆️ Llana</span>
-                </div>
-                <div class="ruta-meta">
-                    <span>🚲 Ideal para principiantes</span>
-                    <span>🛣️ Carril bici segregado</span>
-                </div>
-                <p class="descripcion-ruta">
-                    La principal columna vertebral del ciclismo urbano en Las Palmas de Gran Canaria. Conecta Santa Catalina con Triana, y viceversa de forma rápida, cómoda y completamente por carril bici, enlazando con estaciones de Sítycleta, otros carriles bici y numerosos puntos de interés de la ciudad.
-                </p>
-                <div class="indicaciones">
-                    <strong>💡 Biciconsejos</strong><br><br>
-                    🚲 <strong>Perfecta para estrenarse en la ciudad.</strong><br>
-                    ⚠️ <strong>Precaución en Alcaravaneras:</strong> peatones cruzando el carril bici y vehículos entrando y saliendo del Club Náutico.<br>
-                    ❗ <strong>Fin del carril bici:</strong> a la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta. Para continuar hacia León y Castillo es necesario incorporarse a la calzada.<br>
-                    🌬️ <strong>Viento:</strong> en días de alisio el recorrido hacia Santa Catalina puede resultar más exigente.
-                </div>
-            </div>
 
-            <!-- Ruta 2 -->
-            <div class="ruta-card" data-id="castillo-mata-canodromo" data-dificultad="moderado" onclick="seleccionarRuta('castillo-mata-canodromo', event)">
-                <div class="ruta-title">
-                    Eje Ciudad Baja · Ciudad Alta
-                </div>
-                <div class="ruta-subtitle">
-                    Castillo de Mata ⮕ Parque del Canódromo
-                </div>
-                <div class="ruta-meta">
-                    <span class="tag-dificultad moderado">Moderado</span>
-                    <span>📏 3,9 km</span>
-                    <span>⏱️ 12-13 min ⚡ · 20 min 🚲 </span>
-                    <span>⬆️ +115 m</span>
-                </div>
-                <div class="ruta-meta">
-                    <span>⚡ Ideal para eSítycleta</span>
-                    <span>⛰️ Pendiente moderada</span>
-                    <span>🛣️ Ciclovía 30 (calzada compartida)</span>
-                </div>
-                <p class="descripcion-ruta">
-                    La forma más cómoda de conectar la ciudad baja con la ciudad alta siguiendo el itinerario ciclista existente. Une dos estaciones de eSítycleta mediante un recorrido continuo que evita las rampas más exigentes y permite acceder cómodamente a los barrios de Escaleritas y Schamann.
-                </p>
-                <div class="indicaciones">
-                    <strong>💡 Biciconsejos</strong><br><br>
-                    ⚡ <strong>Muy recomendable con bici eléctrica:</strong> la asistencia eléctrica hace que la subida resulte cómoda para la mayoría de usuarios.<br>
-                    🚲 <strong>Con bicicleta convencional:</strong> requiere una condición física mínima, especialmente en la subida por el Paseo de San Antonio.<br>
-                    🚦 <strong>Vía compartida:</strong> aunque el límite es de 30 km/h, algunos vehículos circulan a mayor velocidad. Mantén una posición visible en el carril y extrema la precaución en la subida del Paseo de San Antonio.<br>
-                </div>
             </div>
-
-            <!-- Ruta 3 -->
-            <div class="ruta-card" data-id="canodromo-castillo-mata" data-dificultad="facil" onclick="seleccionarRuta('canodromo-castillo-mata', event)">
-                <div class="ruta-title">
-                    Eje Ciudad Alta · Ciudad Baja 
-                </div>
-                <div class="ruta-subtitle">
-                    Parque del Canódromo ⮕ Castillo de Mata
-                </div>
-                <div class="ruta-meta">
-                    <span class="tag-dificultad facil">Fácil</span>
-                    <span>📏 3,9 km</span>
-                    <span>⏱️ 10-12 min</span>
-                    <span>⬇️ Descenso</span>
-                </div>
-                <div class="ruta-meta">
-                    <span>🚲 Descenso cómodo</span>
-                    <span>🛣️ Ciclovía 30 + Calzada + Carril bici</span>
-                </div>
-                <p class="descripcion-ruta">
-                    Recorrido hacia ciudad baja. Gracias al descenso prácticamente continuo, permite llegar a Castillo de Mata de forma rápida y cómoda, siendo una opción ideal para bicicletas convencionales y usuarios con poca experiencia.
-                </p>
-                <div class="indicaciones">
-                    <strong>💡 Biciconsejos</strong><br><br>
-                    💡 <strong>Atajo recomendado:</strong> el recorrido abandona momentáneamente el itinerario ciclista para bajar por la calle Pepe García Fajardo, una vía habitualmente tranquila que conecta de forma directa con el carril bici del Paseo de Chil.<br>
-                    ⚠️ <strong>Control de velocidad:</strong> aunque la inercia te invite a acelerar, recuerda que parte del recorrido transcurre por calzada compartida. Modera la velocidad, especialmente en la bajada por la calle Pepe García Fajardo.<br>
-                    🚦 <strong>Atención en las intersecciones:</strong> en los cruces e incorporaciones los conductores pueden no prever la velocidad de una bicicleta en descenso.<br>
-                </div>
-            </div>
-        </div> <!-- Fin de "rutas-sidebar" perfectamente posicionado -->
+        </div>
 
         <!-- El visor de la ruta -->
         <div id="map-rutas"></div>
@@ -189,57 +262,97 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // Capa dinámica única para de dibujar el trazado y puntos activos
+        // Capa dinámica única para dibujar el trazado y puntos activos
         let rutaActivaLayer = L.layerGroup().addTo(map);
 
-        function obtenerColorPorDificultad(idRuta) {
-            // Buscamos la tarjeta usando el nuevo atributo data-id
-            const tarjeta = document.querySelector(`.ruta-card[data-id="${idRuta}"]`);
-            if (!tarjeta) return '#3498db'; // Color por defecto
+        // Paleta de colores unificada por eje
+        const coloresEjes = {
+            'central': '#0074D9',   // Azul
+            'norte': '#2ECC40',     // Verde
+            'baja-alta': '#FF851B', // Naranja/Rojo
+            'alta-baja': '#B10DC9'  // Púrpura
+        };
 
-            const dificultad = tarjeta.getAttribute('data-dificultad');
-            
-            switch (dificultad) {
-                case 'facil':
-                    return '#2ecc71'; // Verde
-                case 'moderado':
-                    return '#f59f00'; // Naranja/Mostaza
-                case 'dificil':
-                    return '#e74c3c'; // Rojo
-                default:
-                    return '#3498db'; // Azul por defecto
+        // Filtrado por eje seleccionado
+        function filtrarEje(ejeId) {
+            // 1. Cambiar visualización del menú de botones superior
+            document.querySelectorAll('.eje-btn').forEach(btn => {
+                if(btn.getAttribute('data-eje') === ejeId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // 2. Limpiar capas anteriores y desmarcar activas de la interfaz
+            rutaActivaLayer.clearLayers();
+            document.querySelectorAll('.ruta-card').forEach(card => card.classList.remove('active'));
+
+            // 3. Filtrar las tarjetas en el panel lateral
+            let coincidencias = 0;
+            document.querySelectorAll('.ruta-card').forEach(card => {
+                if (card.getAttribute('data-eje-grupo') === ejeId) {
+                    card.style.display = 'block';
+                    coincidencias++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Actualizar título del panel lateral según el eje seleccionado
+            const titulos = {
+                'central': 'Eje Central',
+                'norte': 'Eje Norte',
+                'baja-alta': 'Subidas (Ciudad Baja ➔ Alta)',
+                'alta-baja': 'Bajadas (Ciudad Alta ➔ Baja)'
+            };
+            document.getElementById('sidebar-titulo').innerText = titulos[ejeId] || 'Rutas del Eje';
+
+            // 4. Mostrar u ocultar el panel flotante lateral según si hay rutas
+            const sidebar = document.getElementById('rutas-sidebar');
+            if (coincidencias > 0) {
+                sidebar.classList.add('visible');
+            } else {
+                sidebar.classList.remove('visible');
             }
+
+            // Opcional: Re-centrar el mapa con la vista general de la ciudad
+            map.setView([28.128, -15.432], 13);
         }
 
+        // Selección y renderizado de una ruta específica
         function seleccionarRuta(idRuta, e) {
-            // Cambiar clase activa en la interfaz visual (UI)
+            // 1. Cambiar clase activa en la interfaz visual (UI)
             document.querySelectorAll('.ruta-card').forEach(card => card.classList.remove('active'));
-            
-            const tarjetaSeleccionada = document.querySelector(`.ruta-card[data-id="${idRuta}"]`);
-            if (tarjetaSeleccionada) {
-                tarjetaSeleccionada.classList.add('active');
+            if (e && e.currentTarget) {
+                e.currentTarget.classList.add('active');
+            } else {
+                const tarjeta = document.querySelector(`.ruta-card[data-id="${idRuta}"]`);
+                if (tarjeta) tarjeta.classList.add('active');
             }
             
-            // Limpiar el trazado anterior del mapa
+            // 2. Limpiar el trazado anterior del mapa
             rutaActivaLayer.clearLayers();
 
-            // Validar que la ruta exista en la variable global cargada desde el .js
+            // 3. Validar que la ruta exista en la variable global cargada desde el .js
             const ruta = datosRutasTrazados[idRuta];
             if (!ruta || !ruta.geojson) {
                 console.warn(`No se han encontrado datos geográficos para el ID: ${idRuta}`);
                 return;
             }
 
-            // Obtener dinámicamente el color
-            const colorTrazado = obtenerColorPorDificultad(idRuta);
+            // 4. Obtener el color unificado según su eje de procedencia
+            const tarjeta = document.querySelector(`.ruta-card[data-id="${idRuta}"]`);
+            const grupoEje = tarjeta ? tarjeta.getAttribute('data-eje-grupo') : 'central';
+            const colorTrazado = coloresEjes[grupoEje] || '#3498db';
 
-            // Procesar y renderizar el GeoJSON estructurado
+            // 5. Procesar y renderizar el GeoJSON estructurado
             const capaGeoJSON = L.geoJSON(ruta.geojson, {
                 style: function(feature) {
                     return {
                         color: colorTrazado,
-                        weight: 5,
-                        opacity: 0.85
+                        weight: 6,
+                        opacity: 0.90
                     };
                 },
                 pointToLayer: function(feature, latlng) {
@@ -257,18 +370,18 @@
                 }
             }).addTo(rutaActivaLayer);
 
-            // Ajustar el encuadre limitando el zoom máximo para evitar acercamientos agresivos
+            // 6. Ajustar el encuadre limitando el zoom máximo
             if (capaGeoJSON.getBounds().isValid()) {
                 map.fitBounds(capaGeoJSON.getBounds(), { 
-                    padding: [30, 30],
-                    maxZoom: 15 // Impide que el mapa pase de zoom 15 en trayectos cortos
+                    padding: [40, 40],
+                    maxZoom: 15
                 });
             }
         }
 
-        // Cargar la primera ruta por defecto al inicializar la estructura DOM
+        // Ya no cargamos ninguna ruta por defecto al inicializar para dejar el mapa limpio
         document.addEventListener("DOMContentLoaded", function() {
-            seleccionarRuta('santa-catalina-san-telmo');
+            // El mapa se inicia despejado. Esperando a que el usuario pulse un eje.
         });
     </script>
 </body>
