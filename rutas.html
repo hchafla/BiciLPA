@@ -123,22 +123,71 @@
         .ruta-card.active .indicaciones { display: block; }
 
         /* Media Query para pantallas móviles */
+        /* ==========================================
+           ADAPTACIÓN MÓVIL (TIPO GOOGLE MAPS)
+           ========================================== */
         @media (max-width: 768px) {
-            .rutas-sidebar {
-                position: absolute;
-                top: auto;
-                bottom: 15px;
-                right: 15px;
-                left: 15px;
-                width: auto;
-                max-height: 40%;
-                transform: translateY(120%);
+            /* Forzar que el contenedor principal no haga scroll global */
+            body, html {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
             }
+
+            /* Panel lateral transformado en Bottom Sheet */
+            .rutas-sidebar {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                width: 100%;
+                /* Altura máxima para dejar siempre un 10% de mapa visible arriba */
+                height: 85vh; 
+                max-height: 85vh;
+                border-radius: 20px 20px 0 0;
+                box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+                z-index: 2000; /* Asegurar que quede sobre todo control del mapa */
+                
+                /* Comportamiento de arrastre */
+                transform: translateY(100%); /* Oculto por defecto */
+                transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+                
+                /* Añadir padding extra abajo para evitar barras del navegador móvil (safari/chrome) */
+                padding: 10px 20px 80px 20px; 
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Forzar scroll interno solo para las tarjetas, no para todo el panel */
+            #contenedor-tarjetas {
+                overflow-y: auto;
+                flex-grow: 1;
+                -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+            }
+
+            /* Añadimos un tirador visual arriba en el móvil (indicador de que se puede arrastrar) */
+            .rutas-sidebar::before {
+                content: "";
+                display: block;
+                width: 40px;
+                height: 5px;
+                background: #cbd5e1;
+                border-radius: 3px;
+                margin: 0 auto 15px auto;
+                flex-shrink: 0;
+            }
+
+            /* Tres estados del panel controlado por JS */
             .rutas-sidebar.visible {
-                transform: translateY(0);
+                transform: translateY(65%); /* Estado inicial: Solo asoma la cabecera/primera tarjeta */
+            }
+            .rutas-sidebar.expanded {
+                transform: translateY(0%); /* Desplegado por completo hacia arriba */
             }
         }
-    </style>
+            </style>
 </head>
 <body>
 
@@ -383,6 +432,123 @@
         document.addEventListener("DOMContentLoaded", function() {
             // El mapa se inicia despejado. Esperando a que el usuario pulse un eje.
         });
+        // ==========================================
+        // GESTIÓN TÁCTIL MÓVIL (BOTTOM SHEET)
+        // ==========================================
+        const sidebar = document.getElementById('rutas-sidebar');
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        // Detectar si estamos en un dispositivo móvil
+        function esDispositivoMovil() {
+            return window.innerWidth <= 768;
+        }
+
+        // Evento de inicio del toque
+        sidebar.addEventListener('touchstart', (e) => {
+            if (!esDispositivoMovil()) return;
+            
+            // Solo arrastramos si el scroll interno está arriba del todo,
+            // de lo contrario el usuario simplemente quiere deslizar dentro de las tarjetas.
+            const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
+            if (contenedorTarjetas.scrollTop > 0) return;
+
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            sidebar.style.transition = 'none'; // Quitar transiciones durante el arrastre libre
+        });
+
+        // Evento de movimiento
+        sidebar.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+
+            // Si arrastramos hacia arriba (deltaY negativo) y el panel ya está expandido, no hacer nada
+            if (deltaY < 0 && sidebar.classList.contains('expanded')) {
+                return;
+            }
+
+            // Si arrastramos hacia abajo (deltaY positivo) y está colapsado, no dejar bajar infinitamente
+            if (deltaY > 0 && !sidebar.classList.contains('expanded')) {
+                // Pequeña resistencia al arrastrar hacia abajo del todo
+                sidebar.style.transform = `translateY(calc(65% + ${deltaY * 0.2}px))`;
+                return;
+            }
+
+            // Arrastre libre proporcional
+            if (sidebar.classList.contains('expanded')) {
+                sidebar.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
+            } else {
+                sidebar.style.transform = `translateY(calc(65% + ${deltaY}px))`;
+            }
+        });
+
+        // Evento de fin del toque
+        sidebar.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            // Devolver la transición fluida
+            sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94)';
+            
+            const deltaY = currentY - startY;
+
+            // Umbral de píxeles para decidir si se expande o se colapsa (50px de movimiento)
+            if (Math.abs(deltaY) > 50) {
+                if (deltaY < 0) {
+                    // Deslizó hacia arriba -> Expandir
+                    sidebar.classList.add('expanded');
+                    sidebar.style.transform = 'translateY(0%)';
+                } else {
+                    // Deslizó hacia abajo -> Colapsar (modo pestaña visible)
+                    sidebar.classList.remove('expanded');
+                    sidebar.style.transform = 'translateY(65%)';
+                }
+            } else {
+                // Si el movimiento fue muy sutil, restaurar estado actual
+                if (sidebar.classList.contains('expanded')) {
+                    sidebar.style.transform = 'translateY(0%)';
+                } else {
+                    sidebar.style.transform = 'translateY(65%)';
+                }
+            }
+        });
+
+        // Modificamos ligeramente la función filtrarEje existente para adaptarla
+        const originalFiltrarEje = filtrarEje;
+        filtrarEje = function(ejeId) {
+            // Ejecutamos la lógica que ya teníamos escrita
+            originalFiltrarEje(ejeId);
+
+            // Si es móvil, nos aseguramos de que el panel empiece colapsado mostrando cabeceras,
+            // pero NO oculto del todo (65%).
+            if (esDispositivoMovil()) {
+                sidebar.classList.remove('expanded');
+                sidebar.style.transform = 'translateY(65%)';
+                
+                // Hacemos scroll arriba automático en la lista de tarjetas al cambiar de eje
+                document.getElementById('contenedor-tarjetas').scrollTop = 0;
+            } else {
+                // En escritorio limpiamos transformaciones inline que puedan quedar del móvil
+                sidebar.style.transform = '';
+            }
+        };
+
+        // Modificamos también la selección de ruta para móviles
+        const originalSeleccionarRuta = seleccionarRuta;
+        seleccionarRuta = function(idRuta, e) {
+            originalSeleccionarRuta(idRuta, e);
+            
+            // Si el usuario pica en una ruta específica desde el móvil, colapsamos el panel ligeramente
+            // para que pueda ver el trazado del mapa sin que la tarjeta gigante le tape toda la pantalla.
+            if (esDispositivoMovil()) {
+                sidebar.classList.remove('expanded');
+                sidebar.style.transform = 'translateY(65%)';
+            }
+        };
     </script>
 </body>
 </html>
