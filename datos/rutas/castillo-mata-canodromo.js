@@ -21,17 +21,17 @@
             {
                 icono: "⚡",
                 titulo: "Asistencia eléctrica",
-                texto: "Muy recomendable con bici eléctrica."
+                texto: "Muy recomendable con bici eléctrica"
             },
             {
                 icono: "🚲",
                 titulo: "Con bici convencional",
-                texto: "La subida es continua pero asumible si tienes un mínimo de forma física. Puedes tomártela con calma."
+                texto: "La subida es continua pero asumible si tienes un mínimo de forma física. Puedes tomártela con calma"
             },
             {
                 icono: "🚗",
                 titulo: "Comparte la calzada",
-                texto: "Circulas por calles 30 junto a otros vehículos. Mantén una posición visible y evita pegarte al borde derecho."
+                texto: "Circulas por calles 30 junto a otros vehículos. Mantén una posición visible y evita pegarte al borde derecho"
             }
         ],
         geojson: {
