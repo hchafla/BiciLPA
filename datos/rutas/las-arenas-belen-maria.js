@@ -160,24 +160,25 @@
                 },
                 {
                     type: "Feature",
-                    properties: {
-                        tipo: "advertencia",
-                        descripcion: "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote."
-                    },
-                    geometry: {
-                        type: "Point",
-                        coordinates: [-15.4319292, 28.139543]
-                    }
+    properties: {
+        icono: "↪️",
+        titulo: "Desvío recomendado",
+        descripcion: "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote."
+    },
+    geometry: {
+        type: "Point",
+        coordinates: [-15.4319292, 28.139543]
                 },
                 {
                     type: "Feature",
-                    properties: {
-                        tipo: "advertencia",
-                        descripcion: "Carril bici cerrado por obras. Continuar por la calzada extremando la precaución."
-                    },
-                    geometry: {
-                        type: "Point",
-                        coordinates: [-15.430059, 28.1415701]
+    properties: {
+        icono: "🚧",
+        titulo: "Obras en el carril",
+        descripcion: "Carril bici cerrado por obras. Continuar por la calzada extremando la precaución."
+    },
+    geometry: {
+        type: "Point",
+        coordinates: [-15.430059, 28.1415701]
                     }
                 }
             ]
