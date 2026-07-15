@@ -106,6 +106,42 @@ const datosRutasInfo = {
             }
         ]
     }
+},
+    "las-arenas-belen-maria": {
+    eje: "norte",
+    titulo: "Eje Norte · Avenida Marítima",
+    subtitulo: "CC Las Arenas ⬌ Belén María (La Isleta)",
+    dificultad: "facil",
+    distancia: "4,2 km",
+    tiempo: "15-20 min",
+    desnivel: "Llana",
+    descripcion: "Uno de los recorridos más cómodos de la ciudad para desplazarse en bicicleta. Une el CC Las Arenas con Guanarteme, Mesa y López, Santa Catalina y Belén María siguiendo casi en su totalidad carriles bici y vías ciclistas, conectando además con numerosas estaciones de Sítycleta y algunos de los principales puntos de interés de la ciudad.",
+    etiquetas: [
+        "🚲 Ideal para principiantes",
+        "🌊 Recorrido junto al mar"
+    ],
+    consejos: [
+        {
+            icono: "🚲",
+            titulo: "Ruta muy cómoda",
+            texto: "Prácticamente todo el recorrido discurre por carril bici o vías ciclistas de baja dificultad."
+        },
+        {
+            icono: "🚧",
+            titulo: "Obras en Santa Catalina",
+            texto: "Actualmente el carril bici permanece cortado. Sigue la acera bici de Secretario Artiles y continúa por Luis Morote."
+        },
+        {
+            icono: "⚠️",
+            titulo: "Fin temporal del carril bici",
+            texto: "En la zona de Santa Catalina será necesario incorporarse a la calzada durante un pequeño tramo. Circula con precaución."
+        },
+        {
+            icono: "🌬️",
+            titulo: "Viento",
+            texto: "Con alisio es habitual encontrar viento de cara en dirección hacia Belén María."
+        }
+    ]
 };
 
 // =========================================================================
