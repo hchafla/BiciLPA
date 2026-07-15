@@ -27,18 +27,49 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        body, html {
+        /* position:fixed + inset:0 bloquea por completo el scroll/rebote de la
+           página en móvil. Sin esto, al llegar al final de un contenedor con
+           scroll interno, el navegador "cede" el gesto a la página entera y
+           arrastra consigo el mapa y la navbar. */
+        html, body {
             height: 100%;
             width: 100%;
+            position: fixed;
+            inset: 0;
             overflow: hidden;
+            overscroll-behavior: none;
             background-color: var(--bg-light);
         }
 
-        /* Contenedor Principal */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navegación superior (recuperada) */
+        nav {
+            background: #2c3e50;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 8px;
+            z-index: 2000;
+        }
+        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 0.95rem; }
+        nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+
+        /* Contenedor Principal: ocupa el espacio restante bajo la navbar,
+           en vez de un 100vh/100vw fijo que ignoraba la navbar */
         .map-container {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            flex: 1;
+            min-height: 0; /* imprescindible para que flex:1 se calcule bien */
         }
 
         #map-rutas {
@@ -203,6 +234,7 @@
             overflow-y: auto;
             padding: 20px;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain; /* evita que el scroll "se escape" hacia la página/mapa */
         }
 
         /* Tarjeta de Información */
@@ -383,6 +415,17 @@
     </style>
 </head>
 <body>
+
+    <!-- Menú de Navegación del Modelo Multi-página (recuperado) -->
+    <nav>
+        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
+        <div>
+            <a href="index.html">Mapa en Vivo</a>
+            <a href="rutas.html" class="active">Rutas Recomendadas</a>
+            <a href="normativa.html">Normativa</a>
+            <a href="talleres.html">Talleres</a>
+        </div>
+    </nav>
 
     <div class="map-container">
         <!-- Selector Principal de Ejes -->
@@ -674,38 +717,52 @@
         // 5. GESTIÓN TÁCTIL (MOVIMIENTOS DE DESLIZAMIENTO MÓVIL)
         const sidebar = document.getElementById('rutas-sidebar');
         let startY = 0, currentY = 0, isDragging = false;
+        let modoArrastre = null; // 'panel' (mover todo el panel) | null (aún sin decidir)
 
         function esDispositivoMovil() { return window.innerWidth <= 768; }
 
-        // PUNTO 2: cuando el panel ya está totalmente expandido, solo el "drag handle"
-        // puede iniciar un arrastre para colapsarlo. El resto del contenido (biciconsejos,
-        // descripción, etc.) debe poder hacer scroll libremente sin que se interprete
-        // como un gesto de arrastre del panel.
+        // Se puede iniciar el arrastre agarrando la cabecera (handle + botón cerrar),
+        // igual que antes. Pero si el toque empieza dentro del contenido con el panel
+        // ya expandido, NO decidimos todavía: esperamos al primer touchmove para ver
+        // si el usuario quiere hacer scroll (lo dejamos pasar) o tirar hacia abajo
+        // estando ya arriba del todo (eso sí colapsa el panel).
         sidebar.addEventListener('touchstart', (e) => {
             if (!esDispositivoMovil()) return;
-            const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
-            const esHandle = e.target.id === 'drag-handle';
+            const enCabecera = e.target.id === 'drag-handle' || !!e.target.closest('.sidebar-header');
 
-            if (sidebar.classList.contains('expanded')) {
-                if (esHandle) {
-                    startY = e.touches[0].clientY;
-                    isDragging = true;
-                    sidebar.style.transition = 'none';
-                }
-                return;
-            }
+            startY = e.touches[0].clientY;
+            currentY = startY;
 
-            if (esHandle || contenedorTarjetas.scrollTop <= 0) {
-                startY = e.touches[0].clientY;
+            if (enCabecera || !sidebar.classList.contains('expanded')) {
                 isDragging = true;
-                sidebar.style.transition = 'none'; 
+                modoArrastre = 'panel';
+                sidebar.style.transition = 'none';
+            } else {
+                isDragging = false;
+                modoArrastre = null;
             }
         });
 
         sidebar.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
+            if (!esDispositivoMovil()) return;
             currentY = e.touches[0].clientY;
             const deltaY = currentY - startY;
+
+            if (modoArrastre === null) {
+                const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
+                // Solo se convierte en "cerrar panel" si tira hacia abajo estando
+                // ya al principio del contenido. En cualquier otro caso, dejamos
+                // que el scroll nativo del contenido siga funcionando.
+                if (deltaY > 0 && contenedorTarjetas.scrollTop <= 0) {
+                    isDragging = true;
+                    modoArrastre = 'panel';
+                    sidebar.style.transition = 'none';
+                } else {
+                    return;
+                }
+            }
+
+            if (!isDragging) return;
 
             if (e.cancelable) e.preventDefault();
 
@@ -719,6 +776,7 @@
         }, { passive: false });
 
         sidebar.addEventListener('touchend', () => {
+            modoArrastre = null;
             if (!isDragging) return;
             isDragging = false;
             sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94)';
@@ -765,6 +823,10 @@
         selectorEjes.addEventListener('scroll', actualizarPistaScrollCarrusel);
         window.addEventListener('resize', actualizarPistaScrollCarrusel);
         window.addEventListener('load', actualizarPistaScrollCarrusel);
+
+        // Si la navbar cambia de alto (p.ej. hace wrap en pantallas muy estrechas),
+        // el mapa debe recalcular su tamaño o Leaflet se queda con medidas viejas.
+        window.addEventListener('resize', () => map.invalidateSize());
     </script>
 </body>
 </html>
