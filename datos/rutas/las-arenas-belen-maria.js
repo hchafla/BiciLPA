@@ -5,18 +5,17 @@
     const datos = {
         id: "las-arenas-belen-maria",
         eje: "norte",
-        titulo: "Eje Norte · Las Arenas - Belén María",
-        subtitulo: "CC Las Arenas ⬌ Plaza de Belén María",
+        titulo: "CC Las Arenas ⬌ Plaza de Belén María",
+        subtitulo: "Recorre los barrios de Guanarteme y El Puerto",
         dificultad: "facil",
         distancia: "6,2 km",
         tiempo: "22-30 min",
         desnivel: "Llana",
         descripcion: "Eje clave de conexión litoral norte que recorre la icónica zona de Las Canteras y conecta con el área portuaria e industrial de El Sebadal. Ideal para desplazamientos interurbanos rápidos y planos.",
         etiquetas: [
-            "🌊 Vistas al mar",
             "🛣️ Tramos compartidos y segregados",
-            "🚶 Precaución: zona muy peatonal"
-        ],
+            "🚶 Precaución: zonas compartidas con peatones"
+                    ],
         consejos: [
             {
                 icono: "🚶",
@@ -29,9 +28,9 @@
                 texto: "Atención a desvíos temporales o tramos cortados en la conexión hacia el istmo."
             },
             {
-                icono: "🌬️",
-                titulo: "Viento del norte",
-                texto: "Suele soplar con fuerza en dirección oeste-este a la vuelta."
+                icono: "👀",
+                titulo: "Ojo",
+                texto: "En dirección Las Arenas, extremar la precaución en el carril bici a contramano de Secretario Artiles. Especialmente en los cruces con coches."
             }
         ],
         geojson: {
@@ -142,7 +141,7 @@
                             [-15.4243273, 28.1492647],
                             [-15.4241104, 28.1493059],
                             [-15.4241232, 28.149379],
-                            [-15.4233575, 28.149531],
+                            [-15.4223575, 28.149531],
                             [-15.4226045, 28.1496697],
                             [-15.4223812, 28.149696],
                             [-15.4223216, 28.1494541],
@@ -160,25 +159,26 @@
                 },
                 {
                     type: "Feature",
-    properties: {
-        icono: "↪️",
-        titulo: "Desvío recomendado",
-        descripcion: "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote."
-    },
-    geometry: {
-        type: "Point",
-        coordinates: [-15.4319292, 28.139543]
+                    properties: {
+                        icono: "↪️",
+                        titulo: "Desvío recomendado",
+                        descripcion: "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote."
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: [-15.4319292, 28.139543]
+                    }
                 },
-                
+                {
                     type: "Feature",
-    properties: {
-        icono: "🚧",
-        titulo: "Obras en el carril",
-        descripcion: "Carril bici cerrado por obras. Continuar por la calzada extremando la precaución."
-    },
-    geometry: {
-        type: "Point",
-        coordinates: [-15.430059, 28.1415701]
+                    properties: {
+                        icono: "🚧",
+                        titulo: "Obras en el carril",
+                        descripcion: "Carril bici cerrado por obras. Continuar por la calzada extremando la precaución."
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: [-15.430059, 28.1415701]
                     }
                 }
             ]
