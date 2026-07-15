@@ -5,8 +5,8 @@
     const datos = {
         id: "las-arenas-hoya-de-la-plata",
         eje: "este",
-        titulo: "Eje Este",
-        subtitulo: "CC Las Arenas ⮕ Hoya de la Plata",
+        titulo: "CC Las Arenas ⮕ Hoya de la Plata",
+        subtitulo: "",
         dificultad: "moderada",
         distancia: "10,8 km",
         tiempo: "40-55 min",
@@ -32,12 +32,7 @@
                 titulo: "Pendiente moderada",
                 texto: "La subida por la Avenida Eufemiano Jurado es el tramo más exigente de la ruta."
             },
-            {
-                icono: "⚡",
-                titulo: "Ideal para eSítycleta",
-                texto: "La asistencia eléctrica hace prácticamente imperceptible el desnivel."
-            }
-        ],
+                 ],
 geojson: {
     type: "FeatureCollection",
     features: [
