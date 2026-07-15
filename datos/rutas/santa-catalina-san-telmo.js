@@ -23,12 +23,12 @@
                 texto: "Perfecta para estrenarse en la ciudad"
             },
             {
-                icono: "⚠️",
+                icono: "❗",
                 titulo: "Precaución en Alcaravaneras",
                 texto: "Peatones cruzando el carril bici"
             },
             {
-                icono: "❗",
+                icono: "🚳",
                 titulo: "Fin del carril bici",
                 texto: "A la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta. Para continuar en dirección Vegueta hay que salir a la calzada hasta el carril bici de León y Castillo"
             },
