@@ -23,7 +23,7 @@ const rutasManifest = {
     "eje": "alta-baja"
   },
   "las-arenas-belen-maria": {
-    "titulo": "Las Arenas a Belén María",
+    "titulo": "Las Arenas ⮕ Belén María",
     "eje": "norte"
   }
 
