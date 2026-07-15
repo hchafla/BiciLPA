@@ -5,17 +5,17 @@
     const datos = {
         id: "castillo-mata-canodromo",
         eje: "baja-alta",
-        titulo: "Eje Ciudad Baja · Ciudad Alta",
-        subtitulo: "Castillo de Mata ⮕ Parque del Canódromo",
+        titulo: "Castillo de Mata ⮕ Parque del Canódromo",
+        subtitulo: "",
         dificultad: "moderado",
         distancia: "3,9 km",
         tiempo: "12-13 min ⚡ · 20 min 🚲",
         desnivel: "+115 m",
-        descripcion: "La forma más cómoda de conectar la ciudad baja con la ciudad alta siguiendo el itinerario ciclista existente. Une dos estaciones de eSítycleta mediante un recorrido continuo que evita las rampas más exigentes.",
+        descripcion: "La forma más cómoda de subir desde Ciudad Baja hasta Ciudad Alta utilizando el itinerario ciclista existente. Conecta dos estaciones de eSítycleta evitando las rampas más duras de otros accesos.",
         etiquetas: [
             "⚡ Ideal para eSítycleta",
-            "⛰️ Pendiente moderada",
-            "🛣️ Ciclovía 30 (calzada compartida)"
+            "⛰️ Subida constante",
+            "🛣️ Ciclovía 30"
         ],
         consejos: [
             {
@@ -26,12 +26,12 @@
             {
                 icono: "🚲",
                 titulo: "Con bici convencional",
-                texto: "Requiere una condición física mínima, especialmente en la subida por el Paseo de San Antonio."
+                texto: "La subida es continua pero asumible si tienes un mínimo de forma física. Puedes tomártela con calma."
             },
             {
-                icono: "🚦",
-                titulo: "Vía compartida",
-                texto: "Aunque el límite es de 30 km/h, mantén una posición visible en el carril."
+                icono: "🚗",
+                titulo: "Comparte la calzada",
+                texto: "Circulas por calles 30 junto a otros vehículos. Mantén una posición visible y evita pegarte al borde derecho."
             }
         ],
         geojson: {
@@ -52,7 +52,6 @@
                             [-15.421952, 28.1077118],
                             [-15.4220443, 28.1076546],
                             [-15.4221263, 28.1075883],
-                            [-15.422561, 28.1074496],
                             [-15.4223005, 28.1073321],
                             [-15.422321, 28.1071905],
                             [-15.4223927, 28.1071031],
@@ -67,7 +66,6 @@
                             [-15.4223791, 28.1084983],
                             [-15.4224132, 28.1086249],
                             [-15.4224952, 28.1087243],
-                            [-15.4226387, 28.10869],
                             [-15.422789, 28.1089955],
                             [-15.4230179, 28.1091432],
                             [-15.4232878, 28.1093089],
