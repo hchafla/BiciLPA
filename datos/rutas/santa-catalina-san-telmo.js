@@ -4,14 +4,14 @@
 
     const datos = {
         id: "santa-catalina-san-telmo",
-        eje: "central",
-        titulo: "Eje Central · Avenida Marítima",
+        eje: "este",
+        titulo: "Avenida Marítima",
         subtitulo: "Parque Santa Catalina ⬌ Parque San Telmo",
         dificultad: "facil",
         distancia: "4,8 km",
         tiempo: "18-25 min",
         desnivel: "Llana",
-        descripcion: "La principal columna vertebral del ciclismo urbano en Las Palmas de Gran Canaria. Conecta Santa Catalina con Triana, y viceversa de forma rápida, cómoda y completamente por carril bici, enlazando con estaciones de Sítycleta.",
+        descripcion: "La principal columna vertebral del ciclismo urbano en Las Palmas de Gran Canaria. Conecta Santa Catalina con Triana, y viceversa, de forma rápida, cómoda y completamente por carril bici.",
         etiquetas: [
             "🚲 Ideal para principiantes",
             "🛣️ Carril bici segregado"
@@ -30,7 +30,7 @@
             {
                 icono: "❗",
                 titulo: "Fin del carril bici",
-                texto: "A la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta"
+                texto: "A la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta. Para continuar en dirección Vegueta hay que salir a la calzada hasta el carril bici de León y Castillo"
             },
             {
                 icono: "🌬️",
@@ -98,8 +98,9 @@
                 },
                 {
                     type: "Feature",
-                    properties: {
-                        tipo: "advertencia",
+                   properties: {
+        icono: "❗​",
+        titulo: "¡Atención!",
                         descripcion: "Cuidado con entrada y salida de coches + peatones cruzando el carril"
                     },
                     geometry: {
@@ -109,9 +110,10 @@
                 },
                 {
                     type: "Feature",
-                    properties: {
-                        tipo: "advertencia",
-                        descripcion: "Fin del carril bici"
+                   properties: {
+        icono: "🚳​",
+        titulo: "Fin del carril bici",
+                        descripcion: ""
                     },
                     geometry: {
                         type: "Point",
