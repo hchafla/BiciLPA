@@ -1,10 +1,9 @@
 // datos/rutas/castillo-mata-canodromo.js
+(function () {
+    "use strict";
 
-// =========================================================================
-// 1. INFORMACIÓN EDITORIAL Y SEMÁNTICA
-// =========================================================================
-const datosRutasInfo = {
-    "castillo-mata-canodromo": {
+    const datos = {
+        id: "castillo-mata-canodromo",
         eje: "baja-alta",
         titulo: "Eje Ciudad Baja · Ciudad Alta",
         subtitulo: "Castillo de Mata ⮕ Parque del Canódromo",
@@ -34,27 +33,16 @@ const datosRutasInfo = {
                 titulo: "Vía compartida",
                 texto: "Aunque el límite es de 30 km/h, mantén una posición visible en el carril."
             }
-        ]
-    }
-};
-
-// =========================================================================
-// 2. GEOMETRÍA Y GEODATOS (GeoJSON)
-// =========================================================================
-const datosRutasTrazados = {
-    "castillo-mata-canodromo": {
-        "nombre": "Castillo de Mata - Parque del Canódromo",
-        "geojson": {
-            "type": "FeatureCollection",
-            "features": [
+        ],
+        geojson: {
+            type: "FeatureCollection",
+            features: [
                 {
-                    "type": "Feature",
-                    "properties": {
-                        "tipo": "linea"
-                    },
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": [
+                    type: "Feature",
+                    properties: { tipo: "linea" },
+                    geometry: {
+                        type: "LineString",
+                        coordinates: [
                             [-15.4217744, 28.1080794],
                             [-15.4216924, 28.1080764],
                             [-15.4216036, 28.10798],
@@ -101,26 +89,8 @@ const datosRutasTrazados = {
                 }
             ]
         }
-    }
-};
+    };
 
-// =========================================================================
-// 3. EXPOSICIÓN DE VARIABLES GLOBALES (Para el mapa)
-// =========================================================================
-const rutasInfo = datosRutasInfo;
-
-const rutasTrazados = (() => {
-    const procesadas = {};
-    for (const key in datosRutasTrazados) {
-        if (Object.prototype.hasOwnProperty.call(datosRutasTrazados, key)) {
-            const geojson = datosRutasTrazados[key].geojson;
-            const lineaFeature = geojson.features.find(f => f.properties && f.properties.tipo === "linea");
-            if (lineaFeature && lineaFeature.geometry && lineaFeature.geometry.coordinates) {
-                procesadas[key] = lineaFeature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
-            } else {
-                procesadas[key] = [];
-            }
-        }
-    }
-    return procesadas;
+    // Asignación al loader de rutas.html para renderizado inmediato
+    window.rutaActivaDatos = datos;
 })();
