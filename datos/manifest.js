@@ -15,7 +15,7 @@ const rutasManifest = {
     "eje": "este"
   },
   "castillo-mata-canodromo": {
-    "titulo": "Castillo ⮕ Mata a Canódromo",
+    "titulo": "Castillo de Mata ⮕ Canódromo",
     "eje": "baja-alta"
   },
   "canodromo-castillo-mata": {
