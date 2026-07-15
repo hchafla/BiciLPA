@@ -4,33 +4,28 @@
 // El archivo .js detallado solo se descargará cuando el usuario haga clic.
 // 
 // Valores válidos para el campo "eje":
-// - "este"
+// - "central"
 // - "norte"
 // - "baja-alta"
 // - "alta-baja"
 // =========================================================================
 const rutasManifest = {
   "santa-catalina-san-telmo": {
-    "titulo": "Santa Catalina ⬌ San Telmo",
-    "eje": "este"
+    "titulo": "Santa Catalina a San Telmo",
+    "eje": "central"
   },
   "castillo-mata-canodromo": {
-    "titulo": "Castillo de Mata ⮕ Canódromo",
+    "titulo": "Castillo de Mata a Canódromo",
     "eje": "baja-alta"
   },
   "canodromo-castillo-mata": {
-    "titulo": "Canódromo ⮕ Castillo de Mata",
+    "titulo": "Canódromo a Castillo de Mata",
     "eje": "alta-baja"
   },
   "las-arenas-belen-maria": {
-    "titulo": "Las Arenas ⮕ Belén María",
+    "titulo": "Las Arenas a Belén María",
     "eje": "norte"
-  },
-  "las-arenas-hoya-de-la-plata": {
-    "titulo": "Las Arenas ⮕ Hoya de la Plata",
-    "eje": "este"
   }
-};
 
   // =======================================================================
   // 💡 PLANTILLA PARA AÑADIR NUEVAS RUTAS (Copiar y pegar abajo)
@@ -38,7 +33,7 @@ const rutasManifest = {
   /*
   ,"id-de-tu-nueva-ruta": {
     "titulo": "Nombre Visible en el Botón",
-    "eje": "este"
+    "eje": "central"
   }
   */
 };
