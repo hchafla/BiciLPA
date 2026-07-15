@@ -172,6 +172,7 @@
             border-radius: 3px;
             margin: 10px auto 5px auto;
             cursor: grab;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
@@ -179,6 +180,7 @@
             display: flex;
             justify-content: flex-end;
             border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .close-btn {
@@ -199,6 +201,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Tarjeta de Información */
@@ -270,11 +273,26 @@
         .ruta-card[data-eje="baja-alta"] .indicaciones { border-left-color: #FF851B; }
         .ruta-card[data-eje="alta-baja"] .indicaciones { border-left-color: #B10DC9; }
 
+        /* PUNTO 1: Marcadores personalizados con icono desde el GeoJSON */
+        .marcador-punto-icono-interior {
+            width: 34px;
+            height: 34px;
+            background: #fff;
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow);
+        }
+
         /* RESPONSIVE (Móvil / Bottom Sheet) */
         @media (max-width: 768px) {
             .selector-ejes {
                 top: 10px;
                 padding: 6px;
+                position: relative; /* necesario para el degradado del punto 4 */
             }
 
             .eje-btn {
@@ -326,6 +344,24 @@
             .sidebar-content {
                 padding: 10px 20px 30px 20px;
             }
+
+            /* PUNTO 4: pista visual de scroll horizontal en el selector de ejes */
+            .selector-ejes::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 36px;
+                height: 100%;
+                background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.97));
+                border-radius: 0 30px 30px 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease;
+            }
+
+            .selector-ejes.scroll-fin::after {
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -333,7 +369,7 @@
 
     <div class="map-container">
         <!-- Selector Principal de Ejes -->
-        <div class="selector-ejes">
+        <div class="selector-ejes" id="selector-ejes">
             <button class="eje-btn" data-eje="central" onclick="filtrarEje('central')">Eje Central</button>
             <button class="eje-btn" data-eje="norte" onclick="filtrarEje('norte')">Eje Norte</button>
             <button class="eje-btn" data-eje="baja-alta" onclick="filtrarEje('baja-alta')">Conexión Baja-Alta</button>
@@ -441,7 +477,9 @@
                 carrusel.style.display = 'none';
             }
 
-            map.setView([28.128, -15.432], 13);
+            // PUNTO 4: recalcular la pista de scroll horizontal al cambiar de eje
+            // (el nuevo carrusel puede tener un ancho de scroll distinto)
+            requestAnimationFrame(actualizarPistaScrollCarrusel);
         }
 
         // 2. CARGA DINÁMICA BAJO DEMANDA (Inyección de Scripts)
@@ -542,8 +580,13 @@
                 style: function() {
                     return { color: colorTrazado, weight: 6, opacity: 0.90 };
                 },
+                // PUNTO 1: respeta cualquier icono definido en las properties del GeoJSON.
+                // Las advertencias siguen usando el círculo rojo; cualquier otro punto con
+                // un campo "icono" se dibuja con ese emoji/símbolo exacto, sin tocar el HTML.
                 pointToLayer: function(feature, latlng) {
-                    if (feature.properties && feature.properties.tipo === 'advertencia') {
+                    const props = feature.properties || {};
+
+                    if (props.tipo === 'advertencia') {
                         return L.circleMarker(latlng, {
                             radius: 9,
                             fillColor: '#e74c3c',
@@ -551,15 +594,33 @@
                             weight: 2,
                             opacity: 1,
                             fillOpacity: 0.9
-                        }).bindPopup(`<strong>⚠️ ¡Atención!</strong><br>${feature.properties.descripcion}`);
+                        }).bindPopup(`<strong>⚠️ ¡Atención!</strong><br>${props.descripcion}`);
                     }
+
+                    if (props.icono) {
+                        const iconoPersonalizado = L.divIcon({
+                            className: 'marcador-punto-icono',
+                            html: `<div class="marcador-punto-icono-interior">${props.icono}</div>`,
+                            iconSize: [34, 34],
+                            iconAnchor: [17, 17],
+                            popupAnchor: [0, -17]
+                        });
+
+                        const marker = L.marker(latlng, { icon: iconoPersonalizado });
+                        if (props.titulo || props.descripcion) {
+                            marker.bindPopup(`${props.titulo ? `<strong>${props.titulo}</strong><br>` : ''}${props.descripcion || ''}`);
+                        }
+                        return marker;
+                    }
+
                     return L.marker(latlng);
                 }
             }).addTo(rutaActivaLayer);
 
-            // Ajustar el encuadre del mapa al trazado GeoJSON de la ruta
+            // PUNTO 3: centra el mapa en la nueva ruta sin forzar un zoom nuevo,
+            // respetando el nivel de zoom que el usuario tenga en ese momento.
             if (capaGeoJSON.getBounds().isValid()) {
-                map.fitBounds(capaGeoJSON.getBounds(), { padding: [40, 40], maxZoom: 15 });
+                map.panTo(capaGeoJSON.getBounds().getCenter(), { animate: true });
             }
         }
 
@@ -599,11 +660,25 @@
 
         function esDispositivoMovil() { return window.innerWidth <= 768; }
 
+        // PUNTO 2: cuando el panel ya está totalmente expandido, solo el "drag handle"
+        // puede iniciar un arrastre para colapsarlo. El resto del contenido (biciconsejos,
+        // descripción, etc.) debe poder hacer scroll libremente sin que se interprete
+        // como un gesto de arrastre del panel.
         sidebar.addEventListener('touchstart', (e) => {
             if (!esDispositivoMovil()) return;
             const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
-            
-            if (e.target.id === 'drag-handle' || contenedorTarjetas.scrollTop <= 0) {
+            const esHandle = e.target.id === 'drag-handle';
+
+            if (sidebar.classList.contains('expanded')) {
+                if (esHandle) {
+                    startY = e.touches[0].clientY;
+                    isDragging = true;
+                    sidebar.style.transition = 'none';
+                }
+                return;
+            }
+
+            if (esHandle || contenedorTarjetas.scrollTop <= 0) {
                 startY = e.touches[0].clientY;
                 isDragging = true;
                 sidebar.style.transition = 'none'; 
@@ -661,6 +736,18 @@
                 }
             }
         });
+
+        // PUNTO 4: pista visual de scroll horizontal en el selector de Ejes (móvil).
+        // Muestra un degradado a la derecha mientras haya más ejes por descubrir,
+        // y lo oculta automáticamente al llegar al final del scroll.
+        const selectorEjes = document.getElementById('selector-ejes');
+        function actualizarPistaScrollCarrusel() {
+            const alFinal = selectorEjes.scrollLeft + selectorEjes.clientWidth >= selectorEjes.scrollWidth - 5;
+            selectorEjes.classList.toggle('scroll-fin', alFinal);
+        }
+        selectorEjes.addEventListener('scroll', actualizarPistaScrollCarrusel);
+        window.addEventListener('resize', actualizarPistaScrollCarrusel);
+        window.addEventListener('load', actualizarPistaScrollCarrusel);
     </script>
 </body>
 </html>
