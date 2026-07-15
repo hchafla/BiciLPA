@@ -105,8 +105,7 @@ const datosRutasInfo = {
                 texto: "Los coches pueden no prever tu velocidad en descenso."
             }
         ]
-    }
-},
+    },
     "las-arenas-belen-maria": {
     eje: "norte",
     titulo: "Eje Norte · Avenida Marítima",
