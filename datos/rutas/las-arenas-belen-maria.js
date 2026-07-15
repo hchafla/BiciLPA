@@ -20,17 +20,17 @@
             {
                 icono: "🚶",
                 titulo: "Prioridad peatonal",
-                texto: "En los tramos cercanos al paseo de Las Canteras y zonas comerciales, modera la velocidad."
+                texto: "En los tramos cercanos al paseo de Las Canteras y zonas comerciales, modera la velocidad"
             },
              {
                 icono: "↪️",
                 titulo: "Atajo",
-                texto: "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote."
+                texto: "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote"
             },
             {
                 icono: "🚧",
                 titulo: "Zonas en obras",
-                texto: "Atención a desvíos temporales o tramos cortados en la conexión hacia el istmo."
+                texto: "Atención a desvíos temporales o tramos cortados en la conexión hacia el istmo"
             },
             {
                 icono: "👀",
