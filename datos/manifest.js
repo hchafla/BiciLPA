@@ -25,7 +25,12 @@ const rutasManifest = {
   "las-arenas-belen-maria": {
     "titulo": "Las Arenas ⮕ Belén María",
     "eje": "norte"
+  },
+  "las-arenas-hoya-de-la-plata": {
+    "titulo": "Las Arenas ⮕ Hoya de la Plata",
+    "eje": "este"
   }
+};
 
   // =======================================================================
   // 💡 PLANTILLA PARA AÑADIR NUEVAS RUTAS (Copiar y pegar abajo)
