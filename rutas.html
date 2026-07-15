@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Infraestructura Ciclista - Rutas</title>
+    <title>BiciLPA · Rutas</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -92,7 +92,7 @@
             color: #fff;
         }
 
-        /* Estilos específicos de botones según el eje activo */
+        /* Colores específicos de los botones de ejes */
         .eje-btn[data-eje="central"].active { background-color: #0074D9; }
         .eje-btn[data-eje="norte"].active { background-color: #2ECC40; }
         .eje-btn[data-eje="baja-alta"].active { background-color: #FF851B; }
@@ -105,7 +105,7 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
-            display: none; /* Se activa mediante JS */
+            display: none; /* Cambia a flex vía JavaScript */
             gap: 10px;
             max-width: 90%;
             overflow-x: auto;
@@ -134,7 +134,7 @@
             transform: translateY(-2px);
         }
 
-        /* Color dinámico del ítem del carrusel activo según el eje */
+        /* Color de los ítems seleccionados según su eje */
         .carrusel-item.active[data-eje-grupo="central"] { background: #0074D9; color: white; border-color: #0074D9; }
         .carrusel-item.active[data-eje-grupo="norte"] { background: #2ECC40; color: white; border-color: #2ECC40; }
         .carrusel-item.active[data-eje-grupo="baja-alta"] { background: #FF851B; color: white; border-color: #FF851B; }
@@ -154,7 +154,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: translateX(120%); /* Oculto por defecto */
+            transform: translateX(120%); /* Oculto por defecto en escritorio */
             transition: transform 0.4s cubic-bezier(0.1, 0.76, 0.55, 0.94);
             border: 1px solid var(--border-color);
         }
@@ -264,7 +264,7 @@
             color: #4a5568;
         }
 
-        /* Asignación dinámica del borde de indicaciones según el eje */
+        /* Color dinámico del borde de indicaciones según eje */
         .ruta-card[data-eje="central"] .indicaciones { border-left-color: #0074D9; }
         .ruta-card[data-eje="norte"] .indicaciones { border-left-color: #2ECC40; }
         .ruta-card[data-eje="baja-alta"] .indicaciones { border-left-color: #FF851B; }
@@ -301,7 +301,7 @@
             }
 
             .rutas-sidebar.visible {
-                transform: translateY(55%); /* Se eleva inicialmente a la mitad */
+                transform: translateY(55%); /* Elevado a la mitad por defecto */
             }
 
             .rutas-sidebar.expanded {
@@ -361,7 +361,7 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Manifiesto Global (Cargado primero) -->
+    <!-- Manifiesto Global (Cargado en orden prioritario) -->
     <script src="datos/manifest.js"></script>
 
     <!-- Script Principal de Control -->
@@ -370,7 +370,7 @@
         // INICIALIZACIÓN Y EVENTOS
         // =========================================================================
 
-        // Inicialización del Mapa
+        // Inicialización del Mapa centrado en la zona de interés
         const map = L.map('map-rutas').setView([28.128, -15.432], 13);
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -386,41 +386,46 @@
             'alta-baja': '#B10DC9'  
         };
 
-        // Asegurar la carga inicial una vez que el DOM y manifest.js estén listos
-        document.addEventListener("DOMContentLoaded", () => {
+        // Escucha segura para que se lea manifest.js antes de inicializar el eje por defecto
+        window.addEventListener("load", () => {
             if (typeof rutasManifest !== 'undefined') {
-                filtrarEje('central'); // Carga el eje central por defecto
+                filtrarEje('central'); // Eje central por defecto al iniciar
             } else {
-                console.error("Error crítico: No se ha podido cargar 'rutasManifest' desde datos/manifest.js. Comprueba la ruta del archivo.");
+                console.error("Error crítico: 'rutasManifest' no está definido. Revisa que el archivo datos/manifest.js exista y esté bien escrito.");
             }
         });
 
-        // 1. FILTRADO DESDE EL MANIFIESTO
+        // 1. FILTRADO DESDE EL MANIFIESTO REAL
         function filtrarEje(ejeId) {
+            // Activar botón visual correspondiente
             document.querySelectorAll('.eje-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
             });
 
-            // Limpieza y reset de vistas
+            // Limpieza del mapa y cierre de barras laterales previas
             rutaActivaLayer.clearLayers();
             cerrarSidebar();
 
             const carrusel = document.getElementById('rutas-carrusel');
             carrusel.innerHTML = ''; 
-            carrusel.style.display = 'flex'; 
+            carrusel.style.display = 'flex'; // Forzar contenedor visible
 
-            // Verificar si el manifiesto existe antes de iterar
+            // Salvaguarda
             if (typeof rutasManifest === 'undefined') {
-                console.error("El objeto rutasManifest no está definido.");
+                carrusel.style.display = 'none';
                 return;
             }
 
-            // Leer del objeto global 'rutasManifest' cargado desde datos/manifest.js
             let rutasEncontradas = false;
+
+            // Recorrer las claves reales del manifiesto
             Object.keys(rutasManifest).forEach(idRuta => {
                 const infoSimplificada = rutasManifest[idRuta];
-                if (infoSimplificada.eje === ejeId) {
+                
+                // Limpieza de cadenas para evitar fallos por espacios en blanco o mayúsculas
+                if (String(infoSimplificada.eje).trim().toLowerCase() === String(ejeId).trim().toLowerCase()) {
                     rutasEncontradas = true;
+                    
                     const item = document.createElement('div');
                     item.className = 'carrusel-item';
                     item.setAttribute('data-id-ruta', idRuta);
@@ -431,6 +436,7 @@
                 }
             });
 
+            // Ocultar el carrusel si para ese eje no se configuran rutas en el manifiesto
             if (!rutasEncontradas) {
                 carrusel.style.display = 'none';
             }
@@ -438,40 +444,41 @@
             map.setView([28.128, -15.432], 13);
         }
 
-        // 2. CARGA DINÁMICA BAJO DEMANDA (desde datos/rutas/)
+        // 2. CARGA DINÁMICA BAJO DEMANDA (Inyección de Scripts)
         function seleccionarRuta(idRuta) {
+            // Marcar visualmente el submenú activo
             document.querySelectorAll('.carrusel-item').forEach(item => {
                 item.classList.toggle('active', item.getAttribute('data-id-ruta') === idRuta);
             });
 
-            // Destruir script previo si existía para evitar colisiones de memoria
+            // Eliminar scripts anteriores para evitar fugas de memoria
             const scriptPrevio = document.getElementById('script-ruta-activa');
             if (scriptPrevio) {
                 scriptPrevio.remove();
             }
 
-            // Inyectar dinámicamente el script de la ruta seleccionada apuntando a la carpeta de datos/rutas
+            // Crear e inyectar el script con la ruta exacta de la subcarpeta
             const script = document.createElement('script');
             script.id = 'script-ruta-activa';
             script.src = `datos/rutas/${idRuta}.js`;
             
             script.onload = () => {
-                // Recuperar el objeto inyectado en el espacio global por el script de la ruta
+                // Comprobación de integridad de los datos cargados en la variable global window
                 if (window.rutaActivaDatos && window.rutaActivaDatos.id === idRuta) {
                     renderizarDatosYMapa(window.rutaActivaDatos);
                 } else {
-                    console.error("Error: Los datos de la ruta no se cargaron correctamente en window.rutaActivaDatos.");
+                    console.error("Error de carga: Los datos cargados en 'window.rutaActivaDatos' no coinciden con la ID solicitada.");
                 }
             };
 
             script.onerror = () => {
-                console.error(`No se pudo cargar el archivo: datos/rutas/${idRuta}.js`);
+                console.error(`Error de red: No se pudo localizar el archivo 'datos/rutas/${idRuta}.js'.`);
             };
 
             document.body.appendChild(script);
         }
 
-        // 3. RENDERIZADO DE LA TARJETA Y EL TRAZADO EN EL MAPA
+        // 3. RENDERIZADO DE CONTENIDOS Y TRAZADO GEOMETRÍA
         function renderizarDatosYMapa(datos) {
             const contenedor = document.getElementById('contenedor-tarjetas');
             contenedor.innerHTML = ''; // Limpiar tarjeta anterior
@@ -491,7 +498,7 @@
                 ${c.icono || '👉'} <strong>${c.titulo}:</strong> ${c.texto}.<br>
             `).join('\n') : '';
 
-            // Generar la tarjeta dinámica dentro de la barra lateral
+            // Generar la tarjeta detallada
             const card = document.createElement('div');
             card.className = 'ruta-card';
             card.setAttribute('data-eje', datos.eje);
@@ -515,19 +522,19 @@
             `;
             contenedor.appendChild(card);
 
-            // Mostrar barra lateral
+            // Transiciones CSS para la barra lateral / Bottom Sheet móvil
             const sidebar = document.getElementById('rutas-sidebar');
             if (esDispositivoMovil()) {
                 sidebar.classList.remove('expanded', 'minimized');
                 sidebar.classList.add('visible');
-                sidebar.style.transform = 'translateY(55%)'; // Estado colapsado móvil
+                sidebar.style.transform = 'translateY(55%)'; 
             } else {
                 sidebar.classList.remove('minimized', 'expanded');
                 sidebar.classList.add('visible');
                 sidebar.style.transform = ''; 
             }
 
-            // Pintar trazado GeoJSON en el mapa
+            // Limpieza y dibujado GeoJSON
             rutaActivaLayer.clearLayers();
             const colorTrazado = coloresEjes[datos.eje] || '#3498db';
 
@@ -550,12 +557,13 @@
                 }
             }).addTo(rutaActivaLayer);
 
+            // Ajustar el encuadre del mapa al trazado GeoJSON de la ruta
             if (capaGeoJSON.getBounds().isValid()) {
                 map.fitBounds(capaGeoJSON.getBounds(), { padding: [40, 40], maxZoom: 15 });
             }
         }
 
-        // 4. FUNCIONES AUXILIARES DE INTERFAZ
+        // 4. CONTROL DE INTERFAZ (SIDEBAR)
         function cerrarSidebar() {
             const sidebar = document.getElementById('rutas-sidebar');
             sidebar.classList.remove('visible', 'expanded', 'minimized');
@@ -585,7 +593,7 @@
             }
         }
 
-        // 5. GESTIÓN TÁCTIL MÓVIL (BOTTOM SHEET)
+        // 5. GESTIÓN TÁCTIL (MOVIMIENTOS DE DESLIZAMIENTO MÓVIL)
         const sidebar = document.getElementById('rutas-sidebar');
         let startY = 0, currentY = 0, isDragging = false;
 
