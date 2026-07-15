@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BiciLPA · Rutas</title>
+    <title>BiciLPA - Rutas</title>
     
     <!-- Hojas de estilo de Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -17,7 +17,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
             background: #f8f9fa; 
             color: #333; 
-            overflow: hidden; /* Evita cualquier scroll global en la página */
+            overflow: hidden; /* Evita scroll global */
         }
         
         /* Navegación superior común */
@@ -41,9 +41,9 @@
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            scrollbar-width: none; /* Ocultar scrollbar en Firefox */
+            scrollbar-width: none;
         }
-        .ejes-submenu::-webkit-scrollbar { display: none; } /* Ocultar en Chrome/Safari */
+        .ejes-submenu::-webkit-scrollbar { display: none; }
 
         .eje-btn {
             background: #f1f5f9;
@@ -93,7 +93,7 @@
         .carrusel-item.active[data-eje-grupo="baja-alta"] { background: #FF851B; color: white; border-color: #FF851B; }
         .carrusel-item.active[data-eje-grupo="alta-baja"] { background: #B10DC9; color: white; border-color: #B10DC9; }
 
-        /* Contenedor Principal de Rutas */
+        /* Contenedor Principal */
         .rutas-container { 
             display: flex; 
             position: relative;
@@ -102,10 +102,9 @@
             overflow: hidden;
         }
 
-        /* Visor de mapa */
         #map-rutas { width: 100%; height: 100%; z-index: 10; }
         
-        /* Panel Derecho Flotante (Escritorio) */
+        /* Panel Lateral (Escritorio) */
         .rutas-sidebar { 
             position: absolute;
             top: 15px;
@@ -127,35 +126,26 @@
             flex-direction: column;
         }
         
-        /* Tirador táctil visual (Solo visible/útil en móvil, oculto por defecto en escritorio) */
-        .drag-handle {
-            display: none;
-        }
-
-        /* Gradiente de desvanecimiento inferior (Oculto por defecto en escritorio) */
-        .fade-overlay {
-            display: none;
-        }
+        .drag-handle { display: none; }
+        .fade-overlay { display: none; }
 
         .rutas-sidebar.visible {
             transform: translateX(0);
             opacity: 1;
         }
 
-        /* Estado Minimizado en Escritorio (Muestra solo la cabecera/título arriba) */
         .rutas-sidebar.minimized {
             transform: translateY(calc(100% - 75px)) !important; 
         }
 
-        /* Contenedor de Tarjetas interno con scroll */
         #contenedor-tarjetas {
             overflow-y: auto;
             flex-grow: 1;
             padding-right: 5px;
         }
 
-        /* Tarjetas de ruta */
-        .ruta-card { display: none; background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; cursor: default; }
+        /* Tarjeta de ruta dinámica */
+        .ruta-card { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; }
         
         .ruta-card[data-eje-grupo="central"] { border-color: #0074D9; }
         .ruta-card[data-eje-grupo="norte"] { border-color: #2ECC40; }
@@ -173,12 +163,18 @@
             align-items: center; 
             flex-wrap: wrap;    
         }
+        .ruta-meta span:not(.tag-dificultad) {
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #475569;
+        }
         .tag-dificultad { 
             padding: 2px 6px; 
             border-radius: 4px; 
             font-weight: bold; 
             text-transform: uppercase;
-            flex-shrink: 0;      
             width: 90px;         
             text-align: center;
         }
@@ -188,37 +184,31 @@
         .descripcion-ruta { font-size: 0.85rem; color: #555; line-height: 1.4; margin-bottom: 10px; }
         .indicaciones { font-size: 0.85rem; color: #555; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; line-height: 1.4; }
 
-        /* ==========================================
-           ADAPTACIÓN MÓVIL ESTRICTA (EVITA BALANCEO)
-           ========================================== */
+        /* Adaptación móvil (Bottom Sheet) */
         @media (max-width: 768px) {
             .rutas-container {
                 height: calc(100vh - 150px);
                 width: 100%;
             }
             
-            /* Posicionamiento y dimensiones estrictas de la tarjeta móvil */
             .rutas-sidebar {
                 position: fixed;
                 top: auto;
                 bottom: 0;
                 right: 0;
                 left: 0;
-                width: 100%; /* Ocupa el ancho exacto del dispositivo */
+                width: 100%; 
                 height: 75vh; 
                 max-height: 75vh;
                 border-radius: 20px 20px 0 0;
                 box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
                 z-index: 2000;
                 transform: translateY(100%);
-                padding: 10px 20px 25px 20px; /* Reducimos ligeramente padding inferior */
+                padding: 10px 20px 25px 20px;
                 backdrop-filter: blur(10px);
-                border-left: none;
-                border-right: none;
-                border-bottom: none;
+                border: none;
             }
 
-            /* Tirador táctil exclusivo de móvil */
             .drag-handle {
                 display: block;
                 width: 40px;
@@ -230,7 +220,6 @@
                 cursor: grab;
             }
 
-            /* Gradiente activo solo en móvil para ocultar visualmente la parte inferior */
             .fade-overlay {
                 display: block;
                 position: absolute;
@@ -238,47 +227,27 @@
                 left: 0;
                 width: 100%;
                 height: 55px;
-                /* Degradado de transparente a blanco puro para fundirse con la tarjeta */
                 background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.98) 85%);
                 z-index: 2100;
-                pointer-events: none; /* Deja pasar los clicks al scroll de atrás */
+                pointer-events: none;
                 transition: opacity 0.25s ease;
-                opacity: 0; /* Por defecto invisible (cuando está minimizado) */
+                opacity: 0;
             }
 
-            .rutas-sidebar.visible.expanded .fade-overlay {
-                opacity: 0; /* Ocultamos el degradado al expandir para no tapar los biciconsejos */
-            }
+            .rutas-sidebar.visible.expanded .fade-overlay { opacity: 0; }
+            .rutas-sidebar.visible:not(.expanded):not(.minimized) .fade-overlay { opacity: 1; }
 
-            .rutas-sidebar.visible:not(.expanded):not(.minimized) .fade-overlay {
-                opacity: 1; /* Activo únicamente en el estado intermedio (deslizado medio) */
-            }
-
-            /* Forzamos espaciado estratégico para que "Biciconsejos" asome (Scroll Peeking) */
-            .descripcion-ruta {
-                margin-bottom: 25px; /* Crea el hueco ideal para que asome el título de biciconsejos */
-            }
-
-            #contenedor-tarjetas {
-                -webkit-overflow-scrolling: touch;
-            }
+            .descripcion-ruta { margin-bottom: 25px; }
+            #contenedor-tarjetas { -webkit-overflow-scrolling: touch; }
             
-            /* Los 3 estados del panel en móvil */
-            .rutas-sidebar.visible {
-                transform: translateY(55%); /* Estado Medio (Colapsado) */
-            }
-            .rutas-sidebar.expanded {
-                transform: translateY(0%); /* Estado Completo (Abierto) */
-            }
-            .rutas-sidebar.minimized {
-                transform: translateY(calc(100% - 75px)) !important; /* Estado Mínimo (Minimizado) */
-            }
+            .rutas-sidebar.visible { transform: translateY(55%); }
+            .rutas-sidebar.expanded { transform: translateY(0%); }
+            .rutas-sidebar.minimized { transform: translateY(calc(100% - 75px)) !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Menú de Navegación del Modelo Multi-página -->
     <nav>
         <a href="index.html" class="logo">🚲 LPGC en Bici</a>
         <div>
@@ -290,7 +259,7 @@
     </nav>
 
     <div class="header-menus">
-        <!-- 1. Submenú de Filtrado de Ejes -->
+        <!-- 1. Submenú de Ejes -->
         <div class="ejes-submenu">
             <button class="eje-btn" data-eje="central" onclick="filtrarEje('central')">Eje Central</button>
             <button class="eje-btn" data-eje="norte" onclick="filtrarEje('norte')">Eje Norte</button>
@@ -298,106 +267,34 @@
             <button class="eje-btn" data-eje="alta-baja" onclick="filtrarEje('alta-baja')">Ciudad Alta ➔ Ciudad Baja</button>
         </div>
 
-        <!-- 2. Carrusel horizontal de Rutas -->
+        <!-- 2. Carrusel Horizontal de Rutas -->
         <div class="rutas-carrusel" id="rutas-carrusel"></div>
     </div>
 
     <div class="rutas-container">
-        <!-- Panel Derecho Flotante / Bottom Sheet Móvil -->
         <div class="rutas-sidebar" id="rutas-sidebar">
-            <!-- Tirador visual táctil para arrastrar en móviles -->
             <div class="drag-handle" id="drag-handle"></div>
-            
-            <!-- Contenedor donde se inyectarán dinámicamente las tarjetas -->
             <div id="contenedor-tarjetas"></div>
-
-            <!-- Capa de desvanecimiento dinámico -->
             <div class="fade-overlay" id="fade-overlay"></div>
         </div>
 
-        <!-- El visor de la ruta -->
         <div id="map-rutas"></div>
     </div>
 
-    <!-- Scripts de Leaflet, Datos de Trazados y Datos Editoriales de Rutas -->
+    <!-- Cargas de librerías y del Manifiesto de Rutas -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="datos/rutas-trazados.js"></script>
-    <script src="datos/rutas-info.js"></script>
+    <script src="datos/manifest.js"></script>
     
     <script>
-        // =========================================================================
-        // GENERACIÓN DINÁMICA DE TARJETAS DESDE rutas-info.js AL CARGAR LA PÁGINA
-        // =========================================================================
-        const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
-        
-        // El script asume que rutasInfo está disponible (por herencia de rutas-info.js)
-        const infoRutasAAgregar = typeof rutasInfo !== 'undefined' ? rutasInfo : datosRutasInfo;
-
-        Object.keys(infoRutasAAgregar).forEach(idRuta => {
-            const r = infoRutasAAgregar[idRuta];
-            
-            // Mapeamos el nombre de clase CSS de dificultad según el dato
-            let claseDificultad = 'facil';
-            let textoDificultad = 'Fácil';
-            if (r.dificultad === 'moderado') {
-                claseDificultad = 'moderado';
-                textoDificultad = 'Moderado';
-            } else if (r.dificultad === 'dificil') {
-                claseDificultad = 'dificil';
-                textoDificultad = 'Difícil';
-            }
-
-            // Crear etiquetas secundarias HTML
-            const HTMLetiquetas = r.etiquetas.map(etiqueta => `<span>${etiqueta}</span>`).join('\n');
-
-            // Crear consejos HTML dinámicamente respetando el formato visual anterior
-            const HTMLconsejos = r.consejos.map(c => {
-                return `${c.icono} <strong>${c.titulo}:</strong> ${c.texto}.<br>`;
-            }).join('\n');
-
-            // Reconstrucción idéntica de la estructura HTML original
-            const card = document.createElement('div');
-            card.className = 'ruta-card';
-            card.setAttribute('data-eje-grupo', r.eje);
-            card.setAttribute('data-id', idRuta);
-            card.innerHTML = `
-                <div class="ruta-title" onclick="toggleMinimizar()">${r.titulo}</div>
-                <div class="ruta-subtitle">${r.subtitulo}</div>
-                <div class="ruta-meta">
-                    <span class="tag-dificultad ${claseDificultad}">${textoDificultad}</span>
-                    <span>📏 ${r.distancia}</span>
-                    <span>⏱️ ${r.tiempo}</span>
-                    <span>⬆️ ${r.desnivel}</span>
-                </div>
-                <div class="ruta-meta">
-                    ${HTMLetiquetas}
-                </div>
-                <p class="descripcion-ruta">
-                    ${r.descripcion}
-                </p>
-                <div class="indicaciones">
-                    <strong>💡 Biciconsejos</strong><br><br>
-                    ${HTMLconsejos}
-                </div>
-            `;
-            contenedorTarjetas.appendChild(card);
-        });
-
-        // =========================================================================
-        // LÓGICA ORIGINAL DE FUNCIONAMIENTO DE LA APP
-        // =========================================================================
-
-        // Inicializar mapa de rutas centrado en la ciudad
+        // Inicialización del Mapa
         const map = L.map('map-rutas').setView([28.128, -15.432], 13);
         
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // Capa dinámica única para dibujar el trazado y puntos activos
         let rutaActivaLayer = L.layerGroup().addTo(map);
 
-        // Paleta de colores unificada por eje
         const coloresEjes = {
             'central': '#0074D9',   
             'norte': '#2ECC40',     
@@ -405,89 +302,137 @@
             'alta-baja': '#B10DC9'  
         };
 
-        // 1. FILTRADO DE EJES Y GENERACIÓN DE SUB-BOTONES
+        // 1. FILTRADO DESDE EL MANIFIESTO
         function filtrarEje(ejeId) {
             document.querySelectorAll('.eje-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
             });
 
-            // Limpiar mapa y esconder la sidebar por completo antes de seleccionar ruta
+            // Limpieza y reset de vistas
             rutaActivaLayer.clearLayers();
-            const sidebar = document.getElementById('rutas-sidebar');
-            sidebar.classList.remove('visible', 'expanded', 'minimized');
-            if (esDispositivoMovil()) {
-                sidebar.style.transform = 'translateY(100%)';
-            } else {
-                sidebar.style.transform = 'translateX(120%)';
-            }
+            cerrarSidebar();
 
             const carrusel = document.getElementById('rutas-carrusel');
             carrusel.innerHTML = ''; 
             carrusel.style.display = 'flex'; 
 
-            const tarjetasDisponibles = document.querySelectorAll(`.ruta-card[data-eje-grupo="${ejeId}"]`);
-            
-            tarjetasDisponibles.forEach(tarjeta => {
-                const idRuta = tarjeta.getAttribute('data-id');
-                const tituloRuta = tarjeta.querySelector('.ruta-title').innerText;
-                
-                const item = document.createElement('div');
-                item.className = 'carrusel-item';
-                item.setAttribute('data-id-ruta', idRuta);
-                item.setAttribute('data-eje-grupo', ejeId);
-                item.innerText = tituloRuta;
-                item.onclick = () => seleccionarRuta(idRuta);
-                
-                carrusel.appendChild(item);
+            // Leer del objeto global 'rutasManifest' cargado desde manifest.js
+            let rutasEncontradas = false;
+            Object.keys(rutasManifest).forEach(idRuta => {
+                const infoSimplificada = rutasManifest[idRuta];
+                if (infoSimplificada.eje === ejeId) {
+                    rutasEncontradas = true;
+                    const item = document.createElement('div');
+                    item.className = 'carrusel-item';
+                    item.setAttribute('data-id-ruta', idRuta);
+                    item.setAttribute('data-eje-grupo', ejeId);
+                    item.innerText = infoSimplificada.titulo;
+                    item.onclick = () => seleccionarRuta(idRuta);
+                    carrusel.appendChild(item);
+                }
             });
 
-            if (tarjetasDisponibles.length === 0) {
+            if (!rutasEncontradas) {
                 carrusel.style.display = 'none';
             }
 
             map.setView([28.128, -15.432], 13);
         }
 
-        // 2. SELECCIÓN DE UNA RUTA ESPECÍFICA (MODIFICADA PARA INICIAR MINIMIZADA)
+        // 2. CARGA DINÁMICA BAJO DEMANDA (LAZY LOADING)
         function seleccionarRuta(idRuta) {
             document.querySelectorAll('.carrusel-item').forEach(item => {
                 item.classList.toggle('active', item.getAttribute('data-id-ruta') === idRuta);
             });
 
-            document.querySelectorAll('.ruta-card').forEach(card => {
-                if (card.getAttribute('data-id') === idRuta) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+            // Destruir script previo si existía para evitar colisiones de memoria
+            const scriptPrevio = document.getElementById('script-ruta-activa');
+            if (scriptPrevio) {
+                scriptPrevio.remove();
+            }
 
-            const sidebar = document.getElementById('rutas-sidebar');
+            // Inyectar dinámicamente el script de la ruta seleccionada
+            const script = document.createElement('script');
+            script.id = 'script-ruta-activa';
+            script.src = `rutas/${idRuta}.js`;
             
+            script.onload = () => {
+                // Recuperar el objeto inyectado en el espacio global por el script de la ruta
+                if (window.rutaActivaDatos && window.rutaActivaDatos.id === idRuta) {
+                    renderizarDatosYMapa(window.rutaActivaDatos);
+                } else {
+                    console.error("Error: Los datos de la ruta no se cargaron correctamente.");
+                }
+            };
+
+            script.onerror = () => {
+                console.error(`No se pudo cargar el archivo: rutas/${idRuta}.js`);
+            };
+
+            document.body.appendChild(script);
+        }
+
+        // 3. RENDERIZADO DE LA TARJETA Y EL TRAZADO EN EL MAPA
+        function renderizarDatosYMapa(datos) {
+            const contenedor = document.getElementById('contenedor-tarjetas');
+            contenedor.innerHTML = ''; // Limpiar tarjeta anterior
+
+            let claseDificultad = 'facil';
+            let textoDificultad = 'Fácil';
+            if (datos.dificultad === 'moderado') {
+                claseDificultad = 'moderado';
+                textoDificultad = 'Moderado';
+            } else if (datos.dificultad === 'dificil') {
+                claseDificultad = 'dificil';
+                textoDificultad = 'Difícil';
+            }
+
+            const HTMLetiquetas = datos.etiquetas ? datos.etiquetas.map(t => `<span>#${t}</span>`).join('\n') : '';
+            const HTMLconsejos = datos.consejos ? datos.consejos.map(c => `
+                ${c.icono || '👉'} <strong>${c.titulo}:</strong> ${c.texto}.<br>
+            `).join('\n') : '';
+
+            // Generar la tarjeta dinámica dentro de la barra lateral
+            const card = document.createElement('div');
+            card.className = 'ruta-card';
+            card.setAttribute('data-eje-grupo', datos.eje);
+            card.innerHTML = `
+                <div class="ruta-title" onclick="toggleMinimizar()">${datos.titulo}</div>
+                <div class="ruta-subtitle">${datos.subtitulo}</div>
+                <div class="ruta-meta">
+                    <span class="tag-dificultad ${claseDificultad}">${textoDificultad}</span>
+                    <span>📏 ${datos.distancia}</span>
+                    <span>⏱️ ${datos.tiempo}</span>
+                    <span>⬆️ ${datos.desnivel}</span>
+                </div>
+                <div class="ruta-meta">
+                    ${HTMLetiquetas}
+                </div>
+                <p class="descripcion-ruta">${datos.descripcion}</p>
+                <div class="indicaciones">
+                    <strong>💡 Biciconsejos</strong><br><br>
+                    ${HTMLconsejos}
+                </div>
+            `;
+            contenedor.appendChild(card);
+
+            // Mostrar barra lateral
+            const sidebar = document.getElementById('rutas-sidebar');
             if (esDispositivoMovil()) {
-                // En móvil: inicia en estado minimizado para priorizar el mapa
-                sidebar.classList.remove('expanded');
-                sidebar.classList.add('visible', 'minimized');
-                sidebar.style.transform = 'translateY(calc(100% - 75px))';
+                sidebar.classList.remove('expanded', 'minimized');
+                sidebar.classList.add('visible');
+                sidebar.style.transform = 'translateY(55%)'; // Estado colapsado móvil
             } else {
-                // En escritorio: panel lateral desplegado
                 sidebar.classList.remove('minimized', 'expanded');
                 sidebar.classList.add('visible');
                 sidebar.style.transform = ''; 
             }
 
+            // Pintar trazado GeoJSON en el mapa
             rutaActivaLayer.clearLayers();
-            const ruta = datosRutasTrazados[idRuta];
-            if (!ruta || !ruta.geojson) {
-                console.warn(`No se han encontrado datos geográficos para el ID: ${idRuta}`);
-                return;
-            }
+            const colorTrazado = coloresEjes[datos.eje] || '#3498db';
 
-            const tarjeta = document.querySelector(`.ruta-card[data-id="${idRuta}"]`);
-            const grupoEje = tarjeta ? tarjeta.getAttribute('data-eje-grupo') : 'central';
-            const colorTrazado = coloresEjes[grupoEje] || '#3498db';
-
-            const capaGeoJSON = L.geoJSON(ruta.geojson, {
+            const capaGeoJSON = L.geoJSON(datos.geojson, {
                 style: function() {
                     return { color: colorTrazado, weight: 6, opacity: 0.90 };
                 },
@@ -511,12 +456,19 @@
             }
         }
 
-        // ==========================================
-        // CONTROL DE MINIMIZADO (HACIENDO CLICK EN EL TÍTULO EN ESCRITORIO)
-        // ==========================================
+        // 4. FUNCIONES AUXILIARES DE INTERFAZ
+        function cerrarSidebar() {
+            const sidebar = document.getElementById('rutas-sidebar');
+            sidebar.classList.remove('visible', 'expanded', 'minimized');
+            if (esDispositivoMovil()) {
+                sidebar.style.transform = 'translateY(100%)';
+            } else {
+                sidebar.style.transform = 'translateX(120%)';
+            }
+        }
+
         function toggleMinimizar() {
             const sidebar = document.getElementById('rutas-sidebar');
-
             if (sidebar.classList.contains('minimized')) {
                 sidebar.classList.remove('minimized');
                 if (esDispositivoMovil()) {
@@ -534,9 +486,7 @@
             }
         }
 
-        // ==========================================
-        // GESTIÓN TÁCTIL MÓVIL OPTIMIZADA (BOTTOM SHEET)
-        // ==========================================
+        // 5. GESTIÓN TÁCTIL MÓVIL (BOTTOM SHEET)
         const sidebar = document.getElementById('rutas-sidebar');
         let startY = 0, currentY = 0, isDragging = false;
 
@@ -546,8 +496,6 @@
             if (!esDispositivoMovil()) return;
             const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
             
-            // Solo iniciamos el gesto si el usuario arrastra desde el tirador superior
-            // o si el contenedor de las tarjetas está al principio de su scroll
             if (e.target.id === 'drag-handle' || contenedorTarjetas.scrollTop <= 0) {
                 startY = e.touches[0].clientY;
                 isDragging = true;
@@ -560,7 +508,6 @@
             currentY = e.touches[0].clientY;
             const deltaY = currentY - startY;
 
-            // Evitar comportamiento por defecto del scroll elástico de iOS que rompe el layout
             if (e.cancelable) e.preventDefault();
 
             if (sidebar.classList.contains('expanded')) {
@@ -579,10 +526,8 @@
             
             const deltaY = currentY - startY;
 
-            // Umbral mínimo para conmutar estados (70px)
             if (Math.abs(deltaY) > 70) {
                 if (deltaY < 0) {
-                    // Deslizar hacia arriba
                     if (sidebar.classList.contains('minimized')) {
                         sidebar.classList.remove('minimized');
                         sidebar.style.transform = 'translateY(55%)';
@@ -591,7 +536,6 @@
                         sidebar.style.transform = 'translateY(0%)';
                     }
                 } else {
-                    // Deslizar hacia abajo
                     if (sidebar.classList.contains('expanded')) {
                         sidebar.classList.remove('expanded');
                         sidebar.style.transform = 'translateY(55%)';
@@ -601,7 +545,6 @@
                     }
                 }
             } else {
-                // Restaurar el estado en caso de gestos pequeños
                 if (sidebar.classList.contains('expanded')) {
                     sidebar.style.transform = 'translateY(0%)';
                 } else if (sidebar.classList.contains('minimized')) {
