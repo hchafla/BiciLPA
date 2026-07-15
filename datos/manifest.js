@@ -11,7 +11,7 @@
 // =========================================================================
 const rutasManifest = {
   "santa-catalina-san-telmo": {
-    "titulo": "Santa Catalina a San Telmo",
+    "titulo": "Santa Catalina ⬌ San Telmo",
     "eje": "este"
   },
   "castillo-mata-canodromo": {
