@@ -5,35 +5,35 @@
     const datos = {
         id: "canodromo-castillo-mata",
         eje: "alta-baja",
-        titulo: "Eje Ciudad Alta · Ciudad Baja",
-        subtitulo: "Parque del Canódromo ⮕ Castillo de Mata",
+        titulo: "Parque del Canódromo ⮕ Castillo de Mata",
+        subtitulo: "",
         dificultad: "facil",
         distancia: "3,9 km",
         tiempo: "10-12 min",
         desnivel: "-115 m",
-        descripcion: "El sentido inverso de bajada desde el Parque del Canódromo hasta la zona del Castillo de Mata. Una ruta rápida y cómoda para descender de Ciudad Alta a Ciudad Baja aprovechando el desnivel favorable de la ciudad.",
+        descripcion: "Recorrido de descenso que conecta Ciudad Alta con Ciudad Baja aprovechando el desnivel favorable. Aunque abandona puntualmente el itinerario ciclista oficial, utiliza calles tranquilas y de baja intensidad de tráfico para ofrecer una conexión más cómoda y directa con el carril bici del Paseo de Chil.",
         etiquetas: [
             "📉 Descenso continuo",
-            "🚲 Apto para cualquier bicicleta",
-            "🛣️ Ciclovía 30 (calzada compartida)"
+            "🚲 Poco esfuerzo físico",
+            "🛣️ Ciclovía 30 + Calzada + Carril bici segregado"
         ],
         consejos: [
             {
+                icono: "↪️",
+                titulo: "Conexión recomendada",
+                texto: "La ruta pasa por la calle Pepe García Fajardo. Aunque no forma parte del itinerario ciclista oficial, suele tener poco tráfico y permite enlazar de forma rápida y cómoda con el carril bici del Paseo de Chil."
+            },
+            {
                 icono: "📉",
                 titulo: "Controla la velocidad",
-                texto: "El desnivel es favorable, modera tu velocidad en las bajadas pronunciadas."
+                texto: "La pendiente favorece un descenso rápido. Modera la velocidad antes de los cruces y pasos de peatones."
             },
             {
-                icono: "🚦",
+                icono: "🚗",
                 titulo: "Tráfico compartido",
-                texto: "Recuerda que circulas por ciclovía compartida con vehículos a un máximo de 30 km/h."
+                texto: "Gran parte del recorrido discurre por calles 30 compartidas con vehículos. Mantén una posición visible y señaliza las maniobras con antelación."
             },
-            {
-                icono: "🛑",
-                titulo: "Intersecciones",
-                texto: "Presta especial atención en los cruces y pasos de peatones durante el descenso."
-            }
-        ],
+            ],
         geojson: {
             type: "FeatureCollection",
             features: [
@@ -46,7 +46,6 @@
                             [-15.4339968, 28.1126453],
                             [-15.4337656, 28.1122906],
                             [-15.4335847, 28.1120468],
-                            [-15.4334443, 28.11119413],
                             [-15.4333359, 28.1117861],
                             [-15.4332735, 28.1117378],
                             [-15.4330772, 28.1118367],
@@ -100,7 +99,6 @@
                             [-15.4253581, 28.1113314],
                             [-15.4245615, 28.110639],
                             [-15.4242267, 28.110347],
-                            [-15.4243922, 28.1101179],
                             [-15.4237341, 28.1099855],
                             [-15.4234936, 28.1098158],
                             [-15.4232473, 28.1096495],
@@ -110,7 +108,6 @@
                             [-15.4224069, 28.1089116],
                             [-15.4222087, 28.1087843],
                             [-15.4220932, 28.1087164],
-                            [-15.4221951, 28.1086621],
                             [-15.42187, 28.1085619],
                             [-15.4217815, 28.1084805],
                             [-15.4217142, 28.1083905],
