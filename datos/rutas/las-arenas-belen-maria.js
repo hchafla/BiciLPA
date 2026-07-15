@@ -169,7 +169,7 @@
         type: "Point",
         coordinates: [-15.4319292, 28.139543]
                 },
-                {
+                
                     type: "Feature",
     properties: {
         icono: "🚧",
