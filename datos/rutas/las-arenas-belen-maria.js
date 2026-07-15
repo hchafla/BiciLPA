@@ -1,0 +1,219 @@
+// datos/rutas/las-arenas-belen-maria.js
+
+// =========================================================================
+// 1. INFORMACIÓN EDITORIAL Y SEMÁNTICA
+// =========================================================================
+const datosRutasInfo = {
+    "las-arenas-belen-maria": {
+        eje: "norte",
+        titulo: "Eje Norte · Las Arenas - Belén María",
+        subtitulo: "CC Las Arenas ⬌ Plaza de Belén María",
+        dificultad: "facil",
+        distancia: "6,2 km",
+        tiempo: "22-30 min",
+        desnivel: "Llana",
+        descripcion: "Eje clave de conexión litoral norte que recorre la icónica zona de Las Canteras y conecta con el área portuaria e industrial de El Sebadal. Ideal para desplazamientos interurbanos rápidos y planos.",
+        etiquetas: [
+            "🌊 Vistas al mar",
+            "🛣️ Tramos compartidos y segregados",
+            "🚶 Precaución: zona muy peatonal"
+        ],
+        consejos: [
+            {
+                icono: "🚶",
+                titulo: "Prioridad peatonal",
+                texto: "En los tramos cercanos al paseo de Las Canteras y zonas comerciales, modera la velocidad."
+            },
+            {
+                icono: "🚧",
+                titulo: "Zonas en obras",
+                texto: "Atención a desvíos temporales o tramos cortados en la conexión hacia el istmo."
+            },
+            {
+                icono: "🌬️",
+                titulo: "Viento del norte",
+                texto: "Suele soplar con fuerza en dirección oeste-este a la vuelta."
+            }
+        ]
+    }
+};
+
+// =========================================================================
+// 2. GEOMETRÍA Y GEODATOS (GeoJSON)
+// =========================================================================
+const datosRutasTrazados = {
+    "las-arenas-belen-maria": {
+        "nombre": "Eje Norte · CC Las Arenas - Belén María",
+        "geojson": {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "tipo": "linea"
+                    },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [
+                            [-15.4493185, 28.1294775],
+                            [-15.4488863, 28.1296109],
+                            [-15.4485406, 28.1297538],
+                            [-15.4482382, 28.1297634],
+                            [-15.4479401, 28.1297773],
+                            [-15.4477231, 28.1297773],
+                            [-15.4475933, 28.1297593],
+                            [-15.4474617, 28.1296579],
+                            [-15.4474209, 28.1295941],
+                            [-15.4473245, 28.1295009],
+                            [-15.4471224, 28.1292981],
+                            [-15.4470371, 28.1292295],
+                            [-15.4468924, 28.129079],
+                            [-15.4467033, 28.1288861],
+                            [-15.4466421, 28.1287945],
+                            [-15.4465791, 28.1287209],
+                            [-15.4465105, 28.128667],
+                            [-15.446487, 28.1286597],
+                            [-15.4464187, 28.1287087],
+                            [-15.4462748, 28.1288258],
+                            [-15.4452291, 28.1296617],
+                            [-15.4442825, 28.1304032],
+                            [-15.4428357, 28.1315565],
+                            [-15.4412816, 28.1328775],
+                            [-15.4405668, 28.13351],
+                            [-15.4394568, 28.1344857],
+                            [-15.4387683, 28.135083],
+                            [-15.4378588, 28.1357937],
+                            [-15.4375202, 28.1360849],
+                            [-15.437453, 28.1361145],
+                            [-15.437369, 28.1360751],
+                            [-15.4372767, 28.1359393],
+                            [-15.437106, 28.1357542],
+                            [-15.4370304, 28.135658],
+                            [-15.4369688, 28.1356185],
+                            [-15.4367897, 28.1357715],
+                            [-15.4364147, 28.1361071],
+                            [-15.4360375, 28.1364038],
+                            [-15.4356793, 28.1367295],
+                            [-15.4353154, 28.137038],
+                            [-15.4345291, 28.1377192],
+                            [-15.4344451, 28.1378031],
+                            [-15.4344003, 28.1379141],
+                            [-15.4343583, 28.1380276],
+                            [-15.4343164, 28.1380869],
+                            [-15.4341652, 28.1381115],
+                            [-15.4340757, 28.1381214],
+                            [-15.4334544, 28.1386588],
+                            [-15.4333396, 28.138762],
+                            [-15.432056, 28.1388183],
+                            [-15.4329993, 28.1390302],
+                            [-15.4324654, 28.1394972],
+                            [-15.4319486, 28.1395328],
+                            [-15.4320879, 28.141337],
+                            [-15.4301354, 28.1414495],
+                            [-15.430012, 28.1414833],
+                            [-15.4300993, 28.1418002],
+                            [-15.4300295, 28.1422458],
+                            [-15.4300699, 28.1423902],
+                            [-15.4300593, 28.1425965],
+                            [-15.4300082, 28.1428197],
+                            [-15.4300933, 28.1429435],
+                            [-15.4297655, 28.1431614],
+                            [-15.4297719, 28.1434277],
+                            [-15.4297899, 28.1437316],
+                            [-15.4297389, 28.1441029],
+                            [-15.4296863, 28.144462],
+                            [-15.4296225, 28.1447377],
+                            [-15.4295438, 28.1450209],
+                            [-15.4294332, 28.1453997],
+                            [-15.4293396, 28.145711],
+                            [-15.4292813, 28.1459204],
+                            [-15.4294301, 28.1459561],
+                            [-15.4293642, 28.1462186],
+                            [-15.4294067, 28.1462993],
+                            [-15.4292333, 28.1468891],
+                            [-15.4291487, 28.1471411],
+                            [-15.42907, 28.1472986],
+                            [-15.4289807, 28.1473924],
+                            [-15.4288701, 28.1474112],
+                            [-15.4288084, 28.1473962],
+                            [-15.4287255, 28.1474618],
+                            [-15.4286404, 28.1475912],
+                            [-15.4284936, 28.1476568],
+                            [-15.4283384, 28.1476906],
+                            [-15.4280835, 28.1476349],
+                            [-15.4280239, 28.1476031],
+                            [-15.4278368, 28.14768],
+                            [-15.4276305, 28.1477719],
+                            [-15.4272476, 28.14789],
+                            [-15.426835, 28.1479875],
+                            [-15.4264692, 28.14804],
+                            [-15.4258119, 28.1481301],
+                            [-15.425159, 28.1482463],
+                            [-15.4244656, 28.1483739],
+                            [-15.4241423, 28.1484489],
+                            [-15.4243273, 28.1492647],
+                            [-15.4241104, 28.1493059],
+                            [-15.4241232, 28.149379],
+                            [-15.4233575, 28.149531],
+                            [-15.4226045, 28.1496697],
+                            [-15.4223812, 28.149696],
+                            [-15.4223216, 28.1494541],
+                            [-15.422429, 28.1491052],
+                            [-15.4221887, 28.1488621],
+                            [-15.4221589, 28.1487346],
+                            [-15.4216016, 28.1488096],
+                            [-15.4212975, 28.1488565],
+                            [-15.4212549, 28.1488902],
+                            [-15.4212656, 28.148984],
+                            [-15.4212677, 28.1490609],
+                            [-15.4211933, 28.1490665]
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "tipo": "advertencia",
+                        "descripcion": "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote."
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-15.4319292, 28.139543]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "tipo": "advertencia",
+                        "descripcion": "Carril bici cerrado por obras. Continuar por la calzada extremando la precaución."
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-15.430059, 28.1415701]
+                    }
+                }
+            ]
+        }
+    }
+};
+
+// =========================================================================
+// 3. EXPOSICIÓN DE VARIABLES GLOBALES (Para el mapa)
+// =========================================================================
+const rutasInfo = datosRutasInfo;
+
+const rutasTrazados = (() => {
+    const procesadas = {};
+    for (const key in datosRutasTrazados) {
+        if (Object.prototype.hasOwnProperty.call(datosRutasTrazados, key)) {
+            const geojson = datosRutasTrazados[key].geojson;
+            const lineaFeature = geojson.features.find(f => f.properties && f.properties.tipo === "linea");
+            if (lineaFeature && lineaFeature.geometry && lineaFeature.geometry.coordinates) {
+                procesadas[key] = lineaFeature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            } else {
+                procesadas[key] = [];
+            }
+        }
+    }
+    return procesadas;
+})();
