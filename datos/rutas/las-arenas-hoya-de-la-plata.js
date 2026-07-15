@@ -20,17 +20,17 @@
             {
                 icono: "🚲",
                 titulo: "Ruta muy completa",
-                texto: "Combina carril bici, ciclovía 30 y acera bici durante todo el recorrido."
+                texto: "Combina carril bici, ciclovía 30 y acera bici durante todo el recorrido"
             },
             {
                 icono: "⚠️",
                 titulo: "Cambio de infraestructura",
-                texto: "Antes de León y Castillo hay que abandonar brevemente la ciclovía 30 para incorporarse a la calzada hasta enlazar con el carril bici."
+                texto: "Antes de León y Castillo hay que abandonar brevemente la ciclovía 30 para incorporarse a la calzada hasta enlazar con el carril bici"
             },
             {
                 icono: "⛰️",
                 titulo: "Pendiente moderada",
-                texto: "La subida por la Avenida Eufemiano Jurado es el tramo más exigente de la ruta."
+                texto: "La subida por la Avenida Eufemiano Jurado es el tramo más exigente de la ruta"
             }
         ], // <- Cierra correctamente el array consejos
         geojson: { // <- Ahora geojson está correctamente posicionado dentro de 'datos'
