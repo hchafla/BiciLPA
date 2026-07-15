@@ -141,6 +141,7 @@ const datosRutasInfo = {
             texto: "Con alisio es habitual encontrar viento de cara en dirección hacia Belén María."
         }
     ]
+    }
 };
 
 // =========================================================================
