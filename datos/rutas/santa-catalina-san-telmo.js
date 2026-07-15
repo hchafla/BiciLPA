@@ -1,10 +1,9 @@
 // datos/rutas/santa-catalina-san-telmo.js
+(function () {
+    "use strict";
 
-// =========================================================================
-// 1. INFORMACIÓN EDITORIAL Y SEMÁNTICA
-// =========================================================================
-const datosRutasInfo = {
-    "santa-catalina-san-telmo": {
+    const datos = {
+        id: "santa-catalina-san-telmo",
         eje: "central",
         titulo: "Eje Central · Avenida Marítima",
         subtitulo: "Parque Santa Catalina ⬌ Parque San Telmo",
@@ -21,44 +20,33 @@ const datosRutasInfo = {
             {
                 icono: "🚲",
                 titulo: "Ideal para iniciarse",
-                texto: "Perfecta para estrenarse en la ciudad."
+                texto: "Perfecta para estrenarse en la ciudad"
             },
             {
                 icono: "⚠️",
                 titulo: "Precaución en Alcaravaneras",
-                texto: "Peatones cruzando el carril bici."
+                texto: "Peatones cruzando el carril bici"
             },
             {
                 icono: "❗",
                 titulo: "Fin del carril bici",
-                texto: "A la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta."
+                texto: "A la altura de la Biblioteca Pública del Estado el carril bici termina de forma abrupta"
             },
             {
                 icono: "🌬️",
                 titulo: "Viento",
-                texto: "De cara en dirección norte."
+                texto: "De cara en dirección norte"
             }
-        ]
-    }
-};
-
-// =========================================================================
-// 2. GEOMETRÍA Y GEODATOS (GeoJSON)
-// =========================================================================
-const datosRutasTrazados = {
-    "santa-catalina-san-telmo": {
-        "nombre": "Eje Central · Avenida Marítima",
-        "geojson": {
-            "type": "FeatureCollection",
-            "features": [
+        ],
+        geojson: {
+            type: "FeatureCollection",
+            features: [
                 {
-                    "type": "Feature",
-                    "properties": {
-                        "tipo": "linea"
-                    },
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": [
+                    type: "Feature",
+                    properties: { tipo: "linea" },
+                    geometry: {
+                        type: "LineString",
+                        coordinates: [
                             [-15.4301501, 28.1405694],
                             [-15.429394, 28.1406435],
                             [-15.429268, 28.1400435],
@@ -109,49 +97,32 @@ const datosRutasTrazados = {
                     }
                 },
                 {
-                    "type": "Feature",
-                    "properties": {
-                        "tipo": "advertencia",
-                        "descripcion": "Cuidado con entrada y salida de coches + peatones cruzando el carril"
+                    type: "Feature",
+                    properties: {
+                        tipo: "advertencia",
+                        descripcion: "Cuidado con entrada y salida de coches + peatones cruzando el carril"
                     },
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [-15.4295016, 28.1330401]
+                    geometry: {
+                        type: "Point",
+                        coordinates: [-15.4295016, 28.1330401]
                     }
                 },
                 {
-                    "type": "Feature",
-                    "properties": {
-                        "tipo": "advertencia",
-                        "descripcion": "Fin del carril bici"
+                    type: "Feature",
+                    properties: {
+                        tipo: "advertencia",
+                        descripcion: "Fin del carril bici"
                     },
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [-15.4161417, 28.1099303]
+                    geometry: {
+                        type: "Point",
+                        coordinates: [-15.4161417, 28.1099303]
                     }
                 }
             ]
         }
-    }
-};
+    };
 
-// =========================================================================
-// 3. EXPOSICIÓN DE VARIABLES GLOBALES (Para el mapa)
-// =========================================================================
-const rutasInfo = datosRutasInfo;
-
-const rutasTrazados = (() => {
-    const procesadas = {};
-    for (const key in datosRutasTrazados) {
-        if (Object.prototype.hasOwnProperty.call(datosRutasTrazados, key)) {
-            const geojson = datosRutasTrazados[key].geojson;
-            const lineaFeature = geojson.features.find(f => f.properties && f.properties.tipo === "linea");
-            if (lineaFeature && lineaFeature.geometry && lineaFeature.geometry.coordinates) {
-                procesadas[key] = lineaFeature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
-            } else {
-                procesadas[key] = [];
-            }
-        }
-    }
-    return procesadas;
+    // Esta es la línea que faltaba: el loader de rutas.html
+    // solo funciona si esta variable global queda asignada.
+    window.rutaActivaDatos = datos;
 })();
