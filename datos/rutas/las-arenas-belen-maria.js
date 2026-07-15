@@ -1,10 +1,9 @@
 // datos/rutas/las-arenas-belen-maria.js
+(function () {
+    "use strict";
 
-// =========================================================================
-// 1. INFORMACIÓN EDITORIAL Y SEMÁNTICA
-// =========================================================================
-const datosRutasInfo = {
-    "las-arenas-belen-maria": {
+    const datos = {
+        id: "las-arenas-belen-maria",
         eje: "norte",
         titulo: "Eje Norte · Las Arenas - Belén María",
         subtitulo: "CC Las Arenas ⬌ Plaza de Belén María",
@@ -34,27 +33,16 @@ const datosRutasInfo = {
                 titulo: "Viento del norte",
                 texto: "Suele soplar con fuerza en dirección oeste-este a la vuelta."
             }
-        ]
-    }
-};
-
-// =========================================================================
-// 2. GEOMETRÍA Y GEODATOS (GeoJSON)
-// =========================================================================
-const datosRutasTrazados = {
-    "las-arenas-belen-maria": {
-        "nombre": "Eje Norte · CC Las Arenas - Belén María",
-        "geojson": {
-            "type": "FeatureCollection",
-            "features": [
+        ],
+        geojson: {
+            type: "FeatureCollection",
+            features: [
                 {
-                    "type": "Feature",
-                    "properties": {
-                        "tipo": "linea"
-                    },
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": [
+                    type: "Feature",
+                    properties: { tipo: "linea" },
+                    geometry: {
+                        type: "LineString",
+                        coordinates: [
                             [-15.4493185, 28.1294775],
                             [-15.4488863, 28.1296109],
                             [-15.4485406, 28.1297538],
@@ -161,7 +149,7 @@ const datosRutasTrazados = {
                             [-15.422429, 28.1491052],
                             [-15.4221887, 28.1488621],
                             [-15.4221589, 28.1487346],
-                            [-15.4216016, 28.1488096],
+                            [-15.4216016, 28.148096],
                             [-15.4212975, 28.1488565],
                             [-15.4212549, 28.1488902],
                             [-15.4212656, 28.148984],
@@ -171,49 +159,31 @@ const datosRutasTrazados = {
                     }
                 },
                 {
-                    "type": "Feature",
-                    "properties": {
-                        "tipo": "advertencia",
-                        "descripcion": "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote."
+                    type: "Feature",
+                    properties: {
+                        tipo: "advertencia",
+                        descripcion: "Carril bici hacia Santa Catalina cerrado. Recomendación: tomar la acera bici de Secretario Artiles hasta Luis Morote."
                     },
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [-15.4319292, 28.139543]
+                    geometry: {
+                        type: "Point",
+                        coordinates: [-15.4319292, 28.139543]
                     }
                 },
                 {
-                    "type": "Feature",
-                    "properties": {
-                        "tipo": "advertencia",
-                        "descripcion": "Carril bici cerrado por obras. Continuar por la calzada extremando la precaución."
+                    type: "Feature",
+                    properties: {
+                        tipo: "advertencia",
+                        descripcion: "Carril bici cerrado por obras. Continuar por la calzada extremando la precaución."
                     },
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [-15.430059, 28.1415701]
+                    geometry: {
+                        type: "Point",
+                        coordinates: [-15.430059, 28.1415701]
                     }
                 }
             ]
         }
-    }
-};
+    };
 
-// =========================================================================
-// 3. EXPOSICIÓN DE VARIABLES GLOBALES (Para el mapa)
-// =========================================================================
-const rutasInfo = datosRutasInfo;
-
-const rutasTrazados = (() => {
-    const procesadas = {};
-    for (const key in datosRutasTrazados) {
-        if (Object.prototype.hasOwnProperty.call(datosRutasTrazados, key)) {
-            const geojson = datosRutasTrazados[key].geojson;
-            const lineaFeature = geojson.features.find(f => f.properties && f.properties.tipo === "linea");
-            if (lineaFeature && lineaFeature.geometry && lineaFeature.geometry.coordinates) {
-                procesadas[key] = lineaFeature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
-            } else {
-                procesadas[key] = [];
-            }
-        }
-    }
-    return procesadas;
+    // Registro dinámico para rutas.html
+    window.rutaActivaDatos = datos;
 })();
