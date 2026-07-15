@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BiciLPA - Rutas</title>
+    <title>BiciLPA · Rutas</title>
     
     <!-- Hojas de estilo de Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -281,7 +281,7 @@
         <div id="map-rutas"></div>
     </div>
 
-    <!-- Cargas de librerías y del Manifiesto de Rutas -->
+    <!-- Cargas de librerías y del Manifiesto de Rutas (desde carpeta /datos) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="datos/manifest.js"></script>
     
@@ -316,7 +316,7 @@
             carrusel.innerHTML = ''; 
             carrusel.style.display = 'flex'; 
 
-            // Leer del objeto global 'rutasManifest' cargado desde manifest.js
+            // Leer del objeto global 'rutasManifest' cargado desde datos/manifest.js
             let rutasEncontradas = false;
             Object.keys(rutasManifest).forEach(idRuta => {
                 const infoSimplificada = rutasManifest[idRuta];
@@ -339,7 +339,7 @@
             map.setView([28.128, -15.432], 13);
         }
 
-        // 2. CARGA DINÁMICA BAJO DEMANDA (LAZY LOADING)
+        // 2. CARGA DINÁMICA BAJO DEMANDA (desde datos/rutas/)
         function seleccionarRuta(idRuta) {
             document.querySelectorAll('.carrusel-item').forEach(item => {
                 item.classList.toggle('active', item.getAttribute('data-id-ruta') === idRuta);
@@ -351,10 +351,10 @@
                 scriptPrevio.remove();
             }
 
-            // Inyectar dinámicamente el script de la ruta seleccionada
+            // Inyectar dinámicamente el script de la ruta seleccionada apuntando a la carpeta de datos/rutas
             const script = document.createElement('script');
             script.id = 'script-ruta-activa';
-            script.src = `rutas/${idRuta}.js`;
+            script.src = `datos/rutas/${idRuta}.js`;
             
             script.onload = () => {
                 // Recuperar el objeto inyectado en el espacio global por el script de la ruta
@@ -366,7 +366,7 @@
             };
 
             script.onerror = () => {
-                console.error(`No se pudo cargar el archivo: rutas/${idRuta}.js`);
+                console.error(`No se pudo cargar el archivo: datos/rutas/${idRuta}.js`);
             };
 
             document.body.appendChild(script);
