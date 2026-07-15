@@ -22,7 +22,7 @@ const rutasManifest = {
     "titulo": "Canódromo ⮕ Castillo de Mata",
     "eje": "alta-baja"
   },
-   "datos/rutas/las-arenas-hoya-de-la-plata": {
+   "las-arenas-hoya-de-la-plata": {
     "titulo": "CC Las Arenas ⮕ Hoya de la Plata",
     "eje": "este"
   },
