@@ -15,11 +15,11 @@ const rutasManifest = {
     "eje": "este"
   },
   "castillo-mata-canodromo": {
-    "titulo": "Castillo de Mata a Canódromo",
+    "titulo": "Castillo ⮕ Mata a Canódromo",
     "eje": "baja-alta"
   },
   "canodromo-castillo-mata": {
-    "titulo": "Canódromo a Castillo de Mata",
+    "titulo": "Canódromo ⮕ Castillo de Mata",
     "eje": "alta-baja"
   },
   "las-arenas-belen-maria": {
