@@ -124,7 +124,7 @@
         }
 
         /* Colores específicos de los botones de ejes */
-        .eje-btn[data-eje="central"].active { background-color: #0074D9; }
+        .eje-btn[data-eje="este"].active { background-color: #0074D9; }
         .eje-btn[data-eje="norte"].active { background-color: #2ECC40; }
         .eje-btn[data-eje="baja-alta"].active { background-color: #FF851B; }
         .eje-btn[data-eje="alta-baja"].active { background-color: #B10DC9; }
@@ -166,7 +166,7 @@
         }
 
         /* Color de los ítems seleccionados según su eje */
-        .carrusel-item.active[data-eje-grupo="central"] { background: #0074D9; color: white; border-color: #0074D9; }
+        .carrusel-item.active[data-eje-grupo="este"] { background: #0074D9; color: white; border-color: #0074D9; }
         .carrusel-item.active[data-eje-grupo="norte"] { background: #2ECC40; color: white; border-color: #2ECC40; }
         .carrusel-item.active[data-eje-grupo="baja-alta"] { background: #FF851B; color: white; border-color: #FF851B; }
         .carrusel-item.active[data-eje-grupo="alta-baja"] { background: #B10DC9; color: white; border-color: #B10DC9; }
@@ -301,7 +301,7 @@
         }
 
         /* Color dinámico del borde de indicaciones según eje */
-        .ruta-card[data-eje="central"] .indicaciones { border-left-color: #0074D9; }
+        .ruta-card[data-eje="este"] .indicaciones { border-left-color: #0074D9; }
         .ruta-card[data-eje="norte"] .indicaciones { border-left-color: #2ECC40; }
         .ruta-card[data-eje="baja-alta"] .indicaciones { border-left-color: #FF851B; }
         .ruta-card[data-eje="alta-baja"] .indicaciones { border-left-color: #B10DC9; }
@@ -418,7 +418,7 @@
 
     <!-- Menú de Navegación del Modelo Multi-página (recuperado) -->
     <nav>
-        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
+        <a href="index.html" class="logo">🚲 BiciLPA</a>
         <div>
             <a href="index.html">Mapa en Vivo</a>
             <a href="rutas.html" class="active">Rutas Recomendadas</a>
@@ -430,7 +430,7 @@
     <div class="map-container">
         <!-- Selector Principal de Ejes -->
         <div class="selector-ejes" id="selector-ejes">
-            <button class="eje-btn" data-eje="central" onclick="filtrarEje('central')">Eje Central</button>
+            <button class="eje-btn" data-eje="este" onclick="filtrarEje('este')">Eje Este</button>
             <button class="eje-btn" data-eje="norte" onclick="filtrarEje('norte')">Eje Norte</button>
             <button class="eje-btn" data-eje="baja-alta" onclick="filtrarEje('baja-alta')">Conexión Baja-Alta</button>
             <button class="eje-btn" data-eje="alta-baja" onclick="filtrarEje('alta-baja')">Conexión Alta-Baja</button>
@@ -476,7 +476,7 @@
         let rutaActivaLayer = L.layerGroup().addTo(map);
 
         const coloresEjes = {
-            'central': '#0074D9',   
+            'este': '#0074D9',   
             'norte': '#2ECC40',     
             'baja-alta': '#FF851B', 
             'alta-baja': '#B10DC9'  
@@ -485,7 +485,7 @@
         // Escucha segura para que se lea manifest.js antes de inicializar el eje por defecto
         window.addEventListener("load", () => {
             if (typeof rutasManifest !== 'undefined') {
-                filtrarEje('central'); // Eje central por defecto al iniciar
+                filtrarEje('este'); // Eje este por defecto al iniciar
             } else {
                 console.error("Error crítico: 'rutasManifest' no está definido. Revisa que el archivo datos/manifest.js exista y esté bien escrito.");
             }
