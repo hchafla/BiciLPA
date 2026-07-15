@@ -1,47 +1,39 @@
 // =========================================================================
-// CONTENEDORES GLOBALES ÚNICOS (Evita errores de redeclaración "const")
+// 📑 MANIFIESTO DE RUTAS DEFINITIVO
+// Este archivo actúa como índice. Al añadir una ruta aquí, se creará el botón.
+// El archivo .js detallado solo se descargará cuando el usuario haga clic.
+// 
+// Valores válidos para el campo "eje":
+// - "central"
+// - "norte"
+// - "baja-alta"
+// - "alta-baja"
 // =========================================================================
-window.rutasInfo = window.rutasInfo || {};
-window.rutasTrazados = window.rutasTrazados || {};
-
-// =========================================================================
-// 🛒 REGISTRO DE RUTAS Activas
-// Cuando crees una nueva ruta (ej. "datos/rutas/mi-nueva-ruta.js"), 
-// solo tienes que añadir el string con su nombre exacto a esta lista.
-// =========================================================================
-const rutas = [
-    "santa-catalina-san-telmo",
-    "castillo-mata-canodromo",
-    "canodromo-castillo-mata",
-    "las-arenas-belen-maria"
-    // "mi-nueva-ruta" <-- Añade las nuevas rutas aquí
-];
-
-// =========================================================================
-// CARGADOR DINÁMICO Y SECUENCIAL
-// =========================================================================
-const cargarScriptsRutas = async () => {
-    const cargarScript = (nombre) => {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement("script");
-            script.src = `datos/rutas/${nombre}.js`;
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error(`Error cargando la ruta: ${nombre}`));
-            document.head.appendChild(script);
-        });
-    };
-
-    try {
-        // Carga todos los archivos .js de la lista en paralelo
-        await Promise.all(rutas.map(nombre => cargarScript(nombre)));
-        
-        // Emite un evento global indicando al mapa que ya puede renderizar de forma segura
-        const eventoDataListo = new CustomEvent("rutasCargadas");
-        document.dispatchEvent(eventoDataListo);
-    } catch (error) {
-        console.error("Fallo crítico al cargar los datos de las rutas:", error);
-    }
+const rutasManifest = {
+  "santa-catalina-san-telmo": {
+    "titulo": "Santa Catalina a San Telmo",
+    "eje": "central"
+  },
+  "castillo-mata-canodromo": {
+    "titulo": "Castillo de Mata a Canódromo",
+    "eje": "baja-alta"
+  },
+  "canodromo-castillo-mata": {
+    "titulo": "Canódromo a Castillo de Mata",
+    "eje": "alta-baja"
+  },
+  "las-arenas-belen-maria": {
+    "titulo": "Las Arenas a Belén María",
+    "eje": "norte"
+  } // <-- ¡OJO! Asegúrate de poner una coma (,) aquí si vas a añadir una ruta debajo
+  
+  // =======================================================================
+  // 💡 PLANTILLA PARA AÑADIR NUEVAS RUTAS (Copiar y pegar abajo)
+  // =======================================================================
+  /*
+  ,"id-de-tu-nueva-ruta": {
+    "titulo": "Nombre Visible en el Botón",
+    "eje": "central"
+  }
+  */
 };
-
-// Iniciar el proceso de inyección de scripts
-cargarScriptsRutas();
