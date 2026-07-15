@@ -199,6 +199,7 @@
 
         .sidebar-content {
             flex: 1;
+            min-height: 0; /* clave: sin esto, un hijo flex no se contrae y el overflow no scrollea entero */
             overflow-y: auto;
             padding: 20px;
             -webkit-overflow-scrolling: touch;
@@ -345,22 +346,38 @@
                 padding: 10px 20px 30px 20px;
             }
 
-            /* PUNTO 4: pista visual de scroll horizontal en el selector de ejes */
+            /* PUNTO 4: pista visual de scroll horizontal en el selector de ejes.
+               Un degradado blanco sobre fondo blanco apenas se nota, así que aquí
+               se combina con una flecha animada para que sea inequívoco. */
             .selector-ejes::after {
-                content: '';
+                content: '›';
                 position: absolute;
                 top: 0;
                 right: 0;
-                width: 36px;
+                width: 46px;
                 height: 100%;
-                background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.97));
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                padding-right: 8px;
+                font-size: 1.4rem;
+                font-weight: 800;
+                color: var(--accent-color);
+                background: linear-gradient(to right, rgba(248,249,250,0), rgba(248,249,250,0.9) 55%, rgba(248,249,250,0.98) 80%);
                 border-radius: 0 30px 30px 0;
                 pointer-events: none;
                 transition: opacity 0.25s ease;
+                animation: pistaScrollPulso 1.3s ease-in-out infinite;
             }
 
             .selector-ejes.scroll-fin::after {
                 opacity: 0;
+                animation: none;
+            }
+
+            @keyframes pistaScrollPulso {
+                0%, 100% { transform: translateX(0); opacity: 1; }
+                50% { transform: translateX(5px); opacity: 0.5; }
             }
         }
     </style>
