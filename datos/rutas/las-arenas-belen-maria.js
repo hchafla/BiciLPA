@@ -5,8 +5,8 @@
     const datos = {
         id: "las-arenas-belen-maria",
         eje: "norte",
-        titulo: "CC Las Arenas ⬌ Plaza de Belén María",
-        subtitulo: "Recorre los barrios de Guanarteme y El Puerto",
+        titulo: "CC Las Arenas ⮕ Plaza de Belén María",
+        subtitulo: "",
         dificultad: "facil",
         distancia: "6,2 km",
         tiempo: "22-30 min",
@@ -30,7 +30,7 @@
             {
                 icono: "👀",
                 titulo: "Ojo",
-                texto: "En dirección Las Arenas, extremar la precaución en el carril bici a contramano de Secretario Artiles. Especialmente en los cruces con coches."
+                texto: "En Secretario Artiles, en dirección puerto, debes ir por la calzada. Extrema la precaución en los cruces"
             }
         ],
         geojson: {
