@@ -4,7 +4,7 @@
 // El archivo .js detallado solo se descargará cuando el usuario haga clic.
 // 
 // Valores válidos para el campo "eje":
-// - "central"
+// - "este"
 // - "norte"
 // - "baja-alta"
 // - "alta-baja"
@@ -12,7 +12,7 @@
 const rutasManifest = {
   "santa-catalina-san-telmo": {
     "titulo": "Santa Catalina a San Telmo",
-    "eje": "central"
+    "eje": "este"
   },
   "castillo-mata-canodromo": {
     "titulo": "Castillo de Mata a Canódromo",
@@ -33,7 +33,7 @@ const rutasManifest = {
   /*
   ,"id-de-tu-nueva-ruta": {
     "titulo": "Nombre Visible en el Botón",
-    "eje": "central"
+    "eje": "este"
   }
   */
 };
