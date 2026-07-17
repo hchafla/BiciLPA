@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Normativa y Seguridad - Movilidad LPGC</title>
+    <title>BiciLPA · Normativa y Seguridad</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
@@ -27,6 +27,11 @@
         .norma-card h3 { color: #2c3e50; margin-bottom: 12px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
         .norma-card p { font-size: 0.9rem; color: #555; }
         
+        /* Estilos para tablas añadidas */
+        .normas-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        .normas-table th, .normas-table td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
+        .normas-table th { background-color: #f1f5f9; color: #2c3e50; }
+        
         /* Sistema de Alertas / Prohibiciones Clave */
         .prohibido { border-left: 4px solid #e74c3c; }
         .permitido { border-left: 4px solid #2ecc71; }
@@ -40,6 +45,8 @@
         .faq-item:last-child { border-bottom: none; }
         .faq-question { font-weight: 600; color: #2d3748; display: flex; justify-content: space-between; align-items: center; }
         .faq-answer { display: none; margin-top: 10px; font-size: 0.95rem; color: #4a5568; padding-left: 5px; }
+        .faq-answer ul { margin-left: 20px; margin-top: 5px; }
+        .faq-answer li { margin-bottom: 4px; }
         
         /* Clase para activar el acordeón con JS simple */
         .faq-item.open .faq-answer { display: block; }
@@ -62,47 +69,130 @@
     <div class="container">
         <header>
             <h1>Manual de Supervivencia Legal</h1>
-            <p>La ordenanza municipal de Las Palmas de Gran Canaria resumida de forma directa y sin tecnicismos.</p>
+            <p>La ordenanza municipal de Las Palmas de Gran Canaria y la normativa DGT resumidas de forma directa y sin tecnicismos.</p>
         </header>
 
         <!-- Bloques de Reglas Rápidas -->
         <div class="normas-grid">
             <div class="norma-card prohibido">
-                <h3>❌ Circular por Aceras</h3>
-                <p>Está estrictamente prohibido rodar por aceras, paseos peatonales y zonas de preferencia peatonal (salvo señalización expresa o aceras-bici pintadas).</p>
+                <h3>❌ Circulación por Aceras</h3>
+                <p>Terminantemente prohibido como norma general. En LPGC solo se permite a menores de 12 años acompañados, a velocidad de paso (máx. 5 km/h) y guardando 1 metro de distancia con los peatones.</p>
             </div>
             <div class="norma-card obligatorio">
-                <h3>⚠️ Casco y Elementos</h3>
-                <p>El casco es obligatorio para menores de 16 años en bicis y obligatorio siempre para todos los usuarios de VMP (patinetes eléctricos). Luces obligatorias de noche.</p>
+                <h3>⚠️ Casco e Iluminación</h3>
+                <p>El casco es obligatorio siempre en carretera y en ciudad para menores de 16 años o riders profesionales. Obligatorio usar luz delantera blanca y trasera roja de noche o con baja visibilidad.</p>
             </div>
             <div class="norma-card permitido">
-                <h3>✅ Ciclocarriles 30</h3>
-                <p>En las calles de un solo carril limitadas a 30 km/h, tienes derecho a circular por el centro del carril. Los coches tienen prohibido acosarte o adelantarte sin cambiar de carril.</p>
+                <h3>✅ Centro del Carril</h3>
+                <p>En la calzada urbana debes circular preferentemente por el centro del carril para garantizar tu seguridad. En vías con varios carriles, utiliza siempre el carril de la derecha.</p>
             </div>
         </div>
 
         <!-- Preguntas Frecuentes Desplegables -->
         <div class="faq-section">
-            <h2>Preguntas Frecuentes (FAQ)</h2>
+            <h2>Preguntas Frecuentes y Detalles de la Ordenanza</h2>
             
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Me pueden multar por ir con auriculares? <span>+</span></div>
+                <div class="faq-question">¿Cuáles son los límites de velocidad máximos en Las Palmas de Gran Canaria? <span>+</span></div>
                 <div class="faq-answer">
-                    Sí. Está totalmente prohibido conducir bicicletas o VMP utilizando auriculares conectados a receptores o reproductores de sonido, así como el uso del teléfono móvil. La sanción económica es idéntica a la de un conductor de coche.
+                    La velocidad máxima depende de la infraestructura por la que circules:
+                    <table class="normas-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Vía</th>
+                                <th>Límite de Velocidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Plataforma única (calzada y acera al mismo nivel)</td>
+                                <td>20 km/h</td>
+                            </tr>
+                            <tr>
+                                <td>Vías de un solo carril por sentido</td>
+                                <td>30 km/h</td>
+                            </tr>
+                            <tr>
+                                <td>Vías de dos o más carriles por sentido</td>
+                                <td>50 km/h</td>
+                            </tr>
+                            <tr>
+                                <td>Aceras-bici habilitadas</td>
+                                <td>10 km/h (Prioridad peatonal)</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Dónde puedo candar mi bicicleta de forma legal? <span>+</span></div>
+                <div class="faq-question">¿Me pueden multar por ir con auriculares o usar el móvil? <span>+</span></div>
                 <div class="faq-answer">
-                    Debes utilizar prioritariamente los aparcabicis en forma de "U invertida" distribuidos por la ciudad. Está prohibido amarrar la bici a árboles, semáforos, farolas o mobiliario urbano si entorpece el paso peatonal o puede dañar los elementos públicos.
+                    Sí. Está totalmente prohibido conducir bicicletas utilizando auriculares conectados a receptores o reproductores de sonido, así como el uso del teléfono móvil. Las infracciones por estos motivos se consideran graves. Además, está prohibido circular haciendo caballitos (apoyado en una sola rueda) o soltar el manillar.
                 </div>
             </div>
 
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Qué pasa con la Avenida Marítima? ¿Se puede circular? <span>+</span></div>
+                <div class="faq-question">¿Dónde puedo candar mi bicicleta de forma legal si el aparcabicis está lleno? <span>+</span></div>
                 <div class="faq-answer">
-                    El paseo peatonal de la Avenida Marítima está prohibido para bicis y patinetes. Debes utilizar obligatoriamente el carril bici segregado bidireccional que va paralelo a la autovía.
+                    La prioridad absoluta es usar las parrillas de aparcabicis dedicadas. Si no hay ninguna libre en un radio de 50 metros, la ordenanza de LPGC te permite:
+                    <ul>
+                        <li>Estacionar en las bandas de estacionamiento de la calzada (en oblicuo, ocupando un máximo de 2 metros).</li>
+                        <li>En aceras que tengan más de 3 metros de ancho, en línea junto al bordillo (en paralelo si mide menos de 6 metros, o en semibatería si mide más).</li>
+                    </ul>
+                    <strong>Jamás amarrar a:</strong> Árboles, semáforos, farolas, bancos, zonas de carga y descarga en horario comercial, pasos de peatones, paradas de transporte público o plazas de movilidad reducida.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Tengo prioridad en los cruces y rotondas? <span>+</span></div>
+                <div class="faq-answer">
+                    Tienes prioridad de paso cuando circules por un carril bici, paso para ciclistas o arcén señalizado. También la tienes cuando un vehículo de motor gira para entrar en otra vía y tú estás cerca. En las rotondas, si circulas en grupo, todo el pelotón tiene prioridad desde el momento en el que el primer ciclista del grupo ya haya entrado en la glorieta. Recuerda que el peatón siempre conserva la prioridad en zonas peatonales y pasos señalizados.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Cómo debo cruzar un paso de peatones? <span>+</span></div>
+                <div class="faq-answer">
+                    Como norma general, debes <strong>desmontar de la bicicleta y cruzar a pie</strong> actuando como peatón. Solo está permitido cruzar montado y pedaleando si el paso dispone de un carril bici específico adosado o señalización vial explícita de uso compartido.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿A cuánto ascienden las multas más comunes? <span>+</span></div>
+                <div class="faq-answer">
+                    La normativa estatal y local fija sanciones económicas contundentes para las infracciones catalogadas como <strong>Graves</strong>:
+                    <table class="normas-table">
+                        <thead>
+                            <tr>
+                                <th>Infracción Común</th>
+                                <th>Gravedad / Cuantía</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Circular por la acera o zonas peatonales prohibidas</td>
+                                <td>200 € (Grave)</td>
+                            </tr>
+                            <tr>
+                                <td>Uso de teléfono móvil o auriculares en marcha</td>
+                                <td>200 € (Grave)</td>
+                            </tr>
+                            <tr>
+                                <td>No utilizar el casco obligatorio (menores de 16 años o en carretera)</td>
+                                <td>200 € (Grave)</td>
+                            </tr>
+                            <tr>
+                                <td>Circular sin luces delanteras/traseras en baja visibilidad o de noche</td>
+                                <td>200 € (Grave)</td>
+                            </tr>
+                            <tr>
+                                <td>No respetar la prioridad de paso de un peatón</td>
+                                <td>Sanción Grave</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <em>Nota: Los ciclistas también están obligados por ley a someterse a las pruebas de detección de alcohol y drogas si son requeridos.</em>
                 </div>
             </div>
         </div>
