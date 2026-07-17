@@ -22,13 +22,13 @@
         header p { color: #7f8c8d; font-size: 1.1rem; }
 
         /* Rejilla de Categorías principales */
-        .normas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .normas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .norma-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .norma-card h3 { color: #2c3e50; margin-bottom: 12px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-        .norma-card p { font-size: 0.9rem; color: #555; }
+        .norma-card h3 { color: #2c3e50; margin-bottom: 12px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        .norma-card p { font-size: 0.85rem; color: #555; }
         
-        /* Estilos para tablas añadidas */
-        .normas-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        /* Estilos para tablas */
+        .normas-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; margin-bottom: 15px; }
         .normas-table th, .normas-table td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
         .normas-table th { background-color: #f1f5f9; color: #2c3e50; }
         
@@ -36,10 +36,11 @@
         .prohibido { border-left: 4px solid #e74c3c; }
         .permitido { border-left: 4px solid #2ecc71; }
         .obligatorio { border-left: 4px solid #f59f00; }
+        .atencion { border-left: 4px solid #9b59b6; }
 
         /* Sección de Preguntas Frecuentes (Acordeón) */
-        .faq-section { background: white; border-radius: 8px; padding: 30px; border: 1px solid #e2e8f0; }
-        .faq-section h2 { color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem; }
+        .faq-section { background: white; border-radius: 8px; padding: 30px; border: 1px solid #e2e8f0; margin-bottom: 30px; }
+        .faq-section h2 { color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem; border-bottom: 2px solid #edf2f7; padding-bottom: 10px; }
         
         .faq-item { border-bottom: 1px solid #edf2f7; padding: 15px 0; cursor: pointer; }
         .faq-item:last-child { border-bottom: none; }
@@ -48,7 +49,7 @@
         .faq-answer ul { margin-left: 20px; margin-top: 5px; }
         .faq-answer li { margin-bottom: 4px; }
         
-        /* Clase para activar el acordeón con JS simple */
+        /* Clase para activar el acordeón con JS */
         .faq-item.open .faq-answer { display: block; }
         .faq-item.open .faq-question { color: #2ecc71; }
     </style>
@@ -57,7 +58,7 @@
 
     <!-- Menú de Navegación del Modelo Multi-página -->
     <nav>
-        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
+        <a href="index.html" class="logo">🚲 LPGC en Bici y VMP</a>
         <div>
             <a href="index.html">Mapa en Vivo</a>
             <a href="rutas.html">Rutas Recomendadas</a>
@@ -69,33 +70,37 @@
     <div class="container">
         <header>
             <h1>Manual de Supervivencia Legal</h1>
-            <p>La ordenanza municipal de Las Palmas de Gran Canaria y la normativa DGT resumidas de forma directa y sin tecnicismos.</p>
+            <p>Guía de circulación de Las Palmas de Gran Canaria para ciclistas y usuarios de patinetas eléctricas (VMP).</p>
         </header>
 
         <!-- Bloques de Reglas Rápidas -->
         <div class="normas-grid">
             <div class="norma-card prohibido">
-                <h3>❌ Circulación por Aceras</h3>
-                <p>Terminantemente prohibido como norma general. En LPGC solo se permite a menores de 12 años acompañados, a velocidad de paso (máx. 5 km/h) y guardando 1 metro de distancia con los peatones.</p>
+                <h3>❌ Aceras Prohibidas</h3>
+                <p>Prohibido circular por aceras y zonas peatonales en todo el país (tanto bicis como VMP). En Valencia la prohibición es absoluta.</p>
             </div>
             <div class="norma-card obligatorio">
-                <h3>⚠️ Casco e Iluminación</h3>
-                <p>El casco es obligatorio siempre en carretera y en ciudad para menores de 16 años o riders profesionales. Obligatorio usar luz delantera blanca y trasera roja de noche o con baja visibilidad.</p>
+                <h3>⚠️ Casco Obligatorio</h3>
+                <p>En bici: obligatorio para menores de 16 años en ciudad y siempre en carretera. En VMP: obligatorio siempre para todos los conductores en vías urbanas.</p>
+            </div>
+            <div class="norma-card atencion">
+                <h3>📋 Seguro y Placa VMP</h3>
+                <p>Desde 2026, las patinetas eléctricas están obligados a portar un Seguro de Responsabilidad Civil y estar inscritos con su etiqueta identificativa trasera.</p>
             </div>
             <div class="norma-card permitido">
-                <h3>✅ Centro del Carril</h3>
-                <p>En la calzada urbana debes circular preferentemente por el centro del carril para garantizar tu seguridad. En vías con varios carriles, utiliza siempre el carril de la derecha.</p>
+                <h3>✅ Monoplaza</h3>
+                <p>Los VMP son estrictamente de uso individual. Viajar con un pasajero conlleva una sanción directa de 200 €.</p>
             </div>
         </div>
 
-        <!-- Preguntas Frecuentes Desplegables -->
+        <!-- SECCIÓN 1: NORMATIVA DE BICICLETAS -->
         <div class="faq-section">
-            <h2>Preguntas Frecuentes y Detalles de la Ordenanza</h2>
+            <h2>🚲 Normativa para Bicicletas</h2>
             
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Cuáles son los límites de velocidad máximos en Las Palmas de Gran Canaria? <span>+</span></div>
+                <div class="faq-question">¿Por dónde y a qué velocidad puedo circular en bici por LPGC? <span>+</span></div>
                 <div class="faq-answer">
-                    La velocidad máxima depende de la infraestructura por la que circules:
+                    Debes circular preferentemente por las vías ciclistas o por el centro del carril derecho en calzadas urbanas. Los límites de velocidad en Las Palmas de Gran Canaria son:
                     <table class="normas-table">
                         <thead>
                             <tr>
@@ -122,84 +127,169 @@
                             </tr>
                         </tbody>
                     </table>
+                    <em>Excepción en aceras:</em> En LPGC solo se permite circular por la acera a menores de 12 años acompañados, a velocidad de paso (máx. 5 km/h) y manteniendo 1 metro de distancia con peatones.
                 </div>
             </div>
 
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Me pueden multar por ir con auriculares o usar el móvil? <span>+</span></div>
+                <div class="faq-question">¿Cuáles son las obligaciones de seguridad para ciclistas? <span>+</span></div>
                 <div class="faq-answer">
-                    Sí. Está totalmente prohibido conducir bicicletas utilizando auriculares conectados a receptores o reproductores de sonido, así como el uso del teléfono móvil. Las infracciones por estos motivos se consideran graves. Además, está prohibido circular haciendo caballitos (apoyado en una sola rueda) o soltar el manillar.
-                </div>
-            </div>
-
-            <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Dónde puedo candar mi bicicleta de forma legal si el aparcabicis está lleno? <span>+</span></div>
-                <div class="faq-answer">
-                    La prioridad absoluta es usar las parrillas de aparcabicis dedicadas. Si no hay ninguna libre en un radio de 50 metros, la ordenanza de LPGC te permite:
                     <ul>
-                        <li>Estacionar en las bandas de estacionamiento de la calzada (en oblicuo, ocupando un máximo de 2 metros).</li>
-                        <li>En aceras que tengan más de 3 metros de ancho, en línea junto al bordillo (en paralelo si mide menos de 6 metros, o en semibatería si mide más).</li>
+                        <li><strong>Casco:</strong> Obligatorio siempre en vías interurbanas (carreteras) para todos. En ciudad, solo es obligatorio para menores de 16 años y riders profesionales en ejercicio.</li>
+                        <li><strong>Iluminación:</strong> Luz delantera blanca y trasera roja obligatorias de noche, en túneles o con baja visibilidad. En carretera es obligatorio además usar una prenda reflectante visible a 150 metros.</li>
+                        <li><strong>Prohibiciones:</strong> Prohibido usar auriculares, usar teléfonos móviles o soltar el manillar durante la marcha.</li>
                     </ul>
-                    <strong>Jamás amarrar a:</strong> Árboles, semáforos, farolas, bancos, zonas de carga y descarga en horario comercial, pasos de peatones, paradas de transporte público o plazas de movilidad reducida.
                 </div>
             </div>
 
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Tengo prioridad en los cruces y rotondas? <span>+</span></div>
+                <div class="faq-question">¿Dónde puedo aparcar mi bicicleta de forma legal? <span>+</span></div>
                 <div class="faq-answer">
-                    Tienes prioridad de paso cuando circules por un carril bici, paso para ciclistas o arcén señalizado. También la tienes cuando un vehículo de motor gira para entrar en otra vía y tú estás cerca. En las rotondas, si circulas en grupo, todo el pelotón tiene prioridad desde el momento en el que el primer ciclista del grupo ya haya entrado en la glorieta. Recuerda que el peatón siempre conserva la prioridad en zonas peatonales y pasos señalizados.
+                    Utiliza prioritariamente los aparcabicis de horquilla ("U" invertida). Si no hay ninguno libre en un radio de 50 metros, puedes aparcar en las bandas de estacionamiento de la calzada (ocupando máximo 2 metros en oblicuo) o en aceras de más de 3 metros (en paralelo al bordillo si mide menos de 6m; en semibatería si mide más).
+                    <br><br><strong>Prohibido amarrar a:</strong> Árboles, semáforos, farolas, bancos, zonas de carga/descarga activa, pasos de peatones o paradas de guaguas.
                 </div>
             </div>
 
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Cómo debo cruzar un paso de peatones? <span>+</span></div>
+                <div class="faq-question">Infracciones y multas comunes de bicicletas <span>+</span></div>
                 <div class="faq-answer">
-                    Como norma general, debes <strong>desmontar de la bicicleta y cruzar a pie</strong> actuando como peatón. Solo está permitido cruzar montado y pedaleando si el paso dispone de un carril bici específico adosado o señalización vial explícita de uso compartido.
+                    Las siguientes conductas se consideran infracciones Graves y conllevan una sanción de <strong>200 €</strong>:
+                    <ul>
+                        <li>Circular por la acera o zonas peatonales no autorizadas.</li>
+                        <li>Uso de teléfono móvil o auriculares en marcha.</li>
+                        <li>No utilizar el casco (cuando sea obligatorio por edad o vía).</li>
+                        <li>Circular sin luces en condiciones de baja visibilidad o de noche.</li>
+                        <li>No respetar la prioridad de paso de los peatones o cruzar un paso de peatones pedaleando (se debe cruzar a pie).</li>
+                    </ul>
                 </div>
             </div>
+        </div>
 
+        <!-- SECCIÓN 2: NORMATIVA DE VMP / PATINETAS ELÉCTRICAS -->
+        <div class="faq-section">
+            <h2>⚡ Normativa para Patinetas Eléctricos (VMP)</h2>
+            
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿A cuánto ascienden las multas más comunes? <span>+</span></div>
+                <div class="faq-question">¿Por qué vías pueden circular las patinetas eléctricas y a qué velocidad? <span>+</span></div>
                 <div class="faq-answer">
-                    La normativa estatal y local fija sanciones económicas contundentes para las infracciones catalogadas como <strong>Graves</strong>:
+                    Los VMP pueden usar carriles bici, aceras-bici y calzadas específicas. En <strong>Las Palmas de Gran Canaria y Madrid</strong>, solo pueden circular por calzadas cuya velocidad máxima autorizada sea de 30 km/h o inferior y ciclocalles.
+                    <br><br><strong>Vías totalmente prohibidas:</strong> Aceras, paseos peatonales, travesías, vías interurbanas, autopistas, autovías (incluso dentro de poblado) y túneles urbanos.
                     <table class="normas-table">
                         <thead>
                             <tr>
-                                <th>Infracción Común</th>
-                                <th>Gravedad / Cuantía</th>
+                                <th>Ubicación / Tipo de Vía</th>
+                                <th>Límite de Velocidad Máxima</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Circular por la acera o zonas peatonales prohibidas</td>
-                                <td>200 € (Grave)</td>
+                                <td>General (Por diseño y construcción)</td>
+                                <td>25 km/h</td>
                             </tr>
                             <tr>
-                                <td>Uso de teléfono móvil o auriculares en marcha</td>
-                                <td>200 € (Grave)</td>
+                                <td>Aceras-bici (LPGC)</td>
+                                <td>10 km/h</td>
                             </tr>
                             <tr>
-                                <td>No utilizar el casco obligatorio (menores de 16 años o en carretera)</td>
-                                <td>200 € (Grave)</td>
+                                <td>Carriles bici (Valencia)</td>
+                                <td>20 km/h</td>
                             </tr>
                             <tr>
-                                <td>Circular sin luces delanteras/traseras en baja visibilidad o de noche</td>
-                                <td>200 € (Grave)</td>
+                                <td>Ciclocalles (Valencia)</td>
+                                <td>25 km/h</td>
                             </tr>
                             <tr>
-                                <td>No respetar la prioridad de paso de un peatón</td>
-                                <td>Sanción Grave</td>
+                                <td>Calles residenciales (LPGC)</td>
+                                <td>20 km/h</td>
                             </tr>
                         </tbody>
                     </table>
-                    <em>Nota: Los ciclistas también están obligados por ley a someterse a las pruebas de detección de alcohol y drogas si son requeridos.</em>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Qué edad mínima, equipamiento y documentos son obligatorios desde 2026? <span>+</span></div>
+                <div class="faq-answer">
+                    <ul>
+                        <li><strong>Edad mínima:</strong> 15 años con carácter general (16 años en Barcelona).</li>
+                        <li><strong>Elementos de seguridad del conductor:</strong> El uso del casco es obligatorio en cualquier vía urbana. Es obligatorio usar chaleco reflectante de noche o con baja visibilidad (los riders profesionales deben llevar casco y chaleco en todo momento).</li>
+                        <li><strong>Equipamiento de la patineta:</strong> Sistema de iluminación (delantera blanca y trasera roja) encendido permanentemente, elementos reflectantes homologados, timbre y dos sistemas de frenado independientes.</li>
+                        <li><strong>Documentación (Obligatoria en 2026):</strong> 
+                            <ul>
+                                <li><em>Certificado de circulación:</em> Obligatorio para modelos comercializados desde enero de 2024 (moratoria hasta enero de 2027 para modelos anteriores).</li>
+                                <li><em>Registro DGT:</em> Debe portar la etiqueta identificativa (matrícula reducida) en la parte trasera.</li>
+                                <li><em>Seguro:</em> Es obligatorio disponer de un seguro de Responsabilidad Civil a terceros.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Cómo funciona el estacionamiento de VMP en LPGC y Barcelona? <span>+</span></div>
+                <div class="faq-answer">
+                    Deben estacionarse preferentemente en aparcabicis tipo "U" invertida o parrillas específicas. En LPGC, si no hay plazas libres en un radio de 50 metros, se permite el estacionamiento en las bandas de estacionamiento de la calzada (ocupando máximo 2 metros en oblicuo).
+                    <br><br><strong>Prohibición absoluta (Barcelona y LPGC):</strong> Jamás se pueden amarrar a árboles, semáforos, farolas, bancos, zonas PMR (movilidad reducida), paradas de transporte público o estaciones de préstamo público de bicicletas.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">Tabla de Infracciones y Sanciones para VMP <span>+</span></div>
+                <div class="faq-answer">
+                    Las multas y gravedades para los Vehículos de Movilidad Personal están tipificadas de la siguiente manera:
+                    <table class="normas-table">
+                        <thead>
+                            <tr>
+                                <th>Infracción con VMP</th>
+                                <th>Cuantía Económica</th>
+                                <th>Gravedad / Consecuencia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Circular por aceras o zonas peatonales</td>
+                                <td>200 €</td>
+                                <td>Grave (si hay reincidencia)</td>
+                            </tr>
+                            <tr>
+                                <td>Circular sin seguro obligatorio</td>
+                                <td>600 € a 1.000 €</td>
+                                <td>Muy Grave + Inmovilización</td>
+                            </tr>
+                            <tr>
+                                <td>No usar el casco obligatorio</td>
+                                <td>200 €</td>
+                                <td>Grave</td>
+                            </tr>
+                            <tr>
+                                <td>Uso de teléfono móvil o auriculares en marcha</td>
+                                <td>200 €</td>
+                                <td>Grave</td>
+                            </tr>
+                            <tr>
+                                <td>Circular con pasajero (vehículo monoplaza)</td>
+                                <td>200 €</td>
+                                <td>Grave</td>
+                            </tr>
+                            <tr>
+                                <td>Exceso de velocidad (&gt;25 km/h)</td>
+                                <td>Hasta 500 €</td>
+                                <td>Posible reclasificación a ciclomotor</td>
+                            </tr>
+                            <tr>
+                                <td>Falta de registro o placa trasera identificativa</td>
+                                <td>Hasta 500 €</td>
+                                <td>Inmovilización del vehículo</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Función simple para abrir/cerrar los acordeones de la normativa
+        // Función para abrir/cerrar los acordeones de la normativa
         function toggleFaq(elemento) {
             elemento.classList.toggle('open');
             const span = elemento.querySelector('.faq-question span');
