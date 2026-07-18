@@ -438,29 +438,51 @@
             'baja-alta': '#FF851B', 
             'alta-baja': '#B10DC9'  
         };
-        // Escucha segura para que se lea manifest.js antes de inicializar el eje por defecto
+        // Escucha segura para que se lea manifest.js antes de arrancar
         window.addEventListener("load", () => {
             if (typeof rutasManifest !== 'undefined') {
-                filtrarEje('este'); // Eje este por defecto al iniciar
+                // 1) Se precarga y dibuja TODA la red (todos los ejes) difuminada de una vez.
+                // 2) En paralelo, se muestra el submenú del eje por defecto.
+                precargarTodaLaRed();
+                filtrarEje('este'); // Eje este por defecto para el submenú/carrusel
             } else {
                 console.error("Error crítico: 'rutasManifest' no está definido. Revisa que el archivo datos/manifest.js exista y esté bien escrito.");
             }
         });
 
-        // 1. FILTRADO DESDE EL MANIFIESTO REAL + PRECARGA DIFUMINADA DE TODAS SUS RUTAS
-        async function filtrarEje(ejeId) {
+        // 1. PRECARGA DE TODA LA RED DE RUTAS (todos los ejes) EN ESTADO DIFUMINADO.
+        // Se ejecuta una única vez al cargar la página, para que el mapa muestre
+        // siempre la red ciclista completa e interconectada, sin importar qué eje
+        // esté seleccionado en el submenú.
+        async function precargarTodaLaRed() {
+            const todosLosIds = Object.keys(rutasManifest);
+            // Carga en serie: los ficheros de ruta comparten la misma variable
+            // global window.rutaActivaDatos, así que hay que procesarlos uno a uno.
+            for (const idRuta of todosLosIds) {
+                try {
+                    await cargarDatosRuta(idRuta);
+                    // Si esa ruta ya fue seleccionada mientras cargábamos el resto
+                    // (por ejemplo, el usuario hizo clic muy rápido en el carrusel),
+                    // no la pisamos con su versión difuminada.
+                    if (idRutaSeleccionada !== idRuta) {
+                        renderizarCapaRuta(idRuta, false);
+                    }
+                } catch (err) {
+                    console.error(err.message);
+                }
+            }
+        }
+
+        // 2. FILTRADO DEL SUBMENÚ/CARRUSEL SEGÚN EL EJE ELEGIDO.
+        // Ojo: esto NO toca el mapa ni recarga nada; el mapa siempre muestra la
+        // red completa. Solo cambia qué botones aparecen en el carrusel superior.
+        function filtrarEje(ejeId) {
             // Activar botón visual correspondiente
             document.querySelectorAll('.eje-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
             });
 
             ejeActual = ejeId;
-            idRutaSeleccionada = null;
-
-            // Limpieza del mapa y cierre de barras laterales previas
-            capasPreview.clearLayers();
-            capasRutas = {};
-            cerrarSidebar();
 
             const carrusel = document.getElementById('rutas-carrusel');
             carrusel.innerHTML = '';
@@ -490,28 +512,17 @@
                 item.setAttribute('data-id-ruta', idRuta);
                 item.setAttribute('data-eje-grupo', ejeId);
                 item.innerText = infoSimplificada.titulo;
+                // Si la ruta ya está seleccionada (de un clic previo en el mapa o
+                // en otro eje), refleja ese estado también en este submenú.
+                if (idRuta === idRutaSeleccionada) {
+                    item.classList.add('active');
+                }
                 item.onclick = () => seleccionarRuta(idRuta);
                 carrusel.appendChild(item);
             });
 
             // PUNTO 4: recalcular la pista de scroll horizontal al cambiar de eje
             requestAnimationFrame(actualizarPistaScrollCarrusel);
-
-            // Cargar y dibujar cada ruta del eje en su color difuminado, SIN avisos.
-            // Se cargan en serie porque cada fichero de ruta escribe sobre la misma
-            // variable global window.rutaActivaDatos: si se lanzaran todas a la vez
-            // se pisarían entre sí y algunas rutas quedarían mal cacheadas.
-            for (const idRuta of idsDelEje) {
-                try {
-                    await cargarDatosRuta(idRuta);
-                    // Si el usuario cambió de eje mientras esta ruta cargaba, abortamos
-                    // el resto de la cola para no dibujar rutas de un eje ya abandonado.
-                    if (ejeActual !== ejeId) return;
-                    renderizarCapaRuta(idRuta, false);
-                } catch (err) {
-                    console.error(err.message);
-                }
-            }
         }
 
         // 2. CARGA (Y CACHÉ) DE LOS DATOS DE UNA RUTA MEDIANTE INYECCIÓN DE SCRIPT
