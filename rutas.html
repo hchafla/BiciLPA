@@ -714,12 +714,8 @@
                 sidebar.classList.add('visible');
                 sidebar.style.transform = ''; 
             }
-            // PUNTO 3: centra el mapa en la nueva ruta sin forzar un zoom nuevo,
-            // respetando el nivel de zoom que el usuario tenga en ese momento.
-            const capa = capasRutas[datos.id];
-            if (capa && capa.getBounds && capa.getBounds().isValid()) {
-                map.panTo(capa.getBounds().getCenter(), { animate: true });
-            }
+            // El mapa ya NO se desplaza automáticamente al seleccionar una ruta:
+            // se respeta la posición/zoom que el usuario tenga en cada momento.
         }
         // 6. CONTROL DE INTERFAZ (SIDEBAR)
         function cerrarSidebar() {
