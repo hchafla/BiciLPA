@@ -53,4 +53,423 @@
         .leaflet-popup-content-wrapper { border-radius: 10px; padding: 0; overflow: hidden; }
         .leaflet-popup-content { margin: 0; width: 260px !important; }
         .popup-card { padding: 14px 16px; }
-        .popup-zone { font-size: 0.75rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase;
+        .popup-zone { font-size: 0.75rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .popup-name { font-size: 1.05rem; color: #2c3e50; font-weight: bold; margin: 3px 0 2px 0; }
+        .popup-direccion { font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px; }
+        .popup-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+        .popup-tags .tag { font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; background: #f1f5f9; color: #475569; }
+        .popup-tags .tag.special { background: #e0f2fe; color: #0369a1; }
+        .popup-desc { font-size: 0.82rem; color: #555; margin-bottom: 12px; }
+        .popup-actions { display: flex; gap: 8px; }
+        .popup-actions a { flex: 1; text-align: center; padding: 6px; border-radius: 6px; text-decoration: none; font-size: 0.78rem; font-weight: 600; }
+        .popup-actions .btn-map { background: #f1f5f9; color: #334155; }
+        .popup-actions .btn-call { background: #2ecc71; color: white; }
+
+        /* Rejilla de Talleres */
+        .talleres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .taller-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; transition: box-shadow 0.2s, border-color 0.2s; }
+        .taller-card.resaltada { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.15); }
+
+        .taller-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; }
+        .taller-indicador { flex-shrink: 0; width: 10px; height: 10px; border-radius: 50%; margin-top: 8px; }
+        .taller-indicador.bici { background: #3498db; }
+        .taller-indicador.vmp { background: #9b59b6; }
+        .taller-indicador.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
+        .badge-ambos { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: linear-gradient(135deg, #3498db, #9b59b6); color: #fff; vertical-align: middle; margin-left: 4px; }
+        .taller-header-texto { flex: 1; }
+        .taller-name { font-size: 1.2rem; color: #2c3e50; font-weight: bold; margin-bottom: 3px; }
+        .taller-zone { font-size: 0.85rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .taller-direccion { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+
+        .taller-body p { font-size: 0.9rem; color: #555; margin-bottom: 15px; }
+
+        /* Etiquetas de Especialidad */
+        .tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; background: #f1f5f9; color: #475569; }
+        .tag.special { background: #e0f2fe; color: #0369a1; }
+
+        /* Botones de Acción */
+        .taller-actions { display: flex; flex-wrap: wrap; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+        .btn-action { flex: 1; min-width: 100px; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; font-family: inherit; }
+        .btn-map { background: #f1f5f9; color: #334155; }
+        .btn-map:hover { background: #e2e8f0; }
+        .btn-call { background: #2ecc71; color: white; }
+        .btn-call:hover { background: #27ae60; }
+    </style>
+</head>
+<body>
+    <!-- Menú de Navegación del Modelo Multi-página -->
+    <nav>
+        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
+        <div>
+            <a href="index.html">Mapa en Vivo</a>
+            <a href="rutas.html">Rutas Recomendadas</a>
+            <a href="normativa.html">Normativa</a>
+            <a href="talleres.html" class="active">Talleres</a>
+        </div>
+    </nav>
+    <div class="container">
+        <header>
+            <h1>Talleres y Soporte Técnico</h1>
+            <p>Servicios locales de confianza para reparar, poner a punto o equipar tu bici o patinete eléctrico.</p>
+        </header>
+
+        <!-- Filtros de categoría -->
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filtro="all" onclick="filtrarTalleres('all')">Todos</button>
+            <button class="filter-btn" data-filtro="bici" onclick="filtrarTalleres('bici')">Bicicletas</button>
+            <button class="filter-btn" data-filtro="vmp" onclick="filtrarTalleres('vmp')">Patinetes (VMP)</button>
+            <button class="filter-btn" data-filtro="ambos" onclick="filtrarTalleres('ambos')">Ambos</button>
+        </div>
+
+        <!-- Mapa de Talleres -->
+        <div class="map-section">
+            <div id="map-talleres"></div>
+            <div class="map-legend">
+                <span><i class="legend-dot bici"></i> Bicicletas</span>
+                <span><i class="legend-dot vmp"></i> Patinetes (VMP)</span>
+                <span><i class="legend-dot ambos"></i> Ambos</span>
+            </div>
+        </div>
+
+        <!-- Listado de Tarjetas -->
+        <div class="talleres-grid" id="talleres-grid"></div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // =========================================================================
+        // FUENTE ÚNICA DE DATOS: listado y mapa se generan a partir de este array
+        // =========================================================================
+        // NOTA: el "id" es solo una clave interna para relacionar tarjeta <-> marcador,
+        // no se muestra en pantalla (a propósito, para no dar sensación de ranking).
+        const talleresData = [
+            {
+                id: 1,
+                categorias: ['vmp'],
+                nombre: 'Patineteros',
+                zona: 'Guanarteme',
+                direccion: 'Calle Churruca, 36',
+                tags: [
+                    { text: 'Patinetes Eléctricos', special: true },
+                    { text: 'Reparación' }
+                ],
+                descripcion: 'Tienda y taller especializado en reparación de patinetes eléctricos.',
+                lat: 28.133073437298474, lng: -15.438036306973316,
+                mapsUrl: 'https://maps.google.com/?cid=10540027036133289357',
+                tel: '928751075'
+            },
+            {
+                id: 2,
+                categorias: ['bici', 'vmp'],
+                nombre: 'Pedelec Canarias',
+                zona: 'Arenales',
+                direccion: 'Calle Matías Padrón, 102',
+                tags: [
+                    { text: 'Servicio Técnico', special: true },
+                    { text: 'Recambios' },
+                    { text: 'Accesorios' }
+                ],
+                descripcion: 'Servicio técnico para bicicletas y patinetes eléctricos, venta de recambios y accesorios.',
+                lat: 28.11768341255938, lng: -15.423689891866726,
+                mapsUrl: 'https://maps.google.com/?cid=15160181432943207773',
+                tel: '928058119'
+            },
+            {
+                id: 3,
+                categorias: ['vmp'],
+                nombre: 'Mundo Patineta',
+                zona: 'Arenales',
+                direccion: 'Calle León y Castillo, 145',
+                tags: [
+                    { text: 'Movilidad Eléctrica', special: true },
+                    { text: 'Mantenimiento' }
+                ],
+                descripcion: 'Especialistas en reparación y mantenimiento de movilidad eléctrica (patinetes).',
+                lat: 28.11675597681001, lng: -15.422133125509685,
+                mapsUrl: 'https://maps.google.com/?cid=7499556238619769686',
+                tel: '621663511'
+            },
+            {
+                id: 4,
+                categorias: ['vmp'],
+                nombre: 'Aeropatín',
+                zona: 'Ciudad Jardín',
+                direccion: 'Paseo Tomás Morales, 72',
+                tags: [
+                    { text: 'Taller Oficial', special: true },
+                    { text: 'Cecotec' },
+                    { text: 'Dualtron' }
+                ],
+                descripcion: 'Taller oficial de diversas marcas de patinetes (Cecotec, Dualtron, etc.) y venta especializada.',
+                lat: 28.113125059004098, lng: -15.42312800173588,
+                mapsUrl: 'https://maps.google.com/?cid=16393350585597107636',
+                tel: '655787300'
+            },
+            {
+                id: 5,
+                categorias: ['bici'],
+                nombre: 'Free Motion Bikecenter',
+                zona: 'Alcaravaneras',
+                direccion: 'Calle León y Castillo, 323',
+                tags: [
+                    { text: 'Alta Gama', special: true },
+                    { text: 'Alquiler' }
+                ],
+                descripcion: 'Taller profesional de bicicletas, venta y alquiler de equipos de alta gama.',
+                lat: 28.131025881985718, lng: -15.429707077392774,
+                mapsUrl: 'https://maps.google.com/?cid=17315208940678764260',
+                tel: '#'
+            },
+            {
+                id: 7,
+                categorias: ['vmp'],
+                nombre: 'RDP Patinetas',
+                zona: 'Siete Palmas',
+                direccion: 'Avenida Pintor Felo Monzón, 15',
+                tags: [
+                    { text: 'Personalización', special: true },
+                    { text: 'Baterías Litio' }
+                ],
+                descripcion: 'Reparación, mantenimiento, personalización de patinetes y baterías de litio.',
+                lat: 28.10723486380286, lng: -15.450899722422582,
+                mapsUrl: 'https://maps.google.com/?cid=16084814369428931658',
+                tel: '609952071'
+            },
+            {
+                id: 8,
+                categorias: ['bici'],
+                nombre: 'Bike Lane Canarias',
+                zona: 'Triana',
+                direccion: 'Calle Francisco Gourié, 4',
+                tags: [
+                    { text: 'Distribuidor Oficial', special: true },
+                    { text: 'Haibike' },
+                    { text: 'Giant' }
+                ],
+                descripcion: 'Taller, tienda especializada y distribuidor de bicicletas (Haibike, Giant, etc.).',
+                lat: 28.104583235218268, lng: -15.414007070242741,
+                mapsUrl: 'https://maps.google.com/?cid=2703504430876430202',
+                tel: '610707313'
+            },
+            {
+                id: 10,
+                categorias: ['bici'],
+                nombre: 'La Bici Bike Shop',
+                zona: 'Guanarteme',
+                direccion: 'Calle Secretario Padilla, 159',
+                tags: [
+                    { text: 'Atención Personalizada', special: true }
+                ],
+                descripcion: 'Taller de reparación y mantenimiento de bicicletas con atención personalizada.',
+                lat: 28.12943297606159, lng: -15.445087487818085,
+                mapsUrl: 'https://maps.google.com/?cid=16494121218347218625',
+                tel: '651340789'
+            },
+            {
+                id: 11,
+                categorias: ['bici', 'vmp'],
+                nombre: 'Rental Bike Station',
+                zona: 'Santa Catalina',
+                direccion: 'Calle Veintinueve de Abril, 63',
+                tags: [
+                    { text: 'Alquiler', special: true },
+                    { text: 'Urbana' },
+                    { text: 'Carretera' }
+                ],
+                descripcion: 'Alquiler y taller de reparaciones para bicicletas urbanas y de ruta.',
+                lat: 28.14122029237369, lng: -15.432271132606573,
+                mapsUrl: 'https://maps.google.com/?cid=341175293571142682',
+                tel: '928935411'
+            },
+            {
+                id: 16,
+                categorias: ['bici'],
+                nombre: 'DRT Cycling Factory',
+                zona: 'El Sebadal',
+                direccion: 'Calle Sao Paulo esq. Calle Quito, 11, local 4',
+                tags: [
+                    { text: 'Reparación', special: true },
+                    { text: 'Mantenimiento' }
+                ],
+                descripcion: 'Taller de mantenimiento y reparación de bicicletas, venta de marcas y personalización de componentes.',
+                lat: 28.1380, lng: -15.4260,
+                mapsUrl: 'https://maps.app.goo.gl/cuGF4XdKcLq7rorr6',
+                tel: '615240265'
+            }
+        ];
+
+        // =========================================================================
+        // ESTADO GLOBAL
+        // =========================================================================
+        let filtroActual = 'all';
+        const marcadores = {}; // id -> instancia de L.marker
+
+        // =========================================================================
+        // INICIALIZACIÓN DEL MAPA
+        // =========================================================================
+        const map = L.map('map-talleres').setView([28.128, -15.432], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Deriva la clase visual (color) a partir del array de categorías:
+        // ['bici'] -> 'bici', ['vmp'] -> 'vmp', ['bici','vmp'] -> 'ambos'
+        function claseCategoria(taller) {
+            return taller.categorias.length > 1 ? 'ambos' : taller.categorias[0];
+        }
+
+        function iconoCategoria(taller) {
+            if (taller.categorias.length > 1) return '🚲🛴';
+            return taller.categorias[0] === 'vmp' ? '🛴' : '🚲';
+        }
+
+        function crearIconoTaller(taller) {
+            return L.divIcon({
+                className: 'marker-taller-wrapper',
+                html: `<div class="marker-taller ${claseCategoria(taller)}"><span>${iconoCategoria(taller)}</span></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 30],
+                popupAnchor: [0, -30]
+            });
+        }
+
+        function generarHTMLTags(tags) {
+            return tags.map(t => `<span class="tag ${t.special ? 'special' : ''}">${t.text}</span>`).join('');
+        }
+
+        function generarPopupHTML(taller) {
+            return `
+                <div class="popup-card">
+                    <div class="popup-zone">${taller.zona}</div>
+                    <div class="popup-name">${taller.nombre}</div>
+                    <div class="popup-direccion">${taller.direccion}</div>
+                    <div class="popup-tags">${generarHTMLTags(taller.tags)}</div>
+                    <p class="popup-desc">${taller.descripcion}</p>
+                    <div class="popup-actions">
+                        <a href="${taller.mapsUrl}" target="_blank" class="btn-map">📍 Cómo llegar</a>
+                        <a href="tel:${taller.tel}" class="btn-call">📞 Llamar</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        function inicializarMarcadores() {
+            talleresData.forEach(taller => {
+                const marker = L.marker([taller.lat, taller.lng], { icon: crearIconoTaller(taller) })
+                    .addTo(map)
+                    .bindPopup(generarPopupHTML(taller));
+                // Al abrir el popup desde el mapa, resalta también la tarjeta del listado
+                marker.on('click', () => resaltarTarjeta(taller.id));
+                marcadores[taller.id] = marker;
+            });
+        }
+
+        // =========================================================================
+        // RENDERIZADO DEL LISTADO
+        // =========================================================================
+        function generarTarjetaHTML(taller) {
+            const esAmbos = taller.categorias.length > 1;
+            return `
+                <div class="taller-card" data-categorias="${taller.categorias.join(' ')}" data-id="${taller.id}" id="tarjeta-${taller.id}">
+                    <div class="taller-header">
+                        <span class="taller-indicador ${claseCategoria(taller)}"></span>
+                        <div class="taller-header-texto">
+                            <div class="taller-name">${taller.nombre}${esAmbos ? ' <span class="badge-ambos">Bici + VMP</span>' : ''}</div>
+                            <span class="taller-zone">${taller.zona}</span>
+                            <div class="taller-direccion">${taller.direccion}</div>
+                        </div>
+                    </div>
+                    <div class="taller-body">
+                        <div class="tags-container">${generarHTMLTags(taller.tags)}</div>
+                        <p>${taller.descripcion}</p>
+                    </div>
+                    <div class="taller-actions">
+                        <button class="btn-action btn-map" onclick="enfocarEnMapa(${taller.id})">📍 Ver en Mapa</button>
+                        <a href="${taller.mapsUrl}" target="_blank" class="btn-action btn-map">🧭 Cómo llegar</a>
+                        <a href="tel:${taller.tel}" class="btn-action btn-call">📞 Llamar</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarListado() {
+            const grid = document.getElementById('talleres-grid');
+            grid.innerHTML = talleresData.map(generarTarjetaHTML).join('');
+        }
+
+        // =========================================================================
+        // FILTRADO (sincroniza listado + mapa)
+        // =========================================================================
+        // Un taller "coincide" con el filtro elegido si:
+        // - 'all'   -> siempre
+        // - 'bici'  -> hace bicicletas (incluye los que también hacen VMP)
+        // - 'vmp'   -> hace patinetes (incluye los que también hacen bicicletas)
+        // - 'ambos' -> hace las dos cosas exclusivamente (es el filtro "especialista en todo")
+        function tallerCoincideConFiltro(taller, categoria) {
+            if (categoria === 'all') return true;
+            if (categoria === 'ambos') return taller.categorias.length > 1;
+            return taller.categorias.includes(categoria);
+        }
+
+        function filtrarTalleres(categoria) {
+            filtroActual = categoria;
+
+            // Botones de filtro activos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-filtro') === categoria);
+            });
+
+            // Tarjetas del listado
+            talleresData.forEach(taller => {
+                const tarjeta = document.getElementById('tarjeta-' + taller.id);
+                if (!tarjeta) return;
+                tarjeta.style.display = tallerCoincideConFiltro(taller, categoria) ? 'flex' : 'none';
+            });
+
+            // Marcadores del mapa
+            talleresData.forEach(taller => {
+                const marker = marcadores[taller.id];
+                if (tallerCoincideConFiltro(taller, categoria)) {
+                    if (!map.hasLayer(marker)) marker.addTo(map);
+                } else {
+                    map.closePopup();
+                    map.removeLayer(marker);
+                }
+            });
+        }
+
+        // =========================================================================
+        // CONEXIÓN LISTADO <-> MAPA
+        // =========================================================================
+        function enfocarEnMapa(id) {
+            const taller = talleresData.find(t => t.id === id);
+            const marker = marcadores[id];
+            if (!taller || !marker) return;
+
+            // Si el taller está oculto por el filtro actual, no tiene marcador en el mapa
+            if (!map.hasLayer(marker)) return;
+
+            document.getElementById('map-talleres').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            map.setView([taller.lat, taller.lng], 15, { animate: true });
+            setTimeout(() => marker.openPopup(), 400);
+            resaltarTarjeta(id);
+        }
+
+        function resaltarTarjeta(id) {
+            document.querySelectorAll('.taller-card').forEach(t => t.classList.remove('resaltada'));
+            const tarjeta = document.getElementById('tarjeta-' + id);
+            if (tarjeta) tarjeta.classList.add('resaltada');
+        }
+
+        // =========================================================================
+        // ARRANQUE
+        // =========================================================================
+        renderizarListado();
+        inicializarMarcadores();
+        window.addEventListener('resize', () => map.invalidateSize());
+    </script>
+</body>
+</html>
