@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Talleres y Tiendas - Movilidad LPGC</title>
+    <title>BiciLPA · Talleres y tiendas</title>
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -40,12 +40,14 @@
         .legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.15); }
         .legend-dot.bici { background: #3498db; }
         .legend-dot.vmp { background: #9b59b6; }
+        .legend-dot.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
 
         /* Marcadores numerados personalizados */
         .marker-taller { width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 2px solid #fff; }
         .marker-taller span { transform: rotate(45deg); color: #fff; font-weight: 700; font-size: 0.8rem; }
         .marker-taller.bici { background: #3498db; }
         .marker-taller.vmp { background: #9b59b6; }
+        .marker-taller.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
 
         /* Popup del mapa estilizado como mini-tarjeta */
         .leaflet-popup-content-wrapper { border-radius: 10px; padding: 0; overflow: hidden; }
@@ -70,6 +72,10 @@
 
         .taller-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; }
         .taller-numero { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: #2c3e50; color: #fff; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .taller-numero.bici { background: #3498db; }
+        .taller-numero.vmp { background: #9b59b6; }
+        .taller-numero.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
+        .badge-ambos { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: linear-gradient(135deg, #3498db, #9b59b6); color: #fff; vertical-align: middle; margin-left: 4px; }
         .taller-header-texto { flex: 1; }
         .taller-name { font-size: 1.2rem; color: #2c3e50; font-weight: bold; margin-bottom: 3px; }
         .taller-zone { font-size: 0.85rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -113,6 +119,7 @@
             <button class="filter-btn active" data-filtro="all" onclick="filtrarTalleres('all')">Todos</button>
             <button class="filter-btn" data-filtro="bici" onclick="filtrarTalleres('bici')">Bicicletas</button>
             <button class="filter-btn" data-filtro="vmp" onclick="filtrarTalleres('vmp')">Patinetes (VMP)</button>
+            <button class="filter-btn" data-filtro="ambos" onclick="filtrarTalleres('ambos')">Ambos</button>
         </div>
 
         <!-- Mapa de Talleres -->
@@ -121,6 +128,7 @@
             <div class="map-legend">
                 <span><i class="legend-dot bici"></i> Bicicletas</span>
                 <span><i class="legend-dot vmp"></i> Patinetes (VMP)</span>
+                <span><i class="legend-dot ambos"></i> Ambos</span>
             </div>
         </div>
 
@@ -142,7 +150,7 @@
         const talleresData = [
             {
                 id: 1,
-                tipo: 'vmp',
+                categorias: ['vmp'],
                 nombre: 'Patineteros',
                 zona: 'Guanarteme',
                 direccion: 'Calle Churruca, 36',
@@ -157,7 +165,7 @@
             },
             {
                 id: 2,
-                tipo: 'vmp',
+                categorias: ['bici', 'vmp'],
                 nombre: 'Pedelec Canarias',
                 zona: 'Arenales',
                 direccion: 'Calle Matías Padrón, 102',
@@ -173,7 +181,7 @@
             },
             {
                 id: 3,
-                tipo: 'vmp',
+                categorias: ['vmp'],
                 nombre: 'Mundo Patineta',
                 zona: 'Arenales',
                 direccion: 'Calle León y Castillo, 145',
@@ -188,7 +196,7 @@
             },
             {
                 id: 4,
-                tipo: 'vmp',
+                categorias: ['vmp'],
                 nombre: 'Aeropatín',
                 zona: 'Ciudad Jardín',
                 direccion: 'Paseo Tomás Morales, 72',
@@ -204,7 +212,7 @@
             },
             {
                 id: 5,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'Free Motion Bikecenter',
                 zona: 'Alcaravaneras',
                 direccion: 'Calle León y Castillo, 323',
@@ -219,7 +227,7 @@
             },
             {
                 id: 6,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'Vadebicis Las Palmas',
                 zona: 'Arenales',
                 direccion: 'Calle León y Castillo, 157',
@@ -234,7 +242,7 @@
             },
             {
                 id: 7,
-                tipo: 'vmp',
+                categorias: ['vmp'],
                 nombre: 'RDP Patinetas',
                 zona: 'Siete Palmas',
                 direccion: 'Avenida Pintor Felo Monzón, 15',
@@ -249,7 +257,7 @@
             },
             {
                 id: 8,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'Bike Lane Canarias',
                 zona: 'Triana',
                 direccion: 'Calle Francisco Gourié, 4',
@@ -265,7 +273,7 @@
             },
             {
                 id: 9,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'Santbike',
                 zona: 'Guanarteme',
                 direccion: 'Calle Costa Rica, 3',
@@ -279,7 +287,7 @@
             },
             {
                 id: 10,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'La Bici Bike Shop',
                 zona: 'Guanarteme',
                 direccion: 'Calle Secretario Padilla, 159',
@@ -293,7 +301,7 @@
             },
             {
                 id: 11,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'Rental Bike Station',
                 zona: 'Santa Catalina',
                 direccion: 'Calle Veintinueve de Abril, 63',
@@ -309,7 +317,7 @@
             },
             {
                 id: 12,
-                tipo: 'bici',
+                categorias: ['bici', 'vmp'],
                 nombre: 'Grupo MBC',
                 zona: 'Arenales',
                 direccion: 'Calle Matías Padrón, 16',
@@ -323,7 +331,7 @@
             },
             {
                 id: 13,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'BikeGC',
                 zona: 'San José',
                 direccion: 'Paseo de San José, 46',
@@ -338,7 +346,7 @@
             },
             {
                 id: 14,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'Specialized BikeGC',
                 zona: 'Alcaravaneras',
                 direccion: 'Calle Alemania, 59',
@@ -353,7 +361,7 @@
             },
             {
                 id: 15,
-                tipo: 'bici',
+                categorias: ['bici'],
                 nombre: 'Bicicletas Canarias',
                 zona: 'Guanarteme',
                 direccion: 'Calle Castillejos, 72',
@@ -382,10 +390,16 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
+        // Deriva la clase visual (color) a partir del array de categorías:
+        // ['bici'] -> 'bici', ['vmp'] -> 'vmp', ['bici','vmp'] -> 'ambos'
+        function claseCategoria(taller) {
+            return taller.categorias.length > 1 ? 'ambos' : taller.categorias[0];
+        }
+
         function crearIconoTaller(taller) {
             return L.divIcon({
                 className: 'marker-taller-wrapper',
-                html: `<div class="marker-taller ${taller.tipo}"><span>${taller.id}</span></div>`,
+                html: `<div class="marker-taller ${claseCategoria(taller)}"><span>${taller.id}</span></div>`,
                 iconSize: [30, 30],
                 iconAnchor: [15, 30],
                 popupAnchor: [0, -30]
@@ -427,12 +441,13 @@
         // RENDERIZADO DEL LISTADO
         // =========================================================================
         function generarTarjetaHTML(taller) {
+            const esAmbos = taller.categorias.length > 1;
             return `
-                <div class="taller-card" data-tipo="${taller.tipo}" data-id="${taller.id}" id="tarjeta-${taller.id}">
+                <div class="taller-card" data-categorias="${taller.categorias.join(' ')}" data-id="${taller.id}" id="tarjeta-${taller.id}">
                     <div class="taller-header">
-                        <span class="taller-numero">${taller.id}</span>
+                        <span class="taller-numero ${claseCategoria(taller)}">${taller.id}</span>
                         <div class="taller-header-texto">
-                            <div class="taller-name">${taller.nombre}</div>
+                            <div class="taller-name">${taller.nombre}${esAmbos ? ' <span class="badge-ambos">Bici + VMP</span>' : ''}</div>
                             <span class="taller-zone">${taller.zona}</span>
                             <div class="taller-direccion">${taller.direccion}</div>
                         </div>
@@ -458,6 +473,17 @@
         // =========================================================================
         // FILTRADO (sincroniza listado + mapa)
         // =========================================================================
+        // Un taller "coincide" con el filtro elegido si:
+        // - 'all'   -> siempre
+        // - 'bici'  -> hace bicicletas (incluye los que también hacen VMP)
+        // - 'vmp'   -> hace patinetes (incluye los que también hacen bicicletas)
+        // - 'ambos' -> hace las dos cosas exclusivamente (es el filtro "especialista en todo")
+        function tallerCoincideConFiltro(taller, categoria) {
+            if (categoria === 'all') return true;
+            if (categoria === 'ambos') return taller.categorias.length > 1;
+            return taller.categorias.includes(categoria);
+        }
+
         function filtrarTalleres(categoria) {
             filtroActual = categoria;
 
@@ -467,16 +493,16 @@
             });
 
             // Tarjetas del listado
-            document.querySelectorAll('.taller-card').forEach(tarjeta => {
-                const coincide = categoria === 'all' || tarjeta.getAttribute('data-tipo') === categoria;
-                tarjeta.style.display = coincide ? 'flex' : 'none';
+            talleresData.forEach(taller => {
+                const tarjeta = document.getElementById('tarjeta-' + taller.id);
+                if (!tarjeta) return;
+                tarjeta.style.display = tallerCoincideConFiltro(taller, categoria) ? 'flex' : 'none';
             });
 
             // Marcadores del mapa
             talleresData.forEach(taller => {
-                const coincide = categoria === 'all' || taller.tipo === categoria;
                 const marker = marcadores[taller.id];
-                if (coincide) {
+                if (tallerCoincideConFiltro(taller, categoria)) {
                     if (!map.hasLayer(marker)) marker.addTo(map);
                 } else {
                     map.closePopup();
