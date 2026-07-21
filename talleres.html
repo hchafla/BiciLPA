@@ -100,7 +100,7 @@
 <body>
     <!-- Menú de Navegación del Modelo Multi-página -->
     <nav>
-        <a href="index.html" class="logo">🚲 LPGC en Bici</a>
+        <a href="index.html" class="logo">BiciLPA</a>
         <div>
             <a href="index.html">Mapa en Vivo</a>
             <a href="rutas.html">Rutas Recomendadas</a>
@@ -111,14 +111,14 @@
     <div class="container">
         <header>
             <h1>Talleres y Soporte Técnico</h1>
-            <p>Servicios locales de confianza para reparar, poner a punto o equipar tu bici o patinete eléctrico.</p>
+            <p>Servicios locales de confianza para reparar, poner a punto o equipar tu bici o patineta eléctrica.</p>
         </header>
 
         <!-- Filtros de categoría -->
         <div class="filter-bar">
             <button class="filter-btn active" data-filtro="all" onclick="filtrarTalleres('all')">Todos</button>
             <button class="filter-btn" data-filtro="bici" onclick="filtrarTalleres('bici')">Bicicletas</button>
-            <button class="filter-btn" data-filtro="vmp" onclick="filtrarTalleres('vmp')">Patinetes (VMP)</button>
+            <button class="filter-btn" data-filtro="vmp" onclick="filtrarTalleres('vmp')">Patinetas (VMP)</button>
             <button class="filter-btn" data-filtro="ambos" onclick="filtrarTalleres('ambos')">Ambos</button>
         </div>
 
@@ -127,7 +127,7 @@
             <div id="map-talleres"></div>
             <div class="map-legend">
                 <span><i class="legend-dot bici"></i> Bicicletas</span>
-                <span><i class="legend-dot vmp"></i> Patinetes (VMP)</span>
+                <span><i class="legend-dot vmp"></i> Patinetas (VMP)</span>
                 <span><i class="legend-dot ambos"></i> Ambos</span>
             </div>
         </div>
@@ -153,10 +153,10 @@
                 zona: 'Guanarteme',
                 direccion: 'Calle Churruca, 36',
                 tags: [
-                    { text: 'Patinetes Eléctricos', special: true },
+                    { text: 'Patinetas Eléctricas', special: true },
                     { text: 'Reparación' }
                 ],
-                descripcion: 'Tienda y taller especializado en reparación de patinetes eléctricos.',
+                descripcion: 'Tienda y taller especializado en reparación de patinetas eléctricas.',
                 lat: 28.133073437298474, lng: -15.438036306973316,
                 mapsUrl: 'https://maps.google.com/?cid=10540027036133289357',
                 tel: '928751075'
@@ -172,7 +172,7 @@
                     { text: 'Recambios' },
                     { text: 'Accesorios' }
                 ],
-                descripcion: 'Servicio técnico para bicicletas y patinetes eléctricos, venta de recambios y accesorios.',
+                descripcion: 'Servicio técnico para bicicletas y patinetas eléctricas, venta de recambios y accesorios.',
                 lat: 28.11768341255938, lng: -15.423689891866726,
                 mapsUrl: 'https://maps.google.com/?cid=15160181432943207773',
                 tel: '928058119'
@@ -187,7 +187,7 @@
                     { text: 'Movilidad Eléctrica', special: true },
                     { text: 'Mantenimiento' }
                 ],
-                descripcion: 'Especialistas en reparación y mantenimiento de movilidad eléctrica (patinetes).',
+                descripcion: 'Especialistas en reparación y mantenimiento de movilidad eléctrica (patinetas).',
                 lat: 28.11675597681001, lng: -15.422133125509685,
                 mapsUrl: 'https://maps.google.com/?cid=7499556238619769686',
                 tel: '621663511'
@@ -203,7 +203,7 @@
                     { text: 'Cecotec' },
                     { text: 'Dualtron' }
                 ],
-                descripcion: 'Taller oficial de diversas marcas de patinetes (Cecotec, Dualtron, etc.) y venta especializada.',
+                descripcion: 'Taller oficial de diversas marcas de patinetas (Cecotec, Dualtron, etc.) y venta especializada.',
                 lat: 28.113125059004098, lng: -15.42312800173588,
                 mapsUrl: 'https://maps.google.com/?cid=16393350585597107636',
                 tel: '655787300'
@@ -221,7 +221,7 @@
                 descripcion: 'Taller profesional de bicicletas, venta y alquiler de equipos de alta gama.',
                 lat: 28.131025881985718, lng: -15.429707077392774,
                 mapsUrl: 'https://maps.google.com/?cid=17315208940678764260',
-                tel: '#'
+                tel: '928290298'
             },
             {
                 id: 7,
@@ -233,7 +233,7 @@
                     { text: 'Personalización', special: true },
                     { text: 'Baterías Litio' }
                 ],
-                descripcion: 'Reparación, mantenimiento, personalización de patinetes y baterías de litio.',
+                descripcion: 'Reparación, mantenimiento, personalización de patinetas y baterías de litio.',
                 lat: 28.10723486380286, lng: -15.450899722422582,
                 mapsUrl: 'https://maps.google.com/?cid=16084814369428931658',
                 tel: '609952071'
@@ -406,7 +406,7 @@
         // Un taller "coincide" con el filtro elegido si:
         // - 'all'   -> siempre
         // - 'bici'  -> hace bicicletas (incluye los que también hacen VMP)
-        // - 'vmp'   -> hace patinetes (incluye los que también hacen bicicletas)
+        // - 'vmp'   -> hace patinetas (incluye los que también hacen bicicletas)
         // - 'ambos' -> hace las dos cosas exclusivamente (es el filtro "especialista en todo")
         function tallerCoincideConFiltro(taller, categoria) {
             if (categoria === 'all') return true;
