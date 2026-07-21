@@ -601,6 +601,11 @@
                 ? { color: colorTrazado, weight: 6, opacity: 0.90 }
                 : { color: colorTrazado, weight: 4, opacity: 0.30 };
 
+            // Grupo que reúne el trazado visible + las "zonas de click" invisibles
+            // (más anchas) para que sea mucho más fácil acertar con el dedo en móvil,
+            // sin que el grosor de la línea que se ve cambie ni un pixel.
+            const grupoRuta = L.featureGroup();
+
             const capa = L.geoJSON(datos.geojson, {
                 // Los avisos (properties.tipo === 'advertencia') solo se muestran
                 // cuando la ruta está seleccionada; el resto de puntos/icono siguen
@@ -645,22 +650,30 @@
                     return L.marker(latlng, { opacity: seleccionada ? 1 : 0.45 });
                 },
                 onEachFeature: function(feature, layer) {
-                    // Permite seleccionar la ruta haciendo click directamente sobre
-                    // su trazado en el mapa, igual que si se pulsara en el carrusel.
                     const tipoGeometria = feature.geometry && feature.geometry.type;
                     if (tipoGeometria === 'LineString' || tipoGeometria === 'MultiLineString') {
-                        layer.on('click', () => seleccionarRuta(idRuta));
-                        layer.on('mouseover', function () {
-                            if (!document.body.classList.contains('arrastrando')) {
-                                this.getElement() && (this.getElement().style.cursor = 'pointer');
-                            }
+                        // Línea invisible mucho más ancha, calcada sobre la línea real,
+                        // que actúa como "zona de toque" ampliada. Es esta capa (y no la
+                        // visible) la que escucha el click/tap, así el área pulsable es
+                        // mucho mayor sin engordar visualmente el trazado.
+                        const zonaClick = L.polyline(layer.getLatLngs(), {
+                            weight: 28,
+                            opacity: 0,
+                            // 'interactive: true' es el valor por defecto en líneas, pero
+                            // lo dejamos explícito porque es justo lo que necesitamos aquí.
+                            interactive: true
                         });
+                        zonaClick.on('click', () => seleccionarRuta(idRuta));
+                        zonaClick.on('mouseover', () => layer.setStyle({ weight: estiloLinea.weight + 2 }));
+                        zonaClick.on('mouseout', () => layer.setStyle(estiloLinea));
+                        grupoRuta.addLayer(zonaClick);
                     }
                 }
             });
 
-            capasRutas[idRuta] = capa;
-            capasPreview.addLayer(capa);
+            grupoRuta.addLayer(capa);
+            capasRutas[idRuta] = grupoRuta;
+            capasPreview.addLayer(grupoRuta);
         }
 
         // 5. RENDERIZADO DE LA TARJETA DE INFORMACIÓN EN LA SIDEBAR
