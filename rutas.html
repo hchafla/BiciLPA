@@ -284,6 +284,81 @@
             font-size: 1.1rem;
             box-shadow: var(--shadow);
         }
+        /* BOTÓN FLOTANTE DE GEOLOCALIZACIÓN */
+        .geoloc-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            z-index: 999; /* por debajo de la sidebar (1001) para no taparla */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dark);
+        }
+        .geoloc-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        /* Activo = ya estamos localizando y siguiendo al usuario */
+        .geoloc-btn.activo {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        /* Buscando = a la espera del primer resultado del navegador */
+        .geoloc-btn.buscando {
+            animation: geolocPulso 1s ease-in-out infinite;
+        }
+        @keyframes geolocPulso {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        /* Marcador de "mi ubicación": punto azul con anillo de pulso, estilo Google Maps */
+        .marcador-ubicacion-usuario-wrap {
+            position: relative;
+            width: 18px;
+            height: 18px;
+        }
+        .marcador-ubicacion-usuario-dot {
+            position: absolute;
+            inset: 0;
+            background: #4285F4;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.35);
+        }
+        .marcador-ubicacion-usuario-pulso {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 18px;
+            height: 18px;
+            margin: -9px 0 0 -9px;
+            background: rgba(66, 133, 244, 0.35);
+            border-radius: 50%;
+            animation: pulsoUbicacion 1.8s ease-out infinite;
+        }
+        @keyframes pulsoUbicacion {
+            0% { transform: scale(1); opacity: 0.65; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        @media (max-width: 768px) {
+            .geoloc-btn {
+                bottom: 20px;
+                right: 16px;
+                width: 46px;
+                height: 46px;
+                font-size: 1.25rem;
+            }
+        }
         /* RESPONSIVE (Móvil / Bottom Sheet) */
         @media (max-width: 768px) {
             .selector-ejes {
@@ -389,6 +464,8 @@
         <div class="rutas-carrusel" id="rutas-carrusel"></div>
         <!-- El Mapa -->
         <div id="map-rutas"></div>
+        <!-- Botón flotante de Geolocalización (seguimiento continuo) -->
+        <button class="geoloc-btn" id="btn-geoloc" onclick="alternarGeolocalizacion()" title="Ver mi ubicación en el mapa" aria-label="Ver mi ubicación en el mapa">📍</button>
         <!-- Barra Lateral Dinámica -->
         <div class="rutas-sidebar" id="rutas-sidebar">
             <div class="drag-handle" id="drag-handle"></div>
@@ -431,6 +508,101 @@
 
         let ejeActual = null;
         let idRutaSeleccionada = null;
+
+        // =====================================================================
+        // GEOLOCALIZACIÓN (seguimiento continuo, botón flotante 📍)
+        // =====================================================================
+        let siguiendoUbicacion = false;   // ¿está activo el seguimiento ahora mismo?
+        let esperandoPrimerFix = true;    // ¿aún no hemos centrado el mapa la primera vez?
+        let marcadorUbicacion = null;     // el puntito azul
+        let circuloPrecision = null;      // el círculo de precisión del GPS/red
+
+        const iconoUbicacion = L.divIcon({
+            className: 'marcador-ubicacion-usuario-wrap',
+            html: '<div class="marcador-ubicacion-usuario-pulso"></div><div class="marcador-ubicacion-usuario-dot"></div>',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+        });
+
+        function alternarGeolocalizacion() {
+            if (siguiendoUbicacion) {
+                detenerGeolocalizacion();
+                return;
+            }
+            if (!navigator.geolocation) {
+                alert('Tu navegador no admite geolocalización.');
+                return;
+            }
+            siguiendoUbicacion = true;
+            esperandoPrimerFix = true;
+            document.getElementById('btn-geoloc').classList.add('buscando');
+            // watch:true -> Leaflet vuelve a llamar a getCurrentPosition periódicamente
+            // y dispara 'locationfound' cada vez que hay una posición nueva, tanto en
+            // PC (red/Wi-Fi) como en móvil (GPS). setView:false porque el centrado
+            // inicial lo controlamos nosotros mismos (ver locationfound más abajo).
+            map.locate({ watch: true, enableHighAccuracy: true, setView: false, maximumAge: 5000 });
+        }
+
+        function detenerGeolocalizacion() {
+            siguiendoUbicacion = false;
+            esperandoPrimerFix = true;
+            map.stopLocate();
+            const btn = document.getElementById('btn-geoloc');
+            btn.classList.remove('activo', 'buscando');
+            if (marcadorUbicacion) {
+                map.removeLayer(marcadorUbicacion);
+                marcadorUbicacion = null;
+            }
+            if (circuloPrecision) {
+                map.removeLayer(circuloPrecision);
+                circuloPrecision = null;
+            }
+        }
+
+        map.on('locationfound', function (e) {
+            const btn = document.getElementById('btn-geoloc');
+            btn.classList.remove('buscando');
+            btn.classList.add('activo');
+
+            if (!marcadorUbicacion) {
+                marcadorUbicacion = L.marker(e.latlng, {
+                    icon: iconoUbicacion,
+                    zIndexOffset: 1000,
+                    interactive: false
+                }).addTo(map);
+            } else {
+                marcadorUbicacion.setLatLng(e.latlng);
+            }
+
+            if (!circuloPrecision) {
+                circuloPrecision = L.circle(e.latlng, {
+                    radius: e.accuracy,
+                    color: '#4285F4',
+                    weight: 1,
+                    fillColor: '#4285F4',
+                    fillOpacity: 0.08,
+                    interactive: false
+                }).addTo(map);
+            } else {
+                circuloPrecision.setLatLng(e.latlng);
+                circuloPrecision.setRadius(e.accuracy);
+            }
+
+            // Solo se centra el mapa la PRIMERA vez que se localiza al usuario.
+            // Las actualizaciones siguientes del seguimiento solo mueven el punto,
+            // sin forzar la vista del mapa (igual criterio que al seleccionar rutas:
+            // se respeta lo que el usuario esté mirando en cada momento).
+            if (esperandoPrimerFix) {
+                map.setView(e.latlng, Math.max(map.getZoom(), 15));
+                esperandoPrimerFix = false;
+            }
+        });
+
+        map.on('locationerror', function (e) {
+            console.error('Error de geolocalización:', e.message);
+            alert('No se ha podido acceder a tu ubicación. Comprueba que le has dado permiso al navegador y que la página se sirve por HTTPS.');
+            detenerGeolocalizacion();
+        });
 
         const coloresEjes = {
             'este': '#0074D9',   
