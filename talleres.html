@@ -13,59 +13,10 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
 
         /* Navegación superior común */
-        nav { 
-            background: #2c3e50; 
-            padding: 15px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            color: white; 
-            position: relative;
-        }
-        nav a { color: #bdc3c7; text-decoration: none; font-weight: 500; }
+        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
-
-        .nav-links { display: flex; gap: 20px; align-items: center; }
-
-        /* Botón hamburguesa para dispositivos móviles */
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        /* Responsive Breakpoint */
-        @media (max-width: 768px) {
-            .menu-toggle { display: block; }
-            .nav-links {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: #2c3e50;
-                padding: 15px 0;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                z-index: 1000;
-            }
-            .nav-links.active { display: flex; }
-            .nav-links a {
-                padding: 10px 20px;
-                width: 100%;
-                box-sizing: border-box;
-                margin: 0;
-            }
-            .nav-links a:hover, .nav-links a.active {
-                border-bottom: none;
-                background: #34495e;
-            }
-        }
 
         /* Contenedor de Contenido */
         .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
@@ -91,14 +42,14 @@
         .legend-dot.vmp { background: #9b59b6; }
         .legend-dot.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
 
-        /* Marcadores personalizados */
+        /* Marcadores personalizados (sin numeración: solo color + icono por categoría) */
         .marker-taller { width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 2px solid #fff; }
         .marker-taller span { transform: rotate(45deg); font-size: 0.85rem; line-height: 1; }
         .marker-taller.bici { background: #3498db; }
         .marker-taller.vmp { background: #9b59b6; }
         .marker-taller.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
 
-        /* Popup del mapa */
+        /* Popup del mapa estilizado como mini-tarjeta */
         .leaflet-popup-content-wrapper { border-radius: 10px; padding: 0; overflow: hidden; }
         .leaflet-popup-content { margin: 0; width: 260px !important; }
         .popup-card { padding: 14px 16px; }
@@ -147,18 +98,16 @@
     </style>
 </head>
 <body>
-    <!-- Menú de Navegación con soporte desplegable -->
+    <!-- Menú de Navegación del Modelo Multi-página -->
     <nav>
         <a href="index.html" class="logo">BiciLPA</a>
-        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menú">☰</button>
-        <div class="nav-links" id="nav-links">
+        <div>
             <a href="index.html">Mapa en Vivo</a>
             <a href="rutas.html">Rutas Recomendadas</a>
             <a href="normativa.html">Normativa</a>
             <a href="talleres.html" class="active">Talleres</a>
         </div>
     </nav>
-
     <div class="container">
         <header>
             <h1>Talleres y Soporte Técnico</h1>
@@ -191,17 +140,11 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // Lógica del menú desplegable móvil
-        const menuToggle = document.getElementById('menu-toggle');
-        const navLinks = document.getElementById('nav-links');
-
-        menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
-
         // =========================================================================
         // FUENTE ÚNICA DE DATOS: listado y mapa se generan a partir de este array
         // =========================================================================
+        // NOTA: el "id" es solo una clave interna para relacionar tarjeta <-> marcador,
+        // no se muestra en pantalla (a propósito, para no dar sensación de ranking).
         const talleresData = [
             {
                 id: 1,
@@ -362,7 +305,7 @@
         // ESTADO GLOBAL
         // =========================================================================
         let filtroActual = 'all';
-        const marcadores = {}; 
+        const marcadores = {}; // id -> instancia de L.marker
 
         // =========================================================================
         // INICIALIZACIÓN DEL MAPA
@@ -372,6 +315,8 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
+        // Deriva la clase visual (color) a partir del array de categorías:
+        // ['bici'] -> 'bici', ['vmp'] -> 'vmp', ['bici','vmp'] -> 'ambos'
         function claseCategoria(taller) {
             return taller.categorias.length > 1 ? 'ambos' : taller.categorias[0];
         }
@@ -402,81 +347,129 @@
                     <div class="popup-name">${taller.nombre}</div>
                     <div class="popup-direccion">${taller.direccion}</div>
                     <div class="popup-tags">${generarHTMLTags(taller.tags)}</div>
-                    <p class="popup-desc">${tallerAquí tienes el código revisado e integrado. Se han implementado las correcciones necesarias y mantenido la coherencia general del proyecto:
+                    <p class="popup-desc">${taller.descripcion}</p>
+                    <div class="popup-actions">
+                        <a href="${taller.mapsUrl}" target="_blank" class="btn-map">📍 Cómo llegar</a>
+                        <a href="tel:${taller.tel}" class="btn-call">📞 Llamar</a>
+                    </div>
+                </div>
+            `;
+        }
 
-1. **Añadido taller ID 6 (*Vadebicis*)**: Se ha incluido en la estructura de datos con sus coordenadas exactas en la C/ Franchy Roca y sus etiquetas de distribuidor/servicio técnico.
-2. **Inclusión de etiqueta opcional `telDisplay`**: El array de datos permite definir un número en formato legible para la interfaz (`telDisplay: '928 12 34 56'`) mientras mantiene `tel` limpio para la etiqueta HTML `tel:`. Si no se especifica `telDisplay`, el script utiliza `tel` como fallback.
-3. **Consistencia visual en los marcadores de mapa**: Se añadieron estilos para `font-family` dentro de los pins personalizados en Leaflet, evitando que los emojis `🚲` y `🛴` sufran desviaciones de alineación o renderizado según el sistema operativo.
+        function inicializarMarcadores() {
+            talleresData.forEach(taller => {
+                const marker = L.marker([taller.lat, taller.lng], { icon: crearIconoTaller(taller) })
+                    .addTo(map)
+                    .bindPopup(generarPopupHTML(taller));
+                // Al abrir el popup desde el mapa, resalta también la tarjeta del listado
+                marker.on('click', () => resaltarTarjeta(taller.id));
+                marcadores[taller.id] = marker;
+            });
+        }
 
-### Código HTML completo
+        // =========================================================================
+        // RENDERIZADO DEL LISTADO
+        // =========================================================================
+        function generarTarjetaHTML(taller) {
+            const esAmbos = taller.categorias.length > 1;
+            return `
+                <div class="taller-card" data-categorias="${taller.categorias.join(' ')}" data-id="${taller.id}" id="tarjeta-${taller.id}">
+                    <div class="taller-header">
+                        <span class="taller-indicador ${claseCategoria(taller)}"></span>
+                        <div class="taller-header-texto">
+                            <div class="taller-name">${taller.nombre}${esAmbos ? ' <span class="badge-ambos">Bici + VMP</span>' : ''}</div>
+                            <span class="taller-zone">${taller.zona}</span>
+                            <div class="taller-direccion">${taller.direccion}</div>
+                        </div>
+                    </div>
+                    <div class="taller-body">
+                        <div class="tags-container">${generarHTMLTags(taller.tags)}</div>
+                        <p>${taller.descripcion}</p>
+                    </div>
+                    <div class="taller-actions">
+                        <button class="btn-action btn-map" onclick="enfocarEnMapa(${taller.id})">📍 Ver en Mapa</button>
+                        <a href="${taller.mapsUrl}" target="_blank" class="btn-action btn-map">🧭 Cómo llegar</a>
+                        <a href="tel:${taller.tel}" class="btn-action btn-call">📞 Llamar</a>
+                    </div>
+                </div>
+            `;
+        }
 
-```html
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiciLPA · Talleres y tiendas</title>
+        function renderizarListado() {
+            const grid = document.getElementById('talleres-grid');
+            grid.innerHTML = talleresData.map(generarTarjetaHTML).join('');
+        }
 
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.css](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css)" />
+        // =========================================================================
+        // FILTRADO (sincroniza listado + mapa)
+        // =========================================================================
+        // Un taller "coincide" con el filtro elegido si:
+        // - 'all'   -> siempre
+        // - 'bici'  -> hace bicicletas (incluye los que también hacen VMP)
+        // - 'vmp'   -> hace patinetas (incluye los que también hacen bicicletas)
+        // - 'ambos' -> hace las dos cosas exclusivamente (es el filtro "especialista en todo")
+        function tallerCoincideConFiltro(taller, categoria) {
+            if (categoria === 'all') return true;
+            if (categoria === 'ambos') return taller.categorias.length > 1;
+            return taller.categorias.includes(categoria);
+        }
 
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
+        function filtrarTalleres(categoria) {
+            filtroActual = categoria;
 
-        /* Navegación superior común */
-        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
-        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
-        nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
-        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+            // Botones de filtro activos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-filtro') === categoria);
+            });
 
-        /* Contenedor de Contenido */
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+            // Tarjetas del listado
+            talleresData.forEach(taller => {
+                const tarjeta = document.getElementById('tarjeta-' + taller.id);
+                if (!tarjeta) return;
+                tarjeta.style.display = tallerCoincideConFiltro(taller, categoria) ? 'flex' : 'none';
+            });
 
-        header { text-align: center; margin-bottom: 40px; }
-        header h1 { color: #2c3e50; font-size: 2rem; margin-bottom: 10px; }
-        header p { color: #7f8c8d; font-size: 1.1rem; }
+            // Marcadores del mapa
+            talleresData.forEach(taller => {
+                const marker = marcadores[taller.id];
+                if (tallerCoincideConFiltro(taller, categoria)) {
+                    if (!map.hasLayer(marker)) marker.addTo(map);
+                } else {
+                    map.closePopup();
+                    map.removeLayer(marker);
+                }
+            });
+        }
 
-        /* Barra de Filtros */
-        .filter-bar { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
-        .filter-btn { background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-        .filter-btn:hover { border-color: #3498db; color: #3498db; }
-        .filter-btn.active { background: #3498db; color: white; border-color: #3498db; }
+        // =========================================================================
+        // CONEXIÓN LISTADO <-> MAPA
+        // =========================================================================
+        function enfocarEnMapa(id) {
+            const taller = talleresData.find(t => t.id === id);
+            const marker = marcadores[id];
+            if (!taller || !marker) return;
 
-        /* Sección de Mapa */
-        .map-section { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; margin-bottom: 35px; }
-        #map-talleres { width: 100%; height: 420px; z-index: 1; }
+            // Si el taller está oculto por el filtro actual, no tiene marcador en el mapa
+            if (!map.hasLayer(marker)) return;
 
-        .map-legend { position: absolute; bottom: 12px; left: 12px; z-index: 500; background: rgba(255,255,255,0.95); padding: 8px 14px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: flex; gap: 16px; font-size: 0.8rem; font-weight: 600; color: #334155; }
-        .map-legend span { display: flex; align-items: center; gap: 6px; }
-        .legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.15); }
-        .legend-dot.bici { background: #3498db; }
-        .legend-dot.vmp { background: #9b59b6; }
-        .legend-dot.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
+            document.getElementById('map-talleres').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            map.setView([taller.lat, taller.lng], 15, { animate: true });
+            setTimeout(() => marker.openPopup(), 400);
+            resaltarTarjeta(id);
+        }
 
-        /* Marcadores personalizados */
-        .marker-taller { width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 2px solid #fff; }
-        .marker-taller span { transform: rotate(45deg); font-size: 0.85rem; line-height: 1; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
-        .marker-taller.bici { background: #3498db; }
-        .marker-taller.vmp { background: #9b59b6; }
-        .marker-taller.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
+        function resaltarTarjeta(id) {
+            document.querySelectorAll('.taller-card').forEach(t => t.classList.remove('resaltada'));
+            const tarjeta = document.getElementById('tarjeta-' + id);
+            if (tarjeta) tarjeta.classList.add('resaltada');
+        }
 
-        /* Popup del mapa estilizado */
-        .leaflet-popup-content-wrapper { border-radius: 10px; padding: 0; overflow: hidden; }
-        .leaflet-popup-content { margin: 0; width: 260px !important; }
-        .popup-card { padding: 14px 16px; }
-        .popup-zone { font-size: 0.75rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        .popup-name { font-size: 1.05rem; color: #2c3e50; font-weight: bold; margin: 3px 0 2px 0; }
-        .popup-direccion { font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px; }
-        .popup-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
-        .popup-tags .tag { font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; background: #f1f5f9; color: #475569; }
-        .popup-tags .tag.special { background: #e0f2fe; color: #0369a1; }
-        .popup-desc { font-size: 0.82rem; color: #555; margin-bottom: 12px; }
-        .popup-actions { display: flex; gap: 8px; }
-        .popup-actions a { flex: 1; text-align: center; padding: 6px; border-radius: 6px; text-decoration: none; font-size: 0.78rem; font-weight: 600; }
-        .popup-actions .btn-map { background: #f1f5f9; color: #334155; }
-        .popup-actions .btn-call { background: #2ecc71; color: white; }
-
-        /* Rejilla de Talleres */
-        .talleres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,
+        // =========================================================================
+        // ARRANQUE
+        // =========================================================================
+        renderizarListado();
+        inicializarMarcadores();
+        window.addEventListener('resize', () => map.invalidateSize());
+    </script>
+</body>
+</html>
