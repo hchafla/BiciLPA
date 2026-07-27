@@ -485,13 +485,42 @@
     <!-- Script Principal de Control -->
     <script>
         // =========================================================================
+        // CONSTANTES Y CAPAS BASE DE MAPAS
+        // =========================================================================
+        const mapaClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        });
+
+        const mapaOscuro = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        });
+
+        const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            attribution: '&copy; Google Maps',
+            maxZoom: 20
+        });
+
+        // =========================================================================
         // INICIALIZACIÓN Y EVENTOS
         // =========================================================================
-        // Inicialización del Mapa centrado en la zona de interés
-        const map = L.map('map-rutas').setView([28.128, -15.432], 13);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
+        // Inicialización del Mapa con mapaClaro (CartoDB Voyager) por defecto
+        const map = L.map('map-rutas', {
+            center: [28.128, -15.432],
+            zoom: 13,
+            layers: [mapaClaro]
+        });
+
+        // Control selector de capas base
+        const baseMaps = {
+            "Claro": mapaClaro,
+            "Oscuro": mapaOscuro,
+            "Satélite": mapaSatelite
+        };
+        L.control.layers(baseMaps).addTo(map);
 
         // Capa única donde viven TODAS las rutas precargadas del eje activo,
         // tanto las difuminadas como la seleccionada (a color pleno).
