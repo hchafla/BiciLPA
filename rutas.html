@@ -25,10 +25,6 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        /* position:fixed + inset:0 bloquea por completo el scroll/rebote de la
-           página en móvil. Sin esto, al llegar al final de un contenedor con
-           scroll interno, el navegador "cede" el gesto a la página entera y
-           arrastra consigo el mapa y la navbar. */
         html, body {
             height: 100%;
             width: 100%;
@@ -42,7 +38,7 @@
             display: flex;
             flex-direction: column;
         }
-        /* Navegación superior (recuperada) */
+        /* Navegación superior */
         nav {
             background: #2c3e50;
             padding: 12px 20px;
@@ -58,19 +54,19 @@
         nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 0.95rem; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
-        /* Contenedor Principal: ocupa el espacio restante bajo la navbar,
-           en vez de un 100vh/100vw fijo que ignoraba la navbar */
+        
         .map-container {
             position: relative;
             width: 100%;
             flex: 1;
-            min-height: 0; /* imprescindible para que flex:1 se calcule bien */
+            min-height: 0;
         }
         #map-rutas {
             width: 100%;
             height: 100%;
             z-index: 1;
         }
+        
         /* HEADER / SELECTOR DE EJES (Flotante) */
         .selector-ejes {
             position: absolute;
@@ -88,10 +84,10 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             max-width: 90%;
             overflow-x: auto;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         .selector-ejes::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
+            display: none;
         }
         .eje-btn {
             padding: 10px 20px;
@@ -111,19 +107,19 @@
         .eje-btn.active {
             color: #fff;
         }
-        /* Colores específicos de los botones de ejes */
         .eje-btn[data-eje="este"].active { background-color: #0074D9; }
         .eje-btn[data-eje="norte"].active { background-color: #2ECC40; }
         .eje-btn[data-eje="baja-alta"].active { background-color: #FF851B; }
         .eje-btn[data-eje="alta-baja"].active { background-color: #B10DC9; }
-        /* CARRUSEL HORIZONTAL DE RUTAS (SUBMENÚ) */
+
+        /* CARRUSEL HORIZONTAL DE RUTAS */
         .rutas-carrusel {
             position: absolute;
             top: 85px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
-            display: none; /* Cambia a flex vía JavaScript */
+            display: none;
             gap: 10px;
             max-width: 90%;
             overflow-x: auto;
@@ -148,11 +144,11 @@
         .carrusel-item:hover {
             transform: translateY(-2px);
         }
-        /* Color de los ítems seleccionados según su eje */
         .carrusel-item.active[data-eje-grupo="este"] { background: #0074D9; color: white; border-color: #0074D9; }
         .carrusel-item.active[data-eje-grupo="norte"] { background: #2ECC40; color: white; border-color: #2ECC40; }
         .carrusel-item.active[data-eje-grupo="baja-alta"] { background: #FF851B; color: white; border-color: #FF851B; }
         .carrusel-item.active[data-eje-grupo="alta-baja"] { background: #B10DC9; color: white; border-color: #B10DC9; }
+
         /* BARRA LATERAL (SIDEBAR / BOTTOM SHEET) */
         .rutas-sidebar {
             position: absolute;
@@ -167,14 +163,13 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: translateX(120%); /* Oculto por defecto en escritorio */
+            transform: translateX(120%);
             transition: transform 0.4s cubic-bezier(0.1, 0.76, 0.55, 0.94);
             border: 1px solid var(--border-color);
         }
         .rutas-sidebar.visible {
             transform: translateX(0);
         }
-        /* Handle para arrastre en móvil */
         .drag-handle {
             display: none;
             width: 40px;
@@ -206,13 +201,12 @@
         }
         .sidebar-content {
             flex: 1;
-            min-height: 0; /* clave: sin esto, un hijo flex no se contrae y el overflow no scrollea entero */
+            min-height: 0;
             overflow-y: auto;
             padding: 20px;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain; /* evita que el scroll "se escape" hacia la página/mapa */
+            overscroll-behavior: contain;
         }
-        /* Tarjeta de Información */
         .ruta-card {
             display: flex;
             flex-direction: column;
@@ -246,9 +240,7 @@
             align-items: center;
             gap: 4px;
         }
-        .tag-dificultad {
-            color: white !important;
-        }
+        .tag-dificultad { color: white !important; }
         .tag-dificultad.facil { background-color: #2ecc71 !important; }
         .tag-dificultad.moderado { background-color: #f39c12 !important; }
         .tag-dificultad.dificil { background-color: #e74c3c !important; }
@@ -266,12 +258,11 @@
             line-height: 1.5;
             color: #4a5568;
         }
-        /* Color dinámico del borde de indicaciones según eje */
         .ruta-card[data-eje="este"] .indicaciones { border-left-color: #0074D9; }
         .ruta-card[data-eje="norte"] .indicaciones { border-left-color: #2ECC40; }
         .ruta-card[data-eje="baja-alta"] .indicaciones { border-left-color: #FF851B; }
         .ruta-card[data-eje="alta-baja"] .indicaciones { border-left-color: #B10DC9; }
-        /* PUNTO 1: Marcadores personalizados con icono desde el GeoJSON */
+
         .marcador-punto-icono-interior {
             width: 34px;
             height: 34px;
@@ -284,12 +275,13 @@
             font-size: 1.1rem;
             box-shadow: var(--shadow);
         }
+
         /* BOTÓN FLOTANTE DE GEOLOCALIZACIÓN */
         .geoloc-btn {
             position: absolute;
             bottom: 30px;
             right: 20px;
-            z-index: 999; /* por debajo de la sidebar (1001) para no taparla */
+            z-index: 999;
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -305,28 +297,15 @@
             transition: var(--transition);
             color: var(--text-dark);
         }
-        .geoloc-btn:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-        /* Activo = ya estamos localizando y siguiendo al usuario */
-        .geoloc-btn.activo {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-        }
-        /* Buscando = a la espera del primer resultado del navegador */
-        .geoloc-btn.buscando {
-            animation: geolocPulso 1s ease-in-out infinite;
-        }
+        .geoloc-btn:hover { background: rgba(0, 0, 0, 0.05); }
+        .geoloc-btn.activo { background: var(--accent-color); border-color: var(--accent-color); }
+        .geoloc-btn.buscando { animation: geolocPulso 1s ease-in-out infinite; }
         @keyframes geolocPulso {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-        /* Marcador de "mi ubicación": punto azul con anillo de pulso, estilo Google Maps */
-        .marcador-ubicacion-usuario-wrap {
-            position: relative;
-            width: 18px;
-            height: 18px;
-        }
+
+        .marcador-ubicacion-usuario-wrap { position: relative; width: 18px; height: 18px; }
         .marcador-ubicacion-usuario-dot {
             position: absolute;
             inset: 0;
@@ -350,6 +329,63 @@
             0% { transform: scale(1); opacity: 0.65; }
             100% { transform: scale(3); opacity: 0; }
         }
+
+        /* CONTROL DE CAPAS PERSONALIZADO */
+        .custom-layer-control {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-radius: 12px !important;
+            box-shadow: var(--shadow) !important;
+            border: 1px solid var(--border-color) !important;
+            backdrop-filter: blur(8px);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .layer-toggle-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 14px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: var(--text-dark);
+            width: 100%;
+        }
+
+        .layer-options {
+            display: none;
+            padding: 8px 12px 12px 12px;
+            border-top: 1px solid var(--border-color);
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .layer-options.open {
+            display: flex;
+        }
+
+        .layer-option-btn {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .layer-option-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
         @media (max-width: 768px) {
             .geoloc-btn {
                 bottom: 20px;
@@ -358,13 +394,17 @@
                 height: 46px;
                 font-size: 1.25rem;
             }
-        }
-        /* RESPONSIVE (Móvil / Bottom Sheet) */
-        @media (max-width: 768px) {
+
+            /* Bajar el control de capas en móvil para librar el submenú de rutas */
+            .leaflet-top.leaflet-right {
+                top: 130px !important;
+                right: 10px !important;
+            }
+
             .selector-ejes {
                 top: 10px;
                 padding: 6px;
-                position: relative; /* necesario para el degradado del punto 4 */
+                position: relative;
             }
             .eje-btn {
                 padding: 8px 14px;
@@ -381,13 +421,13 @@
                 height: 85%;
                 max-height: 85vh;
                 border-radius: 24px 24px 0 0;
-                transform: translateY(100%); /* Oculto abajo */
+                transform: translateY(100%);
                 box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15);
                 border: none;
                 border-top: 1px solid var(--border-color);
             }
             .rutas-sidebar.visible {
-                transform: translateY(55%); /* Elevado a la mitad por defecto */
+                transform: translateY(55%);
             }
             .rutas-sidebar.expanded {
                 transform: translateY(0%) !important;
@@ -407,9 +447,7 @@
             .sidebar-content {
                 padding: 10px 20px 30px 20px;
             }
-            /* PUNTO 4: pista visual de scroll horizontal en el selector de ejes.
-               Un degradado blanco sobre fondo blanco apenas se nota, así que aquí
-               se combina con una flecha animada para que sea inequívoco. */
+
             .selector-ejes::after {
                 content: '›';
                 position: absolute;
@@ -442,7 +480,6 @@
     </style>
 </head>
 <body>
-    <!-- Menú de Navegación del Modelo Multi-página (recuperado) -->
     <nav>
         <a href="index.html" class="logo">🚲 BiciLPA</a>
         <div>
@@ -453,40 +490,33 @@
         </div>
     </nav>
     <div class="map-container">
-        <!-- Selector Principal de Ejes -->
         <div class="selector-ejes" id="selector-ejes">
             <button class="eje-btn" data-eje="este" onclick="filtrarEje('este')">Eje Este</button>
             <button class="eje-btn" data-eje="norte" onclick="filtrarEje('norte')">Eje Norte</button>
             <button class="eje-btn" data-eje="baja-alta" onclick="filtrarEje('baja-alta')">Conexión Baja-Alta</button>
             <button class="eje-btn" data-eje="alta-baja" onclick="filtrarEje('alta-baja')">Conexión Alta-Baja</button>
         </div>
-        <!-- Submenú Horizontal de Rutas dependiente del Eje -->
+        
         <div class="rutas-carrusel" id="rutas-carrusel"></div>
-        <!-- El Mapa -->
         <div id="map-rutas"></div>
-        <!-- Botón flotante de Geolocalización (seguimiento continuo) -->
+        
         <button class="geoloc-btn" id="btn-geoloc" onclick="alternarGeolocalizacion()" title="Ver mi ubicación en el mapa" aria-label="Ver mi ubicación en el mapa">📍</button>
-        <!-- Barra Lateral Dinámica -->
+        
         <div class="rutas-sidebar" id="rutas-sidebar">
             <div class="drag-handle" id="drag-handle"></div>
             <div class="sidebar-header">
                 <button class="close-btn" onclick="cerrarSidebar()">✕</button>
             </div>
-            <div class="sidebar-content" id="contenedor-tarjetas">
-                <!-- Se inyecta dinámicamente con JS -->
-            </div>
+            <div class="sidebar-content" id="contenedor-tarjetas"></div>
         </div>
     </div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- Manifiesto Global (Cargado en orden prioritario) -->
     <script src="datos/manifest.js"></script>
-    <!-- Script Principal de Control -->
+    
     <script>
-        // =========================================================================
-        // CONSTANTES Y CAPAS BASE DE MAPAS
-        // =========================================================================
+        // CAPAS BASE DE MAPAS
         const mapaClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             subdomains: 'abcd',
@@ -504,47 +534,82 @@
             maxZoom: 20
         });
 
-        // =========================================================================
-        // INICIALIZACIÓN Y EVENTOS
-        // =========================================================================
-        // Inicialización del Mapa con mapaClaro (CartoDB Voyager) por defecto
         const map = L.map('map-rutas', {
             center: [28.128, -15.432],
             zoom: 13,
             layers: [mapaClaro]
         });
 
-        // Control selector de capas base
-        const baseMaps = {
-            "Claro": mapaClaro,
-            "Oscuro": mapaOscuro,
-            "Satélite": mapaSatelite
-        };
-        L.control.layers(baseMaps).addTo(map);
+        // CONTROL DE CAPAS PERSONALIZADO (Idéntico a index.html)
+        const CustomLayerControl = L.Control.extend({
+            options: { position: 'topright' },
+            onAdd: function() {
+                const container = L.DomUtil.create('div', 'custom-layer-control leaflet-bar');
+                
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.disableScrollPropagation(container);
 
-        // Capa única donde viven TODAS las rutas precargadas del eje activo,
-        // tanto las difuminadas como la seleccionada (a color pleno).
+                container.innerHTML = `
+                    <button class="layer-toggle-btn" id="layer-toggle-btn" title="Cambiar mapa base">
+                        🗺️ <span style="font-size: 0.85rem;">Capas</span>
+                    </button>
+                    <div class="layer-options" id="layer-options">
+                        <button class="layer-option-btn active" data-layer="claro">Carto Voyager</button>
+                        <button class="layer-option-btn" data-layer="oscuro">Modo Oscuro</button>
+                        <button class="layer-option-btn" data-layer="satelite">Google Satélite</button>
+                    </div>
+                `;
+
+                return container;
+            }
+        });
+
+        map.addControl(new CustomLayerControl());
+
+        document.addEventListener('click', (e) => {
+            const toggleBtn = e.target.closest('#layer-toggle-btn');
+            const optionBtn = e.target.closest('.layer-option-btn');
+            const layerOptions = document.getElementById('layer-options');
+
+            if (toggleBtn) {
+                if (layerOptions) layerOptions.classList.toggle('open');
+                return;
+            }
+
+            if (optionBtn) {
+                const layerType = optionBtn.getAttribute('data-layer');
+
+                map.removeLayer(mapaClaro);
+                map.removeLayer(mapaOscuro);
+                map.removeLayer(mapaSatelite);
+
+                if (layerType === 'claro') mapaClaro.addTo(map);
+                if (layerType === 'oscuro') mapaOscuro.addTo(map);
+                if (layerType === 'satelite') mapaSatelite.addTo(map);
+
+                document.querySelectorAll('.layer-option-btn').forEach(btn => btn.classList.remove('active'));
+                optionBtn.classList.add('active');
+
+                if (layerOptions) layerOptions.classList.remove('open');
+                return;
+            }
+
+            if (layerOptions && !e.target.closest('.custom-layer-control')) {
+                layerOptions.classList.remove('open');
+            }
+        });
+
         let capasPreview = L.layerGroup().addTo(map);
-
-        // Caché de datos ya descargados: idRuta -> datos completos del fichero
-        // datos/rutas/{idRuta}.js. Evita volver a pedir el mismo fichero por red
-        // y evita colisiones, ya que esos ficheros comparten la variable global
-        // window.rutaActivaDatos (solo válida durante el instante de carga).
         let rutasCache = {};
-        // Referencia a la instancia de capa Leaflet dibujada para cada ruta,
-        // para poder localizar sus bounds o quitarla del mapa al redibujarla.
         let capasRutas = {};
-
         let ejeActual = null;
         let idRutaSeleccionada = null;
 
-        // =====================================================================
-        // GEOLOCALIZACIÓN (seguimiento continuo, botón flotante 📍)
-        // =====================================================================
-        let siguiendoUbicacion = false;   // ¿está activo el seguimiento ahora mismo?
-        let esperandoPrimerFix = true;    // ¿aún no hemos centrado el mapa la primera vez?
-        let marcadorUbicacion = null;     // el puntito azul
-        let circuloPrecision = null;      // el círculo de precisión del GPS/red
+        // GEOLOCALIZACIÓN
+        let siguiendoUbicacion = false;
+        let esperandoPrimerFix = true;
+        let marcadorUbicacion = null;
+        let circuloPrecision = null;
 
         const iconoUbicacion = L.divIcon({
             className: 'marcador-ubicacion-usuario-wrap',
@@ -565,10 +630,6 @@
             siguiendoUbicacion = true;
             esperandoPrimerFix = true;
             document.getElementById('btn-geoloc').classList.add('buscando');
-            // watch:true -> Leaflet vuelve a llamar a getCurrentPosition periódicamente
-            // y dispara 'locationfound' cada vez que hay una posición nueva, tanto en
-            // PC (red/Wi-Fi) como en móvil (GPS). setView:false porque el centrado
-            // inicial lo controlamos nosotros mismos (ver locationfound más abajo).
             map.locate({ watch: true, enableHighAccuracy: true, setView: false, maximumAge: 5000 });
         }
 
@@ -617,10 +678,6 @@
                 circuloPrecision.setRadius(e.accuracy);
             }
 
-            // Solo se centra el mapa la PRIMERA vez que se localiza al usuario.
-            // Las actualizaciones siguientes del seguimiento solo mueven el punto,
-            // sin forzar la vista del mapa (igual criterio que al seleccionar rutas:
-            // se respeta lo que el usuario esté mirando en cada momento).
             if (esperandoPrimerFix) {
                 map.setView(e.latlng, Math.max(map.getZoom(), 15));
                 esperandoPrimerFix = false;
@@ -639,32 +696,21 @@
             'baja-alta': '#FF851B', 
             'alta-baja': '#B10DC9'  
         };
-        // Escucha segura para que se lea manifest.js antes de arrancar
+
         window.addEventListener("load", () => {
             if (typeof rutasManifest !== 'undefined') {
-                // 1) Se precarga y dibuja TODA la red (todos los ejes) difuminada de una vez.
-                // 2) En paralelo, se muestra el submenú del eje por defecto.
                 precargarTodaLaRed();
-                filtrarEje('este'); // Eje este por defecto para el submenú/carrusel
+                filtrarEje('este');
             } else {
-                console.error("Error crítico: 'rutasManifest' no está definido. Revisa que el archivo datos/manifest.js exista y esté bien escrito.");
+                console.error("Error crítico: 'rutasManifest' no está definido.");
             }
         });
 
-        // 1. PRECARGA DE TODA LA RED DE RUTAS (todos los ejes) EN ESTADO DIFUMINADO.
-        // Se ejecuta una única vez al cargar la página, para que el mapa muestre
-        // siempre la red ciclista completa e interconectada, sin importar qué eje
-        // esté seleccionado en el submenú.
         async function precargarTodaLaRed() {
             const todosLosIds = Object.keys(rutasManifest);
-            // Carga en serie: los ficheros de ruta comparten la misma variable
-            // global window.rutaActivaDatos, así que hay que procesarlos uno a uno.
             for (const idRuta of todosLosIds) {
                 try {
                     await cargarDatosRuta(idRuta);
-                    // Si esa ruta ya fue seleccionada mientras cargábamos el resto
-                    // (por ejemplo, el usuario hizo clic muy rápido en el carrusel),
-                    // no la pisamos con su versión difuminada.
                     if (idRutaSeleccionada !== idRuta) {
                         renderizarCapaRuta(idRuta, false);
                     }
@@ -674,11 +720,7 @@
             }
         }
 
-        // 2. FILTRADO DEL SUBMENÚ/CARRUSEL SEGÚN EL EJE ELEGIDO.
-        // Ojo: esto NO toca el mapa ni recarga nada; el mapa siempre muestra la
-        // red completa. Solo cambia qué botones aparecen en el carrusel superior.
         function filtrarEje(ejeId) {
-            // Activar botón visual correspondiente
             document.querySelectorAll('.eje-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
             });
@@ -687,20 +729,17 @@
 
             const carrusel = document.getElementById('rutas-carrusel');
             carrusel.innerHTML = '';
-            carrusel.style.display = 'flex'; // Forzar contenedor visible
+            carrusel.style.display = 'flex';
 
-            // Salvaguarda
             if (typeof rutasManifest === 'undefined') {
                 carrusel.style.display = 'none';
                 return;
             }
 
-            // Recorrer las claves reales del manifiesto
             const idsDelEje = Object.keys(rutasManifest).filter(idRuta =>
                 String(rutasManifest[idRuta].eje).trim().toLowerCase() === String(ejeId).trim().toLowerCase()
             );
 
-            // Ocultar el carrusel si para ese eje no se configuran rutas en el manifiesto
             if (idsDelEje.length === 0) {
                 carrusel.style.display = 'none';
                 return;
@@ -713,8 +752,6 @@
                 item.setAttribute('data-id-ruta', idRuta);
                 item.setAttribute('data-eje-grupo', ejeId);
                 item.innerText = infoSimplificada.titulo;
-                // Si la ruta ya está seleccionada (de un clic previo en el mapa o
-                // en otro eje), refleja ese estado también en este submenú.
                 if (idRuta === idRutaSeleccionada) {
                     item.classList.add('active');
                 }
@@ -722,14 +759,11 @@
                 carrusel.appendChild(item);
             });
 
-            // PUNTO 4: recalcular la pista de scroll horizontal al cambiar de eje
             requestAnimationFrame(actualizarPistaScrollCarrusel);
         }
 
-        // 2. CARGA (Y CACHÉ) DE LOS DATOS DE UNA RUTA MEDIANTE INYECCIÓN DE SCRIPT
         function cargarDatosRuta(idRuta) {
             return new Promise((resolve, reject) => {
-                // Si ya se descargó antes (p.ej. al cambiar de eje y volver), no repetir petición de red
                 if (rutasCache[idRuta]) {
                     resolve(rutasCache[idRuta]);
                     return;
@@ -738,30 +772,25 @@
                 script.src = `datos/rutas/${idRuta}.js`;
 
                 script.onload = () => {
-                    // Comprobación de integridad de los datos cargados en la variable global window
                     if (window.rutaActivaDatos && window.rutaActivaDatos.id === idRuta) {
                         rutasCache[idRuta] = window.rutaActivaDatos;
-                        // Limpiamos la variable global para que no quede "contaminada"
-                        // de cara a la siguiente ruta que se cargue en la cola.
                         window.rutaActivaDatos = undefined;
                         script.remove();
                         resolve(rutasCache[idRuta]);
                     } else {
                         script.remove();
-                        reject(new Error(`Error de carga: Los datos cargados en 'window.rutaActivaDatos' no coinciden con la ID solicitada ('${idRuta}').`));
+                        reject(new Error(`Error de carga: Los datos de 'window.rutaActivaDatos' no coinciden con la ID ('${idRuta}').`));
                     }
                 };
                 script.onerror = () => {
                     script.remove();
-                    reject(new Error(`Error de red: No se pudo localizar el archivo 'datos/rutas/${idRuta}.js'.`));
+                    reject(new Error(`Error de red: No se pudo localizar 'datos/rutas/${idRuta}.js'.`));
                 };
                 document.body.appendChild(script);
             });
         }
 
-        // 3. SELECCIÓN DE UNA RUTA (desde el carrusel o con click directo sobre el trazado en el mapa)
         async function seleccionarRuta(idRuta) {
-            // Marcar visualmente el submenú activo
             document.querySelectorAll('.carrusel-item').forEach(item => {
                 item.classList.toggle('active', item.getAttribute('data-id-ruta') === idRuta);
             });
@@ -772,27 +801,21 @@
             try {
                 const datos = await cargarDatosRuta(idRuta);
 
-                // Devolver la ruta anterior (si había una distinta) a su estado difuminado
                 if (idPrevio && idPrevio !== idRuta && rutasCache[idPrevio]) {
                     renderizarCapaRuta(idPrevio, false);
                 }
 
-                // Redibujar la ruta seleccionada a color pleno, mostrando ya sus avisos
                 renderizarCapaRuta(idRuta, true);
-
                 mostrarInfoRuta(datos);
             } catch (err) {
                 console.error(err.message);
             }
         }
 
-        // 4. DIBUJADO DE LA GEOMETRÍA DE UNA RUTA (difuminada o seleccionada)
         function renderizarCapaRuta(idRuta, seleccionada) {
             const datos = rutasCache[idRuta];
             if (!datos) return;
 
-            // Si ya existía una instancia dibujada de esta ruta, se retira para
-            // sustituirla por la nueva (con el estilo/avisos que corresponda).
             if (capasRutas[idRuta]) {
                 capasPreview.removeLayer(capasRutas[idRuta]);
             }
@@ -802,15 +825,9 @@
                 ? { color: colorTrazado, weight: 6, opacity: 0.90 }
                 : { color: colorTrazado, weight: 4, opacity: 0.30 };
 
-            // Grupo que reúne el trazado visible + las "zonas de click" invisibles
-            // (más anchas) para que sea mucho más fácil acertar con el dedo en móvil,
-            // sin que el grosor de la línea que se ve cambie ni un pixel.
             const grupoRuta = L.featureGroup();
 
             const capa = L.geoJSON(datos.geojson, {
-                // Los avisos (properties.tipo === 'advertencia') solo se muestran
-                // cuando la ruta está seleccionada; el resto de puntos/icono siguen
-                // visibles siempre, igual que en el comportamiento original.
                 filter: function(feature) {
                     const props = feature.properties || {};
                     if (props.tipo === 'advertencia') {
@@ -821,7 +838,6 @@
                 style: function() {
                     return estiloLinea;
                 },
-                // PUNTO 1: respeta cualquier icono definido en las properties del GeoJSON.
                 pointToLayer: function(feature, latlng) {
                     const props = feature.properties || {};
                     if (props.tipo === 'advertencia') {
@@ -853,15 +869,9 @@
                 onEachFeature: function(feature, layer) {
                     const tipoGeometria = feature.geometry && feature.geometry.type;
                     if (tipoGeometria === 'LineString' || tipoGeometria === 'MultiLineString') {
-                        // Línea invisible mucho más ancha, calcada sobre la línea real,
-                        // que actúa como "zona de toque" ampliada. Es esta capa (y no la
-                        // visible) la que escucha el click/tap, así el área pulsable es
-                        // mucho mayor sin engordar visualmente el trazado.
                         const zonaClick = L.polyline(layer.getLatLngs(), {
                             weight: 28,
                             opacity: 0,
-                            // 'interactive: true' es el valor por defecto en líneas, pero
-                            // lo dejamos explícito porque es justo lo que necesitamos aquí.
                             interactive: true
                         });
                         zonaClick.on('click', () => seleccionarRuta(idRuta));
@@ -877,10 +887,9 @@
             capasPreview.addLayer(grupoRuta);
         }
 
-        // 5. RENDERIZADO DE LA TARJETA DE INFORMACIÓN EN LA SIDEBAR
         function mostrarInfoRuta(datos) {
             const contenedor = document.getElementById('contenedor-tarjetas');
-            contenedor.innerHTML = ''; // Limpiar tarjeta anterior
+            contenedor.innerHTML = '';
             let claseDificultad = 'facil';
             let textoDificultad = 'Fácil';
             if (datos.dificultad === 'moderado') {
@@ -894,7 +903,7 @@
             const HTMLconsejos = datos.consejos ? datos.consejos.map(c => `
                 ${c.icono || '👉'} <strong>${c.titulo}:</strong> ${c.texto}.<br>
             `).join('\n') : '';
-            // Generar la tarjeta detallada
+
             const card = document.createElement('div');
             card.className = 'ruta-card';
             card.setAttribute('data-eje', datos.eje);
@@ -917,7 +926,7 @@
                 </div>
             `;
             contenedor.appendChild(card);
-            // Transiciones CSS para la barra lateral / Bottom Sheet móvil
+
             const sidebar = document.getElementById('rutas-sidebar');
             if (esDispositivoMovil()) {
                 sidebar.classList.remove('expanded', 'minimized');
@@ -928,10 +937,8 @@
                 sidebar.classList.add('visible');
                 sidebar.style.transform = ''; 
             }
-            // El mapa ya NO se desplaza automáticamente al seleccionar una ruta:
-            // se respeta la posición/zoom que el usuario tenga en cada momento.
         }
-        // 6. CONTROL DE INTERFAZ (SIDEBAR)
+
         function cerrarSidebar() {
             const sidebar = document.getElementById('rutas-sidebar');
             sidebar.classList.remove('visible', 'expanded', 'minimized');
@@ -941,6 +948,7 @@
                 sidebar.style.transform = 'translateX(120%)';
             }
         }
+
         function toggleMinimizar() {
             const sidebar = document.getElementById('rutas-sidebar');
             if (sidebar.classList.contains('minimized')) {
@@ -959,16 +967,13 @@
                 }
             }
         }
-        // 7. GESTIÓN TÁCTIL (MOVIMIENTOS DE DESLIZAMIENTO MÓVIL)
+
+        // GESTIÓN TÁCTIL SIDEBAR
         const sidebar = document.getElementById('rutas-sidebar');
         let startY = 0, currentY = 0, isDragging = false;
-        let modoArrastre = null; // 'panel' (mover todo el panel) | null (aún sin decidir)
+        let modoArrastre = null;
         function esDispositivoMovil() { return window.innerWidth <= 768; }
-        // Se puede iniciar el arrastre agarrando la cabecera (handle + botón cerrar),
-        // igual que antes. Pero si el toque empieza dentro del contenido con el panel
-        // ya expandido, NO decidimos todavía: esperamos al primer touchmove para ver
-        // si el usuario quiere hacer scroll (lo dejamos pasar) o tirar hacia abajo
-        // estando ya arriba del todo (eso sí colapsa el panel).
+
         sidebar.addEventListener('touchstart', (e) => {
             if (!esDispositivoMovil()) return;
             const enCabecera = e.target.id === 'drag-handle' || !!e.target.closest('.sidebar-header');
@@ -983,15 +988,13 @@
                 modoArrastre = null;
             }
         });
+
         sidebar.addEventListener('touchmove', (e) => {
             if (!esDispositivoMovil()) return;
             currentY = e.touches[0].clientY;
             const deltaY = currentY - startY;
             if (modoArrastre === null) {
                 const contenedorTarjetas = document.getElementById('contenedor-tarjetas');
-                // Solo se convierte en "cerrar panel" si tira hacia abajo estando
-                // ya al principio del contenido. En cualquier otro caso, dejamos
-                // que el scroll nativo del contenido siga funcionando.
                 if (deltaY > 0 && contenedorTarjetas.scrollTop <= 0) {
                     isDragging = true;
                     modoArrastre = 'panel';
@@ -1010,6 +1013,7 @@
                 sidebar.style.transform = `translateY(calc(55% + ${deltaY}px))`;
             }
         }, { passive: false });
+
         sidebar.addEventListener('touchend', () => {
             modoArrastre = null;
             if (!isDragging) return;
@@ -1045,9 +1049,7 @@
                 }
             }
         });
-        // PUNTO 4: pista visual de scroll horizontal en el selector de Ejes (móvil).
-        // Muestra un degradado a la derecha mientras haya más ejes por descubrir,
-        // y lo oculta automáticamente al llegar al final del scroll.
+
         const selectorEjes = document.getElementById('selector-ejes');
         function actualizarPistaScrollCarrusel() {
             const alFinal = selectorEjes.scrollLeft + selectorEjes.clientWidth >= selectorEjes.scrollWidth - 5;
@@ -1056,8 +1058,6 @@
         selectorEjes.addEventListener('scroll', actualizarPistaScrollCarrusel);
         window.addEventListener('resize', actualizarPistaScrollCarrusel);
         window.addEventListener('load', actualizarPistaScrollCarrusel);
-        // Si la navbar cambia de alto (p.ej. hace wrap en pantallas muy estrechas),
-        // el mapa debe recalcular su tamaño o Leaflet se queda con medidas viejas.
         window.addEventListener('resize', () => map.invalidateSize());
     </script>
 </body>
