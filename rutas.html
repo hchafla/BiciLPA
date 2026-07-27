@@ -330,7 +330,7 @@
             100% { transform: scale(3); opacity: 0; }
         }
 
-        /* CONTROL DE CAPAS PERSONALIZADO */
+        /* CONTROL DE CAPAS DESPLEGABLE (Idéntico a index.html) */
         .custom-layer-control {
             background: rgba(255, 255, 255, 0.95) !important;
             border-radius: 12px !important;
@@ -395,9 +395,9 @@
                 font-size: 1.25rem;
             }
 
-            /* Bajar el control de capas en móvil para librar el submenú de rutas */
+            /* Ajuste de posición justo debajo del menú superior en móvil */
             .leaflet-top.leaflet-right {
-                top: 130px !important;
+                top: 85px !important;
                 right: 10px !important;
             }
 
@@ -540,7 +540,7 @@
             layers: [mapaClaro]
         });
 
-        // CONTROL DE CAPAS PERSONALIZADO (Idéntico a index.html)
+        // CONTROL DE CAPAS DESPLEGABLE PERSONALIZADO
         const CustomLayerControl = L.Control.extend({
             options: { position: 'topright' },
             onAdd: function() {
@@ -566,6 +566,7 @@
 
         map.addControl(new CustomLayerControl());
 
+        // LÓGICA DE APERTURA/CIERRE DEL DESPLEGABLE
         document.addEventListener('click', (e) => {
             const toggleBtn = e.target.closest('#layer-toggle-btn');
             const optionBtn = e.target.closest('.layer-option-btn');
