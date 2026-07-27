@@ -2,67 +2,200 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Ciclismo Urbano - LPGC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BiciLPA · Mapa en vivo</title>
     
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; overflow: hidden; }
-        
-        /* Menú superior de navegación */
-        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; height: 54px; }
-        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-light: #f8f9fa;
+            --text-dark: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        html, body {
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            overscroll-behavior: none;
+            background-color: var(--bg-light);
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navegación superior */
+        nav {
+            background: #2c3e50;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 8px;
+            z-index: 2000;
+        }
+        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 0.95rem; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
         .nav-slogan { color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px; }
 
-        /* Contenedores principales (Mapa + Panel lateral) */
-        #app-container { display: flex; height: calc(100vh - 54px); width: 100vw; }
-        #sidebar { width: 320px; background: #2c3e50; color: #fff; padding: 20px; overflow-y: auto; z-index: 1000; box-shadow: 2px 0 5px rgba(0,0,0,0.2); }
-        #map { flex-grow: 1; height: 100%; width: 100%; }
-        
-        /* Tipografías y Leyendas del menú lateral */
-        h1 { font-size: 1.3rem; margin-bottom: 15px; color: #ecf0f1; border-bottom: 2px solid #34495e; padding-bottom: 10px; }
-        .legend { background: #34495e; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.4; }
-        .legend-title { font-weight: bold; margin-bottom: 8px; color: #f1c40f; font-size: 0.9rem; }
-        .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
-        
-        /* Iconos de la leyenda (Círculos y Líneas) */
-        .circle-key { width: 14px; height: 14px; border-radius: 50%; margin-right: 10px; border: 2px solid #fff; }
-        .line-key { width: 20px; height: 4px; margin-right: 10px; border-radius: 2px; }
-        
-        /* Bloque inferior de información de estado */
-        .status-info { font-size: 0.8rem; color: #95a5a6; line-height: 1.4; border-top: 1px solid #34495e; padding-top: 15px; }
-        
-        /* Popups de información dentro del mapa */
-        .popup-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; display: block; }
-        .popup-bike-img { display: block; max-width: 90px; max-height: 55px; margin: 8px auto; object-fit: contain; }
+        /* Contenedor del Mapa (Ancho total sin sidebar) */
+        #app-container {
+            display: flex;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
 
-        /* ==========================================
-           MEDIA QUERY: DISEÑO RESPONSIVE PARA MÓVILES
-           ========================================== */
+        /* Iconos de marcadores emoji personalizados */
+        .emoji-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border: 2px solid #ffffff;
+            transition: transform 0.2s ease;
+        }
+        .emoji-marker-sity { border-color: #f1c40f; font-size: 16px; }
+        .emoji-marker-esity { border-color: #2ecc71; font-size: 16px; }
+        .emoji-marker-vacia { border-color: #e74c3c; font-size: 14px; background: #fff5f5; }
+
+        /* Control de capas personalizado */
+        .custom-layer-control {
+            background: #ffffff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            color: #2c3e50;
+            font-size: 0.85rem;
+            max-width: 260px;
+            user-select: none;
+        }
+        .layer-group {
+            margin-bottom: 10px;
+        }
+        .layer-group:last-child {
+            margin-bottom: 0;
+        }
+        .layer-group-header {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+        .layer-subitems {
+            padding-left: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .layer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .layer-item input, .layer-group-header input {
+            cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+        .line-sample {
+            display: inline-block;
+            width: 16px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        /* Botón flotante de geolocalización */
+        .geoloc-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            z-index: 999;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dark);
+        }
+        .geoloc-btn:hover { background: rgba(0, 0, 0, 0.05); }
+        .geoloc-btn.activo { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+        .geoloc-btn.buscando { animation: geolocPulso 1s ease-in-out infinite; }
+        @keyframes geolocPulso {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Punto de ubicación del usuario */
+        .marcador-ubicacion-usuario-wrap { position: relative; width: 18px; height: 18px; }
+        .marcador-ubicacion-usuario-dot {
+            position: absolute;
+            inset: 0;
+            background: #4285F4;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.35);
+        }
+        .marcador-ubicacion-usuario-pulso {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 18px;
+            height: 18px;
+            margin: -9px 0 0 -9px;
+            background: rgba(66, 133, 244, 0.35);
+            border-radius: 50%;
+            animation: pulsoUbicacion 1.8s ease-out infinite;
+        }
+        @keyframes pulsoUbicacion {
+            0% { transform: scale(1); opacity: 0.65; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
         @media (max-width: 768px) {
-            body, html { overflow: auto; }
-            
-            /* Ajustes de Navegación Móvil */
-            nav { flex-direction: column; height: auto; padding: 10px; gap: 8px; }
-            .nav-slogan { display: none; } /* Ocultar eslogan para ganar espacio crítico */
+            .nav-slogan { display: none; }
             nav a { margin: 0 8px; font-size: 0.9rem; }
-            
-            /* Reestructuración de Contenedores */
-            #app-container { flex-direction: column; height: calc(100vh - 78px); }
-            
-            /* El mapa se prioriza en la mitad superior */
-            #map { height: 60vh; flex-grow: 0; }
-            
-            /* El panel pasa abajo con scroll independiente */
-            #sidebar { width: 100%; height: 40vh; box-shadow: 0 -2px 5px rgba(0,0,0,0.2); padding: 15px; }
-            
-            /* Optimización de elementos de la interfaz flotante de Leaflet */
-            .leaflet-top, .leaflet-bottom { z-index: 1001; }
-            .leaflet-control-layers { font-size: 11px !important; max-width: 140px; }
+            .geoloc-btn { bottom: 20px; right: 16px; width: 46px; height: 46px; font-size: 1.25rem; }
+            .custom-layer-control { font-size: 0.8rem; max-width: 210px; padding: 8px 10px; }
         }
     </style>
 </head>
@@ -76,86 +209,38 @@
             </span>
         </div>
         <div>
-            <a href="index.html" class="active">Mapa en vivo</a>
-            <a href="rutas.html">Rutas</a>
+            <a href="index.html" class="active">Mapa en Vivo</a>
+            <a href="rutas.html">Rutas Recomendadas</a>
             <a href="normativa.html">Normativa</a>
             <a href="talleres.html">Talleres</a>
         </div>
     </nav>
 
     <div id="app-container">
-        <div id="sidebar">
-            <h1>Infraestructura y Estado</h1>
-            <p style="font-size: 0.85rem; color: #bdc3c7; margin-bottom: 20px;">Gestiona los mapas de fondo y las capas desde el panel flotante superior derecho.</p>
-            
-            <div class="legend">
-                <div class="legend-title">Servicios y Ocupación</div>
-                <div class="legend-item">
-                    <div class="circle-key" style="background: #f1c40f;"></div>
-                    <span>Sítycleta</span>
-                </div>
-                <div class="legend-item">
-                    <div class="circle-key" style="background: #2ecc71;"></div>
-                    <span>e-Sítycleta</span>
-                </div>
-                <div class="legend-item">
-                    <div class="circle-key" style="background: #e74c3c;"></div>
-                    <span>Estación vacía</span>
-                </div>
-                <div class="legend-item">
-                    <div class="circle-key" style="background: #3498db;"></div>
-                    <span>Taller mecánico</span>
-                </div>
-            </div>
-
-            <div class="legend">
-                <div class="legend-title">Vías de la Ciudad</div>
-                <div class="legend-item">
-                    <div class="line-key" style="background: #a93226;"></div>
-                    <span>Carriles-Bici</span>
-                </div>
-                <div class="legend-item">
-                    <div class="line-key" style="background: repeating-linear-gradient(90deg, #27ae60, #27ae60 4px, transparent 4px, transparent 8px);"></div>
-                    <span>Aceras-Bici (Compartido Peatón)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="line-key" style="background: repeating-linear-gradient(90deg, #FF4500, #FF4500 4px, transparent 4px, transparent 8px);"></div>
-                    <span>Ciclocarril / Calles 30</span>
-                </div>
-            </div>
-
-            <div class="status-info">
-                <p><strong>Filtro Unificado:</strong> Las coordenadas son exactas. Si una parada cuenta con bicis mecánicas y eléctricas simultáneamente, puedes apagar o encender las capas en el selector para verlas por separado.</p>
-            </div>
-        </div>
-
         <div id="map"></div>
+        <button class="geoloc-btn" id="btn-geoloc" onclick="alternarGeolocalizacion()" title="Ver mi ubicación en el mapa" aria-label="Ver mi ubicación en el mapa">📍</button>
     </div>
 
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <!-- Datos estáticos de infraestructura -->
     <script src="datos/carriles-bici.js"></script>
     <script src="datos/aceras-bici.js"></script>
     <script src="datos/ciclovias.js"></script>
 
     <script>
         // ==========================================
-        // 5.1 CONSTANTES, ENDPOINTS API Y MAPA BASE
+        // 1. CONSTANTES Y CONFIGURACIÓN DEL MAPA
         // ==========================================
         const URL_INFO = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/station_information.json';
         const URL_STATUS = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/station_status.json';
         const URL_TYPES = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/vehicle_types.json';
 
-        // Capas base de fondo alternables (Carto vs Satélite Esri)
         const mapaClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO'
         });
 
-        const mapaSatelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'
-        });
-
-        // Creación del objeto Mapa centrado en Las Palmas de Gran Canaria
         const map = L.map('map', {
             center: [28.128, -15.432],
             zoom: 14,
@@ -163,83 +248,241 @@
         });
 
         // ==========================================
-        // 5.2 CREACIÓN DE CAPAS LÓGICAS (DATA LAYERS)
+        // 2. CAPAS DE DATOS
         // ==========================================
-        let sityMecanicasLayer = L.layerGroup().addTo(map);
-        let sityElectricasLayer = L.layerGroup().addTo(map);
-        let sityVaciasLayer = L.layerGroup().addTo(map);
-        let talleresLayer = L.layerGroup().addTo(map);
-        let carrilesBiciLayer = L.layerGroup().addTo(map);
-        let acerasBiciLayer = L.layerGroup().addTo(map);
-        let cicloviasLayer = L.layerGroup().addTo(map);
-
-        // Control de Mapas base
-        const baseMaps = {
-            "🗺️ Mapa": mapaClaro,
-            "🛰️ Satélite": mapaSatelite
-        };
-
-        // Control de Capas superpuestas con nomenclatura simplificada y emojis actualizados
-        const overlayMaps = {
-            "🟡 Sítycleta": sityMecanicasLayer,
-            "🟢 e-Sítycleta": sityElectricasLayer,
-            "🔴 Sítycleta Vacía": sityVaciasLayer,
-            "🔵 Talleres": talleresLayer,
-            "🟥 Carriles-Bici": carrilesBiciLayer,
-            "🟩 Aceras-Bici": acerasBiciLayer,
-            "🟧​ Ciclocarril": cicloviasLayer
-        };
-
-        // Detecta si la pantalla es móvil (menos de 768px) para colapsar el selector automáticamente
-const esMovil = window.innerWidth <= 768;
-
-L.control.layers(baseMaps, overlayMaps, { 
-    collapsed: esMovil // Se cierra solo en móviles, se queda abierto en escritorio
-}).addTo(map);
+        const sityMecanicasLayer = L.layerGroup().addTo(map);
+        const sityElectricasLayer = L.layerGroup().addTo(map);
+        const sityVaciasLayer = L.layerGroup().addTo(map);
+        
+        const carrilesBiciLayer = L.layerGroup().addTo(map);
+        const acerasBiciLayer = L.layerGroup().addTo(map);
+        const cicloviasLayer = L.layerGroup().addTo(map);
 
         // ==========================================
-        // 5.3 CARGA DE INFRAESTRUCTURA LOCAL (GeoJSON)
+        // 3. CONTROL DE CAPAS PERSONALIZADO (Agrupado)
+        // ==========================================
+        const CustomLayerControl = L.Control.extend({
+            options: { position: 'topright' },
+            onAdd: function() {
+                const container = L.DomUtil.create('div', 'custom-layer-control');
+                L.DomEvent.disableClickPropagation(container);
+                
+                container.innerHTML = `
+                    <div class="layer-group">
+                        <label class="layer-group-header">
+                            <input type="checkbox" id="grp-sity" checked>
+                            <span>🚲 Estaciones Sítycleta</span>
+                        </label>
+                        <div class="layer-subitems">
+                            <label class="layer-item">
+                                <input type="checkbox" id="chk-sity" checked>
+                                <span>🚲 Sítycleta</span>
+                            </label>
+                            <label class="layer-item">
+                                <input type="checkbox" id="chk-esity" checked>
+                                <span>⚡ e-Sítycleta</span>
+                            </label>
+                            <label class="layer-item">
+                                <input type="checkbox" id="chk-vacia" checked>
+                                <span>❌ Estación vacía</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="layer-group">
+                        <label class="layer-group-header">
+                            <input type="checkbox" id="grp-vias" checked>
+                            <span>🛣️ Vías de la ciudad</span>
+                        </label>
+                        <div class="layer-subitems">
+                            <label class="layer-item">
+                                <input type="checkbox" id="chk-carril" checked>
+                                <span class="line-sample" style="background:#a93226;"></span>
+                                <span>Carril-Bici</span>
+                            </label>
+                            <label class="layer-item">
+                                <input type="checkbox" id="chk-acera" checked>
+                                <span class="line-sample" style="background:#27ae60;"></span>
+                                <span>Acera-Bici</span>
+                            </label>
+                            <label class="layer-item">
+                                <input type="checkbox" id="chk-ciclovia" checked>
+                                <span class="line-sample" style="background:#FF4500;"></span>
+                                <span>Ciclocarril</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+                return container;
+            }
+        });
+
+        map.addControl(new CustomLayerControl());
+
+        // Lógica de Sincronización de Checkboxes
+        function vincularControles() {
+            const grpSity = document.getElementById('grp-sity');
+            const chkSity = document.getElementById('chk-sity');
+            const chkEsity = document.getElementById('chk-esity');
+            const chkVacia = document.getElementById('chk-vacia');
+
+            const grpVias = document.getElementById('grp-vias');
+            const chkCarril = document.getElementById('chk-carril');
+            const chkAcera = document.getElementById('chk-acera');
+            const chkCiclovia = document.getElementById('chk-ciclovia');
+
+            function toggleLayer(layer, show) {
+                if (show) { if (!map.hasLayer(layer)) map.addLayer(layer); }
+                else { if (map.hasLayer(layer)) map.removeLayer(layer); }
+            }
+
+            // Grupo Sítycletas
+            grpSity.addEventListener('change', (e) => {
+                const val = e.target.checked;
+                chkSity.checked = val;
+                chkEsity.checked = val;
+                chkVacia.checked = val;
+                toggleLayer(sityMecanicasLayer, val);
+                toggleLayer(sityElectricasLayer, val);
+                toggleLayer(sityVaciasLayer, val);
+            });
+
+            const actualizarGrupoSity = () => {
+                grpSity.checked = chkSity.checked || chkEsity.checked || chkVacia.checked;
+                grpSity.indeterminate = (chkSity.checked || chkEsity.checked || chkVacia.checked) &&
+                                       !(chkSity.checked && chkEsity.checked && chkVacia.checked);
+            };
+
+            chkSity.addEventListener('change', (e) => { toggleLayer(sityMecanicasLayer, e.target.checked); actualizarGrupoSity(); });
+            chkEsity.addEventListener('change', (e) => { toggleLayer(sityElectricasLayer, e.target.checked); actualizarGrupoSity(); });
+            chkVacia.addEventListener('change', (e) => { toggleLayer(sityVaciasLayer, e.target.checked); actualizarGrupoSity(); });
+
+            // Grupo Vías
+            grpVias.addEventListener('change', (e) => {
+                const val = e.target.checked;
+                chkCarril.checked = val;
+                chkAcera.checked = val;
+                chkCiclovia.checked = val;
+                toggleLayer(carrilesBiciLayer, val);
+                toggleLayer(acerasBiciLayer, val);
+                toggleLayer(cicloviasLayer, val);
+            });
+
+            const actualizarGrupoVias = () => {
+                grpVias.checked = chkCarril.checked || chkAcera.checked || chkCiclovia.checked;
+                grpVias.indeterminate = (chkCarril.checked || chkAcera.checked || chkCiclovia.checked) &&
+                                       !(chkCarril.checked && chkAcera.checked && chkCiclovia.checked);
+            };
+
+            chkCarril.addEventListener('change', (e) => { toggleLayer(carrilesBiciLayer, e.target.checked); actualizarGrupoVias(); });
+            chkAcera.addEventListener('change', (e) => { toggleLayer(acerasBiciLayer, e.target.checked); actualizarGrupoVias(); });
+            chkCiclovia.addEventListener('change', (e) => { toggleLayer(cicloviasLayer, e.target.checked); actualizarGrupoVias(); });
+        }
+
+        vincularControles();
+
+        // ==========================================
+        // 4. ICONOS EMOJI DE SÍTYCLETA
+        // ==========================================
+        const crearIconoEmoji = (emoji, clase) => L.divIcon({
+            className: `emoji-marker ${clase}`,
+            html: emoji,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14]
+        });
+
+        const iconoSity = crearIconoEmoji('🚲', 'emoji-marker-sity');
+        const iconoEsity = crearIconoEmoji('⚡', 'emoji-marker-esity');
+        const iconoVacia = crearIconoEmoji('❌', 'emoji-marker-vacia');
+
+        // ==========================================
+        // 5. GEOLOCALIZACIÓN CONTINUA
+        // ==========================================
+        let siguiendoUbicacion = false;
+        let esperandoPrimerFix = true;
+        let marcadorUbicacion = null;
+        let circuloPrecision = null;
+
+        const iconoUbicacion = L.divIcon({
+            className: 'marcador-ubicacion-usuario-wrap',
+            html: '<div class="marcador-ubicacion-usuario-pulso"></div><div class="marcador-ubicacion-usuario-dot"></div>',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+        });
+
+        function alternarGeolocalizacion() {
+            if (siguiendoUbicacion) {
+                detenerGeolocalizacion();
+                return;
+            }
+            if (!navigator.geolocation) {
+                alert('Tu navegador no admite geolocalización.');
+                return;
+            }
+            siguiendoUbicacion = true;
+            esperandoPrimerFix = true;
+            document.getElementById('btn-geoloc').classList.add('buscando');
+            map.locate({ watch: true, enableHighAccuracy: true, setView: false, maximumAge: 5000 });
+        }
+
+        function detenerGeolocalizacion() {
+            siguiendoUbicacion = false;
+            esperandoPrimerFix = true;
+            map.stopLocate();
+            const btn = document.getElementById('btn-geoloc');
+            btn.classList.remove('activo', 'buscando');
+            if (marcadorUbicacion) { map.removeLayer(marcadorUbicacion); marcadorUbicacion = null; }
+            if (circuloPrecision) { map.removeLayer(circuloPrecision); circuloPrecision = null; }
+        }
+
+        map.on('locationfound', function (e) {
+            const btn = document.getElementById('btn-geoloc');
+            btn.classList.remove('buscando');
+            btn.classList.add('activo');
+
+            if (!marcadorUbicacion) {
+                marcadorUbicacion = L.marker(e.latlng, { icon: iconoUbicacion, zIndexOffset: 1000, interactive: false }).addTo(map);
+            } else {
+                marcadorUbicacion.setLatLng(e.latlng);
+            }
+
+            if (!circuloPrecision) {
+                circuloPrecision = L.circle(e.latlng, {
+                    radius: e.accuracy, color: '#4285F4', weight: 1, fillColor: '#4285F4', fillOpacity: 0.08, interactive: false
+                }).addTo(map);
+            } else {
+                circuloPrecision.setLatLng(e.latlng);
+                circuloPrecision.setRadius(e.accuracy);
+            }
+
+            if (esperandoPrimerFix) {
+                map.setView(e.latlng, Math.max(map.getZoom(), 15));
+                esperandoPrimerFix = false;
+            }
+        });
+
+        map.on('locationerror', function () {
+            alert('No se pudo acceder a tu ubicación.');
+            detenerGeolocalizacion();
+        });
+
+        // ==========================================
+        // 6. CARGA DE INFRAESTRUCTURA GEOJSON
         // ==========================================
         function cargarInfraestructura() {
-            // Carril Bici Segregado: Rojo Granate continuo (#a93226)
             if (typeof datosCarriles !== 'undefined') {
-                L.geoJSON(datosCarriles, { 
-                    style: { color: '#a93226', weight: 4, opacity: 0.9 } 
-                }).addTo(carrilesBiciLayer);
+                L.geoJSON(datosCarriles, { style: { color: '#a93226', weight: 4, opacity: 0.9 } }).addTo(carrilesBiciLayer);
             }
-            
-            // Acera Bici: Verde (#27ae60) con patrón discontinuo para indicar vía compartida
             if (typeof datosAceras !== 'undefined') {
-                L.geoJSON(datosAceras, { 
-                    style: { color: '#27ae60', weight: 4, opacity: 0.85, dashArray: '5, 8' } 
-                }).addTo(acerasBiciLayer);
+                L.geoJSON(datosAceras, { style: { color: '#27ae60', weight: 4, opacity: 0.85, dashArray: '5, 8' } }).addTo(acerasBiciLayer);
             }
-            
-            // Ciclovías: Naranja Intenso (#FF4500) discontinuo para alto contraste en satélite
             if (typeof datosCiclovias !== 'undefined') {
-                L.geoJSON(datosCiclovias, { 
-                    style: { color: '#FF4500', weight: 3, opacity: 0.8, dashArray: '3, 6' } 
-                }).addTo(cicloviasLayer);
+                L.geoJSON(datosCiclovias, { style: { color: '#FF4500', weight: 3, opacity: 0.8, dashArray: '3, 6' } }).addTo(cicloviasLayer);
             }
-        }
-
-        // Fichero estático manual de talleres colaboradores
-        const talleresLocales = [
-            { name: "La Bici Bike Shop", lat: 28.1301, lon: -15.4452, desc: "Zona Guanarteme." },
-            { name: "Free Motion - Las Palmas", lat: 28.1345, lon: -15.4298, desc: "Calle León y Castillo." },
-            { name: "Pedelec Canarias", lat: 28.1215, lon: -15.4270, desc: "Especializados en VMP." }
-        ];
-        function cargarTalleres() {
-            talleresLocales.forEach(taller => {
-                const marker = L.circleMarker([taller.lat, taller.lon], {
-                    radius: 8.5, fillColor: '#3498db', color: '#fff', weight: 2, fillOpacity: 0.9
-                }).bindPopup(`<strong class="popup-title">🛠️ ${taller.name}</strong><p style="font-size:0.85rem;">${taller.desc}</p>`);
-                talleresLayer.addLayer(marker);
-            });
         }
 
         // ==========================================
-        // 5.4 CONSULTA EN TIEMPO REAL API (GBFS Nextbike)
+        // 7. CONSULTA GBFS NEXTBIKE (Sin imágenes)
         // ==========================================
         async function actualizarSitycleta(){
             try {
@@ -254,16 +497,11 @@ L.control.layers(baseMaps, overlayMaps, {
                 const typesData = await resTypes.json();
 
                 const infoIndex = {};
-                infoData.data.stations.forEach(station => {
-                    infoIndex[station.station_id] = station;
-                });
+                infoData.data.stations.forEach(station => { infoIndex[station.station_id] = station; });
 
                 const metaTypesIndex = {};
                 typesData.data.vehicle_types.forEach(type => {
-                    metaTypesIndex[type.vehicle_type_id] = {
-                        propulsion: type.propulsion_type,
-                        image: type.vehicle_image ?? ''
-                    };
+                    metaTypesIndex[type.vehicle_type_id] = type.propulsion_type;
                 });
 
                 sityMecanicasLayer.clearLayers();
@@ -276,91 +514,60 @@ L.control.layers(baseMaps, overlayMaps, {
 
                     let mecanicas = 0;
                     let electricas = 0;
-                    let imgMecanica = '';
-                    let imgElectrica = '';
 
                     (status.vehicle_types_available || []).forEach(vehicle => {
-                        const meta = metaTypesIndex[vehicle.vehicle_type_id];
-                        if (!meta) return;
-
-                        if (meta.propulsion === "human") {
-                            mecanicas += vehicle.count;
-                            if (meta.image) imgMecanica = meta.image;
-                        }
-                        if (meta.propulsion === "electric_assist") {
-                            electricas += vehicle.count;
-                            if (meta.image) imgElectrica = meta.image;
-                        }
+                        const propulsion = metaTypesIndex[vehicle.vehicle_type_id];
+                        if (propulsion === "human") mecanicas += vehicle.count;
+                        if (propulsion === "electric_assist") electricas += vehicle.count;
                     });
 
                     const huecos = status.num_docks_available ?? 0;
-                    const capacidadBase = info.capacity || 10;
 
-                    // ESTACIÓN VACÍA
+                    // Estación Vacía
                     if (mecanicas === 0 && electricas === 0) {
-                        L.circleMarker([info.lat, info.lon], {
-                            radius: 8, fillColor: "#e74c3c", color: "#ffffff", weight: 1.5, fillOpacity: 0.9
-                        })
-                        .bindPopup(`<strong>${info.name}</strong><hr style="margin:5px 0; border:0; border-top:1px solid #eee;">❌ Sin bicicletas disponibles`)
-                        .addTo(sityVaciasLayer);
+                        L.marker([info.lat, info.lon], { icon: iconoVacia })
+                            .bindPopup(`<strong>${info.name}</strong><hr style="margin:5px 0; border:0; border-top:1px solid #eee;">❌ Sin bicicletas disponibles`)
+                            .addTo(sityVaciasLayer);
                         return;
                     }
 
-                    // SÍTYCLETA MECÁNICA (Coordenadas originales exactas)
+                    // Sítycleta Mecánica
                     if (mecanicas > 0) {
-                        const ratioM = mecanicas / capacidadBase;
-                        const opacidadM = Math.min(Math.max(0.35 + ratioM * 0.65, 0.35), 1);
-                        
-                        const tagImg = imgMecanica ? `<img src="${imgMecanica}" class="popup-bike-img" alt="Bici Mecánica">` : '';
-
-                        L.circleMarker([info.lat, info.lon], {
-                            radius: 8, fillColor: "#f1c40f", color: "#ffffff", weight: 1.5, fillOpacity: opacidadM
-                        })
-                        .bindPopup(`
-                            <strong>🚲 ${info.name} (Mecánica)</strong>
-                            <hr style="margin:5px 0; border:0; border-top:1px solid #eee;">
-                            ${tagImg}
-                            Bicicletas mecánicas: <b>${mecanicas}</b><br>
-                            Anclajes libres: <b>${huecos}</b>
-                        `)
-                        .addTo(sityMecanicasLayer);
+                        L.marker([info.lat, info.lon], { icon: iconoSity })
+                            .bindPopup(`
+                                <strong>🚲 ${info.name} (Mecánica)</strong>
+                                <hr style="margin:5px 0; border:0; border-top:1px solid #eee;">
+                                Bicicletas mecánicas: <b>${mecanicas}</b><br>
+                                Anclajes libres: <b>${huecos}</b>
+                            `)
+                            .addTo(sityMecanicasLayer);
                     }
 
-                    // E-SÍTYCLETA ELÉCTRICA (Coordenadas originales exactas)
+                    // e-Sítycleta Eléctrica
                     if (electricas > 0) {
-                        const ratioE = electricas / capacidadBase;
-                        const opacidadE = Math.min(Math.max(0.35 + ratioE * 0.65, 0.35), 1);
-                        
-                        const tagImg = imgElectrica ? `<img src="${imgElectrica}" class="popup-bike-img" alt="Bici Eléctrica">` : '';
-
-                        L.circleMarker([info.lat, info.lon], {
-                            radius: 8, fillColor: "#2ecc71", color: "#ffffff", weight: 1.5, fillOpacity: opacidadE
-                        })
-                        .bindPopup(`
-                            <strong>⚡ ${info.name} (Eléctrica)</strong>
-                            <hr style="margin:5px 0; border:0; border-top:1px solid #eee;">
-                            ${tagImg}
-                            Bicicletas eléctricas: <b>${electricas}</b><br>
-                            Anclajes libres: <b>${huecos}</b>
-                        `)
-                        .addTo(sityElectricasLayer);
+                        L.marker([info.lat, info.lon], { icon: iconoEsity })
+                            .bindPopup(`
+                                <strong>⚡ ${info.name} (Eléctrica)</strong>
+                                <hr style="margin:5px 0; border:0; border-top:1px solid #eee;">
+                                Bicicletas eléctricas: <b>${electricas}</b><br>
+                                Anclajes libres: <b>${huecos}</b>
+                            `)
+                            .addTo(sityElectricasLayer);
                     }
                 });
-                console.log("Sincronización GBFS completada con éxito.");
             } catch (error) {
-                console.error("Fallo crítico en la llamada de red API:", error);
+                console.error("Error al actualizar la API de Sítycleta:", error);
             }
         }
 
         // ==========================================
-        // 5.5 INICIALIZACIÓN DE PROCESOS
+        // 8. INICIALIZACIÓN
         // ==========================================
         cargarInfraestructura();
-        cargarTalleres();
         actualizarSitycleta();
 
-        // Refresco automático en segundo plano cada 60 segundos
         setInterval(actualizarSitycleta, 60000);
+        window.addEventListener('resize', () => map.invalidateSize());
     </script>
 </body>
 </html>
