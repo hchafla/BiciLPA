@@ -70,7 +70,7 @@
             z-index: 1;
         }
 
-        /* ESTILO LIMPIO PARA ICONOS EMOJI (SIN CÍRCULOS NI BORDES) */
+        /* ESTILO LIMPIO PARA ICONOS EMOJI */
         .clean-emoji-marker {
             display: flex;
             align-items: center;
@@ -98,6 +98,25 @@
             font-size: 0.85rem;
             max-width: 260px;
             user-select: none;
+        }
+        .base-map-selector {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .base-map-selector select {
+            width: 100%;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-dark);
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
         }
         .layer-group {
             margin-bottom: 10px;
@@ -243,6 +262,10 @@
             attribution: '&copy; OpenStreetMap &copy; CARTO'
         });
 
+        const mapaSatelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri'
+        });
+
         const map = L.map('map', {
             center: [28.128, -15.432],
             zoom: 14,
@@ -270,6 +293,13 @@
                 L.DomEvent.disableClickPropagation(container);
                 
                 container.innerHTML = `
+                    <div class="base-map-selector">
+                        <label for="select-basemap" style="font-weight: bold;">🗺️ Mapa base:</label>
+                        <select id="select-basemap">
+                            <option value="claro" selected>Callejero Claro</option>
+                            <option value="satelite">Vista Satélite</option>
+                        </select>
+                    </div>
                     <div class="layer-group">
                         <label class="layer-group-header">
                             <input type="checkbox" id="grp-sity" checked>
@@ -321,6 +351,18 @@
         map.addControl(new CustomLayerControl());
 
         function vincularControles() {
+            // Cambio de Mapa Base (Claro / Satélite)
+            const selectBasemap = document.getElementById('select-basemap');
+            selectBasemap.addEventListener('change', (e) => {
+                if (e.target.value === 'satelite') {
+                    map.removeLayer(mapaClaro);
+                    map.addLayer(mapaSatelite);
+                } else {
+                    map.removeLayer(mapaSatelite);
+                    map.addLayer(mapaClaro);
+                }
+            });
+
             const grpSity = document.getElementById('grp-sity');
             const chkSity = document.getElementById('chk-sity');
             const chkEsity = document.getElementById('chk-esity');
@@ -481,7 +523,7 @@
         }
 
         // ==========================================
-        // 7. CONSULTA GBFS NEXTBIKE
+        // 7. CONSULTA GBFS NEXTBIKE + DESPLAZAMIENTO ANTISOLAPAMIENTO
         // ==========================================
         async function actualizarSitycleta(){
             try {
@@ -530,9 +572,16 @@
                         return;
                     }
 
-                    // Sítycleta Mecánica
+                    // Cálculo de desplazamiento si coexisten mecánica y eléctrica en la misma parada
+                    const haySolapamiento = mecanicas > 0 && electricas > 0;
+                    
+                    // Offset equivalente a ~3 metros a la izquierda y derecha para no pisarse
+                    const offsetLonMecanica = haySolapamiento ? -0.00008 : 0;
+                    const offsetLonElectrica = haySolapamiento ? 0.00008 : 0;
+
+                    // Sítycleta Mecánica (desplazada levemente a la izquierda si coincide)
                     if (mecanicas > 0) {
-                        L.marker([info.lat, info.lon], { icon: iconoSity })
+                        L.marker([info.lat, info.lon + offsetLonMecanica], { icon: iconoSity })
                             .bindPopup(`
                                 <strong>🚲 ${info.name} (Mecánica)</strong>
                                 <hr style="margin:5px 0; border:0; border-top:1px solid #eee;">
@@ -542,9 +591,9 @@
                             .addTo(sityMecanicasLayer);
                     }
 
-                    // e-Sítycleta Eléctrica
+                    // e-Sítycleta Eléctrica (desplazada levemente a la derecha si coincide)
                     if (electricas > 0) {
-                        L.marker([info.lat, info.lon], { icon: iconoEsity })
+                        L.marker([info.lat, info.lon + offsetLonElectrica], { icon: iconoEsity })
                             .bindPopup(`
                                 <strong>⚡ ${info.name} (Eléctrica)</strong>
                                 <hr style="margin:5px 0; border:0; border-top:1px solid #eee;">
