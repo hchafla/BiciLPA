@@ -18,6 +18,17 @@
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
+
+        /* Estilos Modo Oscuro de la Interfaz */
+        body.dark-theme {
+            --primary-color: #1a252f;
+            --accent-color: #2980b9;
+            --bg-light: #121212;
+            --text-dark: #ecf0f1;
+            --border-color: #2c3e50;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -32,6 +43,7 @@
             overflow: hidden;
             overscroll-behavior: none;
             background-color: var(--bg-light);
+            transition: background-color 0.3s ease;
         }
         body {
             display: flex;
@@ -50,6 +62,10 @@
             flex-wrap: wrap;
             gap: 8px;
             z-index: 2000;
+            transition: background 0.3s ease;
+        }
+        body.dark-theme nav {
+            background: #111a22;
         }
         nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 0.95rem; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
@@ -70,7 +86,7 @@
             z-index: 1;
         }
 
-        /* ESTILO LIMPIO PARA ICONOS EMOJI */
+        /* Iconos Emoji */
         .clean-emoji-marker {
             display: flex;
             align-items: center;
@@ -94,11 +110,16 @@
             padding: 12px 15px;
             border-radius: 8px;
             box-shadow: var(--shadow);
-            color: #2c3e50;
+            color: var(--text-dark);
             font-size: 0.85rem;
             max-width: 260px;
             user-select: none;
+            transition: background 0.3s ease, color 0.3s ease;
         }
+        body.dark-theme .custom-layer-control {
+            background: #1e2a38;
+        }
+
         .base-map-selector {
             margin-bottom: 10px;
             padding-bottom: 8px;
@@ -118,12 +139,14 @@
             outline: none;
             cursor: pointer;
         }
-        .layer-group {
-            margin-bottom: 10px;
+        body.dark-theme .base-map-selector select {
+            background: #2c3e50;
+            color: #fff;
+            border-color: #34495e;
         }
-        .layer-group:last-child {
-            margin-bottom: 0;
-        }
+
+        .layer-group { margin-bottom: 10px; }
+        .layer-group:last-child { margin-bottom: 0; }
         .layer-group-header {
             font-weight: bold;
             display: flex;
@@ -178,6 +201,10 @@
             transition: var(--transition);
             color: var(--text-dark);
         }
+        body.dark-theme .geoloc-btn {
+            background: rgba(30, 42, 56, 0.95);
+            color: #ecf0f1;
+        }
         .geoloc-btn:hover { background: rgba(0, 0, 0, 0.05); }
         .geoloc-btn.activo { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
         .geoloc-btn.buscando { animation: geolocPulso 1s ease-in-out infinite; }
@@ -186,7 +213,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* Punto de ubicación del usuario */
+        /* Ubicación del usuario */
         .marcador-ubicacion-usuario-wrap { position: relative; width: 18px; height: 18px; }
         .marcador-ubicacion-usuario-dot {
             position: absolute;
@@ -252,18 +279,30 @@
 
     <script>
         // ==========================================
-        // 1. CONSTANTES Y CONFIGURACIÓN DEL MAPA
+        // 1. CONSTANTES Y CAPAS BASE DE MAPAS
         // ==========================================
         const URL_INFO = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/station_information.json';
         const URL_STATUS = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/station_status.json';
         const URL_TYPES = 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_el/es/vehicle_types.json';
 
-        const mapaClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        // CartoDB Voyager (Claro - Por defecto)
+        const mapaClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
         });
 
-        const mapaSatelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri'
+        // CartoDB Dark Matter (Oscuro)
+        const mapaOscuro = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        });
+
+        // Google Maps Híbrido (Satélite + Callejero)
+        const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            attribution: '&copy; Google Maps',
+            maxZoom: 20
         });
 
         const map = L.map('map', {
@@ -296,8 +335,9 @@
                     <div class="base-map-selector">
                         <label for="select-basemap" style="font-weight: bold;">🗺️ Mapa base:</label>
                         <select id="select-basemap">
-                            <option value="claro" selected>Callejero Claro</option>
-                            <option value="satelite">Vista Satélite</option>
+                            <option value="claro">Carto Voyager (Claro)</option>
+                            <option value="oscuro">Carto Dark (Oscuro)</option>
+                            <option value="satelite">Google Híbrido</option>
                         </select>
                     </div>
                     <div class="layer-group">
@@ -350,17 +390,38 @@
 
         map.addControl(new CustomLayerControl());
 
+        function cambiarMapaBase(tipo) {
+            [mapaClaro, mapaOscuro, mapaSatelite].forEach(m => {
+                if (map.hasLayer(m)) map.removeLayer(m);
+            });
+
+            if (tipo === 'oscuro') {
+                document.body.classList.add('dark-theme');
+                map.addLayer(mapaOscuro);
+            } else if (tipo === 'satelite') {
+                document.body.classList.remove('dark-theme');
+                map.addLayer(mapaSatelite);
+            } else {
+                document.body.classList.remove('dark-theme');
+                map.addLayer(mapaClaro);
+            }
+        }
+
         function vincularControles() {
-            // Cambio de Mapa Base (Claro / Satélite)
             const selectBasemap = document.getElementById('select-basemap');
+
+            // Comprobación de preferencia del sistema (solo para la carga inicial)
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDark) {
+                selectBasemap.value = 'oscuro';
+                cambiarMapaBase('oscuro');
+            } else {
+                selectBasemap.value = 'claro';
+                cambiarMapaBase('claro');
+            }
+
             selectBasemap.addEventListener('change', (e) => {
-                if (e.target.value === 'satelite') {
-                    map.removeLayer(mapaClaro);
-                    map.addLayer(mapaSatelite);
-                } else {
-                    map.removeLayer(mapaSatelite);
-                    map.addLayer(mapaClaro);
-                }
+                cambiarMapaBase(e.target.value);
             });
 
             const grpSity = document.getElementById('grp-sity');
@@ -422,7 +483,7 @@
         vincularControles();
 
         // ==========================================
-        // 4. ICONOS EMOJI SIN CÍRCULOS NI BORDES
+        // 4. ICONOS EMOJI
         // ==========================================
         const crearIconoEmojiLimpio = (emoji, claseEmoji, size = 24) => L.divIcon({
             className: `clean-emoji-marker ${claseEmoji}`,
@@ -523,7 +584,7 @@
         }
 
         // ==========================================
-        // 7. CONSULTA GBFS NEXTBIKE + DESPLAZAMIENTO ANTISOLAPAMIENTO
+        // 7. CONSULTA GBFS NEXTBIKE + ANTISOLAPAMIENTO
         // ==========================================
         async function actualizarSitycleta(){
             try {
@@ -564,7 +625,6 @@
 
                     const huecos = status.num_docks_available ?? 0;
 
-                    // Estación Vacía
                     if (mecanicas === 0 && electricas === 0) {
                         L.marker([info.lat, info.lon], { icon: iconoVacia })
                             .bindPopup(`<strong>${info.name}</strong><hr style="margin:5px 0; border:0; border-top:1px solid #eee;">❌ Sin bicicletas disponibles`)
@@ -572,14 +632,10 @@
                         return;
                     }
 
-                    // Cálculo de desplazamiento si coexisten mecánica y eléctrica en la misma parada
                     const haySolapamiento = mecanicas > 0 && electricas > 0;
-                    
-                    // Offset equivalente a ~3 metros a la izquierda y derecha para no pisarse
                     const offsetLonMecanica = haySolapamiento ? -0.00008 : 0;
                     const offsetLonElectrica = haySolapamiento ? 0.00008 : 0;
 
-                    // Sítycleta Mecánica (desplazada levemente a la izquierda si coincide)
                     if (mecanicas > 0) {
                         L.marker([info.lat, info.lon + offsetLonMecanica], { icon: iconoSity })
                             .bindPopup(`
@@ -591,7 +647,6 @@
                             .addTo(sityMecanicasLayer);
                     }
 
-                    // e-Sítycleta Eléctrica (desplazada levemente a la derecha si coincide)
                     if (electricas > 0) {
                         L.marker([info.lat, info.lon + offsetLonElectrica], { icon: iconoEsity })
                             .bindPopup(`
