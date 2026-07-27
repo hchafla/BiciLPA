@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BiciLPA · Mapa en vivo</title>
+    <title>BiciLPA · Mapa en Vivo</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -14,7 +14,6 @@
             --accent-color: #3498db;
             --bg-light: #f8f9fa;
             --text-dark: #2c3e50;
-            --text-muted: #7f8c8d;
             --border-color: #e2e8f0;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -57,7 +56,7 @@
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
         .nav-slogan { color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px; }
 
-        /* Contenedor del Mapa (Ancho total sin sidebar) */
+        /* Contenedor del Mapa */
         #app-container {
             display: flex;
             width: 100%;
@@ -71,20 +70,23 @@
             z-index: 1;
         }
 
-        /* Iconos de marcadores emoji personalizados */
-        .emoji-marker {
+        /* ESTILO LIMPIO PARA ICONOS EMOJI (SIN CÍRCULOS NI BORDES) */
+        .clean-emoji-marker {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            border: 2px solid #ffffff;
-            transition: transform 0.2s ease;
+            background: transparent;
+            border: none;
+            line-height: 1;
+            filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.4));
+            transition: transform 0.15s ease;
         }
-        .emoji-marker-sity { border-color: #f1c40f; font-size: 16px; }
-        .emoji-marker-esity { border-color: #2ecc71; font-size: 16px; }
-        .emoji-marker-vacia { border-color: #e74c3c; font-size: 14px; background: #fff5f5; }
+        .clean-emoji-marker:hover {
+            transform: scale(1.25);
+        }
+        .emoji-sity { font-size: 22px; }
+        .emoji-esity { font-size: 22px; }
+        .emoji-vacia { font-size: 18px; }
 
         /* Control de capas personalizado */
         .custom-layer-control {
@@ -259,7 +261,7 @@
         const cicloviasLayer = L.layerGroup().addTo(map);
 
         // ==========================================
-        // 3. CONTROL DE CAPAS PERSONALIZADO (Agrupado)
+        // 3. CONTROL DE CAPAS PERSONALIZADO
         // ==========================================
         const CustomLayerControl = L.Control.extend({
             options: { position: 'topright' },
@@ -318,7 +320,6 @@
 
         map.addControl(new CustomLayerControl());
 
-        // Lógica de Sincronización de Checkboxes
         function vincularControles() {
             const grpSity = document.getElementById('grp-sity');
             const chkSity = document.getElementById('chk-sity');
@@ -335,7 +336,6 @@
                 else { if (map.hasLayer(layer)) map.removeLayer(layer); }
             }
 
-            // Grupo Sítycletas
             grpSity.addEventListener('change', (e) => {
                 const val = e.target.checked;
                 chkSity.checked = val;
@@ -356,7 +356,6 @@
             chkEsity.addEventListener('change', (e) => { toggleLayer(sityElectricasLayer, e.target.checked); actualizarGrupoSity(); });
             chkVacia.addEventListener('change', (e) => { toggleLayer(sityVaciasLayer, e.target.checked); actualizarGrupoSity(); });
 
-            // Grupo Vías
             grpVias.addEventListener('change', (e) => {
                 const val = e.target.checked;
                 chkCarril.checked = val;
@@ -381,19 +380,19 @@
         vincularControles();
 
         // ==========================================
-        // 4. ICONOS EMOJI DE SÍTYCLETA
+        // 4. ICONOS EMOJI SIN CÍRCULOS NI BORDES
         // ==========================================
-        const crearIconoEmoji = (emoji, clase) => L.divIcon({
-            className: `emoji-marker ${clase}`,
+        const crearIconoEmojiLimpio = (emoji, claseEmoji, size = 24) => L.divIcon({
+            className: `clean-emoji-marker ${claseEmoji}`,
             html: emoji,
-            iconSize: [28, 28],
-            iconAnchor: [14, 14],
-            popupAnchor: [0, -14]
+            iconSize: [size, size],
+            iconAnchor: [size / 2, size / 2],
+            popupAnchor: [0, -(size / 2)]
         });
 
-        const iconoSity = crearIconoEmoji('🚲', 'emoji-marker-sity');
-        const iconoEsity = crearIconoEmoji('⚡', 'emoji-marker-esity');
-        const iconoVacia = crearIconoEmoji('❌', 'emoji-marker-vacia');
+        const iconoSity = crearIconoEmojiLimpio('🚲', 'emoji-sity', 24);
+        const iconoEsity = crearIconoEmojiLimpio('⚡', 'emoji-esity', 24);
+        const iconoVacia = crearIconoEmojiLimpio('❌', 'emoji-vacia', 18);
 
         // ==========================================
         // 5. GEOLOCALIZACIÓN CONTINUA
@@ -482,7 +481,7 @@
         }
 
         // ==========================================
-        // 7. CONSULTA GBFS NEXTBIKE (Sin imágenes)
+        // 7. CONSULTA GBFS NEXTBIKE
         // ==========================================
         async function actualizarSitycleta(){
             try {
