@@ -446,32 +446,12 @@
         }
 
         function vincularControles() {
-            // Lógica de toggle para desplegar/minimizar leyenda
+            // 1. Obtención de referencias
             const btnToggle = document.getElementById('btn-toggle-layers');
             const layerControlContainer = document.querySelector('.custom-layer-control');
             const toggleIcon = document.getElementById('toggle-icon');
 
-            btnToggle.addEventListener('click', () => {
-                layerControlContainer.classList.toggle('collapsed');
-                const estaColapsado = layerControlContainer.classList.contains('collapsed');
-                toggleIcon.textContent = estaColapsado ? '▼' : '▲';
-            });
-
             const selectBasemap = document.getElementById('select-basemap');
-
-            // Preferencia del sistema solo para carga inicial
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (prefersDark) {
-                selectBasemap.value = 'oscuro';
-                cambiarMapaBase('oscuro');
-            } else {
-                selectBasemap.value = 'claro';
-                cambiarMapaBase('claro');
-            }
-
-            selectBasemap.addEventListener('change', (e) => {
-                cambiarMapaBase(e.target.value);
-            });
 
             const grpSity = document.getElementById('grp-sity');
             const chkSity = document.getElementById('chk-sity');
@@ -488,6 +468,108 @@
                 else { if (map.hasLayer(layer)) map.removeLayer(layer); }
             }
 
+            // 2. Gestión de localStorage
+            const guardarPreferencias = () => {
+                const prefs = {
+                    basemap: selectBasemap.value,
+                    layers: {
+                        sity: chkSity.checked,
+                        esity: chkEsity.checked,
+                        vacia: chkVacia.checked,
+                        carril: chkCarril.checked,
+                        acera: chkAcera.checked,
+                        ciclovia: chkCiclovia.checked
+                    }
+                };
+                localStorage.setItem('bicilpa_user_prefs', JSON.stringify(prefs));
+            };
+
+            const cargarPreferencias = () => {
+                const saved = localStorage.getItem('bicilpa_user_prefs');
+                if (!saved) {
+                    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    return {
+                        basemap: prefersDark ? 'oscuro' : 'claro',
+                        layers: { sity: true, esity: true, vacia: true, carril: true, acera: true, ciclovia: true }
+                    };
+                }
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    return {
+                        basemap: 'claro',
+                        layers: { sity: true, esity: true, vacia: true, carril: true, acera: true, ciclovia: true }
+                    };
+                }
+            };
+
+            // 3. Aplicar preferencias guardadas
+            const prefs = cargarPreferencias();
+
+            selectBasemap.value = prefs.basemap;
+            cambiarMapaBase(prefs.basemap);
+
+            chkSity.checked = prefs.layers.sity;
+            chkEsity.checked = prefs.layers.esity;
+            chkVacia.checked = prefs.layers.vacia;
+
+            chkCarril.checked = prefs.layers.carril;
+            chkAcera.checked = prefs.layers.acera;
+            chkCiclovia.checked = prefs.layers.ciclovia;
+
+            toggleLayer(sityMecanicasLayer, chkSity.checked);
+            toggleLayer(sityElectricasLayer, chkEsity.checked);
+            toggleLayer(sityVaciasLayer, chkVacia.checked);
+
+            toggleLayer(carrilesBiciLayer, chkCarril.checked);
+            toggleLayer(acerasBiciLayer, chkAcera.checked);
+            toggleLayer(cicloviasLayer, chkCiclovia.checked);
+
+            const actualizarGrupoSity = () => {
+                grpSity.checked = chkSity.checked || chkEsity.checked || chkVacia.checked;
+                grpSity.indeterminate = (chkSity.checked || chkEsity.checked || chkVacia.checked) &&
+                                       !(chkSity.checked && chkEsity.checked && chkVacia.checked);
+            };
+
+            const actualizarGrupoVias = () => {
+                grpVias.checked = chkCarril.checked || chkAcera.checked || chkCiclovia.checked;
+                grpVias.indeterminate = (chkCarril.checked || chkAcera.checked || chkCiclovia.checked) &&
+                                       !(chkCarril.checked && chkAcera.checked && chkCiclovia.checked);
+            };
+
+            actualizarGrupoSity();
+            actualizarGrupoVias();
+
+            // 4. Lógica de interactividad y auto-colapso
+            btnToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                layerControlContainer.classList.toggle('collapsed');
+                const estaColapsado = layerControlContainer.classList.contains('collapsed');
+                toggleIcon.textContent = estaColapsado ? '▼' : '▲';
+            });
+
+            const cerrarLeyendaSiEstaAbierta = () => {
+                if (window.innerWidth <= 768 && !layerControlContainer.classList.contains('collapsed')) {
+                    layerControlContainer.classList.add('collapsed');
+                    toggleIcon.textContent = '▼';
+                }
+            };
+
+            map.on('movestart', cerrarLeyendaSiEstaAbierta);
+            map.on('click', cerrarLeyendaSiEstaAbierta);
+
+            document.addEventListener('pointerdown', (e) => {
+                if (!layerControlContainer.contains(e.target)) {
+                    cerrarLeyendaSiEstaAbierta();
+                }
+            });
+
+            // 5. Escuchadores de eventos
+            selectBasemap.addEventListener('change', (e) => {
+                cambiarMapaBase(e.target.value);
+                guardarPreferencias();
+            });
+
             grpSity.addEventListener('change', (e) => {
                 const val = e.target.checked;
                 chkSity.checked = val;
@@ -496,17 +578,12 @@
                 toggleLayer(sityMecanicasLayer, val);
                 toggleLayer(sityElectricasLayer, val);
                 toggleLayer(sityVaciasLayer, val);
+                guardarPreferencias();
             });
 
-            const actualizarGrupoSity = () => {
-                grpSity.checked = chkSity.checked || chkEsity.checked || chkVacia.checked;
-                grpSity.indeterminate = (chkSity.checked || chkEsity.checked || chkVacia.checked) &&
-                                       !(chkSity.checked && chkEsity.checked && chkVacia.checked);
-            };
-
-            chkSity.addEventListener('change', (e) => { toggleLayer(sityMecanicasLayer, e.target.checked); actualizarGrupoSity(); });
-            chkEsity.addEventListener('change', (e) => { toggleLayer(sityElectricasLayer, e.target.checked); actualizarGrupoSity(); });
-            chkVacia.addEventListener('change', (e) => { toggleLayer(sityVaciasLayer, e.target.checked); actualizarGrupoSity(); });
+            chkSity.addEventListener('change', (e) => { toggleLayer(sityMecanicasLayer, e.target.checked); actualizarGrupoSity(); guardarPreferencias(); });
+            chkEsity.addEventListener('change', (e) => { toggleLayer(sityElectricasLayer, e.target.checked); actualizarGrupoSity(); guardarPreferencias(); });
+            chkVacia.addEventListener('change', (e) => { toggleLayer(sityVaciasLayer, e.target.checked); actualizarGrupoSity(); guardarPreferencias(); });
 
             grpVias.addEventListener('change', (e) => {
                 const val = e.target.checked;
@@ -516,17 +593,12 @@
                 toggleLayer(carrilesBiciLayer, val);
                 toggleLayer(acerasBiciLayer, val);
                 toggleLayer(cicloviasLayer, val);
+                guardarPreferencias();
             });
 
-            const actualizarGrupoVias = () => {
-                grpVias.checked = chkCarril.checked || chkAcera.checked || chkCiclovia.checked;
-                grpVias.indeterminate = (chkCarril.checked || chkAcera.checked || chkCiclovia.checked) &&
-                                       !(chkCarril.checked && chkAcera.checked && chkCiclovia.checked);
-            };
-
-            chkCarril.addEventListener('change', (e) => { toggleLayer(carrilesBiciLayer, e.target.checked); actualizarGrupoVias(); });
-            chkAcera.addEventListener('change', (e) => { toggleLayer(acerasBiciLayer, e.target.checked); actualizarGrupoVias(); });
-            chkCiclovia.addEventListener('change', (e) => { toggleLayer(cicloviasLayer, e.target.checked); actualizarGrupoVias(); });
+            chkCarril.addEventListener('change', (e) => { toggleLayer(carrilesBiciLayer, e.target.checked); actualizarGrupoVias(); guardarPreferencias(); });
+            chkAcera.addEventListener('change', (e) => { toggleLayer(acerasBiciLayer, e.target.checked); actualizarGrupoVias(); guardarPreferencias(); });
+            chkCiclovia.addEventListener('change', (e) => { toggleLayer(cicloviasLayer, e.target.checked); actualizarGrupoVias(); guardarPreferencias(); });
         }
 
         vincularControles();
