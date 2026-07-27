@@ -120,6 +120,22 @@
             background: #1e2a38;
         }
 
+        /* Botón toggle para minimizar en móvil */
+        .layer-control-toggle {
+            display: none;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-align: left;
+            padding: 2px 0;
+            cursor: pointer;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .base-map-selector {
             margin-bottom: 10px;
             padding-bottom: 8px;
@@ -239,11 +255,26 @@
             100% { transform: scale(3); opacity: 0; }
         }
 
+        /* Comportamiento Móvil */
         @media (max-width: 768px) {
             .nav-slogan { display: none; }
             nav a { margin: 0 8px; font-size: 0.9rem; }
             .geoloc-btn { bottom: 20px; right: 16px; width: 46px; height: 46px; font-size: 1.25rem; }
-            .custom-layer-control { font-size: 0.8rem; max-width: 210px; padding: 8px 10px; }
+            
+            .custom-layer-control {
+                font-size: 0.8rem;
+                max-width: 210px;
+                padding: 10px 12px;
+            }
+            .layer-control-toggle {
+                display: flex;
+            }
+            .custom-layer-control.collapsed .layer-control-content {
+                display: none;
+            }
+            .custom-layer-control.collapsed {
+                padding: 8px 12px;
+            }
         }
     </style>
 </head>
@@ -328,59 +359,66 @@
         const CustomLayerControl = L.Control.extend({
             options: { position: 'topright' },
             onAdd: function() {
-                const container = L.DomUtil.create('div', 'custom-layer-control');
+                const container = L.DomUtil.create('div', 'custom-layer-control collapsed');
                 L.DomEvent.disableClickPropagation(container);
                 
                 container.innerHTML = `
-                    <div class="base-map-selector">
-                        <label for="select-basemap" style="font-weight: bold;">🗺️ Mapa base:</label>
-                        <select id="select-basemap">
-                            <option value="claro">🗺️ Mapa</option>
-                            <option value="oscuro">🌙 Oscuro</option>
-                            <option value="satelite">🛰️ Satélite</option>>
-                        </select>
-                    </div>
-                    <div class="layer-group">
-                        <label class="layer-group-header">
-                            <input type="checkbox" id="grp-sity" checked>
-                            <span>🚲 Estaciones Sítycleta</span>
-                        </label>
-                        <div class="layer-subitems">
-                            <label class="layer-item">
-                                <input type="checkbox" id="chk-sity" checked>
-                                <span>🚲 Sítycleta</span>
-                            </label>
-                            <label class="layer-item">
-                                <input type="checkbox" id="chk-esity" checked>
-                                <span>⚡ e-Sítycleta</span>
-                            </label>
-                            <label class="layer-item">
-                                <input type="checkbox" id="chk-vacia" checked>
-                                <span>❌ Estación vacía</span>
-                            </label>
+                    <button class="layer-control-toggle" id="btn-toggle-layers" aria-label="Mostrar u ocultar opciones de mapa">
+                        <span>⚙️ Capas y Filtros</span>
+                        <span id="toggle-icon">▼</span>
+                    </button>
+
+                    <div class="layer-control-content">
+                        <div class="base-map-selector">
+                            <label for="select-basemap" style="font-weight: bold;">🗺️ Mapa base:</label>
+                            <select id="select-basemap">
+                                <option value="claro">🗺️ Mapa</option>
+                                <option value="oscuro">🌙 Oscuro</option>
+                                <option value="satelite">🛰️ Satélite</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="layer-group">
-                        <label class="layer-group-header">
-                            <input type="checkbox" id="grp-vias" checked>
-                            <span>🛣️ Vías de la ciudad</span>
-                        </label>
-                        <div class="layer-subitems">
-                            <label class="layer-item">
-                                <input type="checkbox" id="chk-carril" checked>
-                                <span class="line-sample" style="background:#a93226;"></span>
-                                <span>Carril-Bici</span>
+                        <div class="layer-group">
+                            <label class="layer-group-header">
+                                <input type="checkbox" id="grp-sity" checked>
+                                <span>🚲 Estaciones Sítycleta</span>
                             </label>
-                            <label class="layer-item">
-                                <input type="checkbox" id="chk-acera" checked>
-                                <span class="line-sample" style="background:#27ae60;"></span>
-                                <span>Acera-Bici</span>
+                            <div class="layer-subitems">
+                                <label class="layer-item">
+                                    <input type="checkbox" id="chk-sity" checked>
+                                    <span>🚲 Sítycleta</span>
+                                </label>
+                                <label class="layer-item">
+                                    <input type="checkbox" id="chk-esity" checked>
+                                    <span>⚡ e-Sítycleta</span>
+                                </label>
+                                <label class="layer-item">
+                                    <input type="checkbox" id="chk-vacia" checked>
+                                    <span>❌ Estación vacía</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="layer-group">
+                            <label class="layer-group-header">
+                                <input type="checkbox" id="grp-vias" checked>
+                                <span>🛣️ Vías de la ciudad</span>
                             </label>
-                            <label class="layer-item">
-                                <input type="checkbox" id="chk-ciclovia" checked>
-                                <span class="line-sample" style="background:#FF4500;"></span>
-                                <span>Ciclocarril</span>
-                            </label>
+                            <div class="layer-subitems">
+                                <label class="layer-item">
+                                    <input type="checkbox" id="chk-carril" checked>
+                                    <span class="line-sample" style="background:#a93226;"></span>
+                                    <span>Carril-Bici</span>
+                                </label>
+                                <label class="layer-item">
+                                    <input type="checkbox" id="chk-acera" checked>
+                                    <span class="line-sample" style="background:#27ae60;"></span>
+                                    <span>Acera-Bici</span>
+                                </label>
+                                <label class="layer-item">
+                                    <input type="checkbox" id="chk-ciclovia" checked>
+                                    <span class="line-sample" style="background:#FF4500;"></span>
+                                    <span>Ciclocarril</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -408,9 +446,20 @@
         }
 
         function vincularControles() {
+            // Lógica de toggle para desplegar/minimizar leyenda
+            const btnToggle = document.getElementById('btn-toggle-layers');
+            const layerControlContainer = document.querySelector('.custom-layer-control');
+            const toggleIcon = document.getElementById('toggle-icon');
+
+            btnToggle.addEventListener('click', () => {
+                layerControlContainer.classList.toggle('collapsed');
+                const estaColapsado = layerControlContainer.classList.contains('collapsed');
+                toggleIcon.textContent = estaColapsado ? '▼' : '▲';
+            });
+
             const selectBasemap = document.getElementById('select-basemap');
 
-            // Comprobación de preferencia del sistema (solo para la carga inicial)
+            // Preferencia del sistema solo para carga inicial
             const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (prefersDark) {
                 selectBasemap.value = 'oscuro';
