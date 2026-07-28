@@ -6,7 +6,7 @@
     <title>Talleres de Bicicletas y Patinetas Eléctricas en Las Palmas de Gran Canaria | BiciLPA</title>
 
     <!-- Meta Description & Canonical -->
-    <meta name="description" content="Encuentra talleres de bicicletas y patinetes eléctricos en Las Palmas de Gran Canaria. Consulta ubicación, teléfono, servicios y cómo llegar a cada taller especializado.">
+    <meta name="description" content="Encuentra talleres de bicicletas y patinetas eléctricos en Las Palmas de Gran Canaria. Consulta ubicación, teléfono, servicios y cómo llegar a cada taller especializado.">
     <link rel="canonical" href="https://hchafla.github.io/bicilpa/talleres.html">
 
     <!-- Open Graph -->
@@ -78,6 +78,37 @@
         .popup-actions .btn-map { background: #f1f5f9; color: #334155; }
         .popup-actions .btn-call { background: #2ecc71; color: white; }
 
+        /* Rejilla de Talleres */
+        .talleres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .taller-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; transition: box-shadow 0.2s, border-color 0.2s; }
+        .taller-card.resaltada { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.15); }
+
+        .taller-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; }
+        .taller-indicador { flex-shrink: 0; width: 10px; height: 10px; border-radius: 50%; margin-top: 8px; }
+        .taller-indicador.bici { background: #3498db; }
+        .taller-indicador.vmp { background: #9b59b6; }
+        .taller-indicador.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
+        .badge-ambos { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: linear-gradient(135deg, #3498db, #9b59b6); color: #fff; vertical-align: middle; margin-left: 4px; }
+        .taller-header-texto { flex: 1; }
+        .taller-name { font-size: 1.2rem; color: #2c3e50; font-weight: bold; margin-bottom: 3px; }
+        .taller-zone { font-size: 0.85rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .taller-direccion { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+
+        .taller-body p { font-size: 0.9rem; color: #555; margin-bottom: 15px; }
+
+        /* Etiquetas de Especialidad */
+        .tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; background: #f1f5f9; color: #475569; }
+        .tag.special { background: #e0f2fe; color: #0369a1; }
+
+        /* Botones de Acción */
+        .taller-actions { display: flex; flex-wrap: wrap; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+        .btn-action { flex: 1; min-width: 100px; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; font-family: inherit; }
+        .btn-map { background: #f1f5f9; color: #334155; }
+        .btn-map:hover { background: #e2e8f0; }
+        .btn-call { background: #2ecc71; color: white; }
+        .btn-call:hover { background: #27ae60; }
+
         /* Sección FAQ */
         .faq-section {
             background: white;
@@ -128,37 +159,6 @@
         .faq-item.open .faq-question {
             color: #3498db;
         }
-
-        /* Rejilla de Talleres */
-        .talleres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-        .taller-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; transition: box-shadow 0.2s, border-color 0.2s; }
-        .taller-card.resaltada { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.15); }
-
-        .taller-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; }
-        .taller-indicador { flex-shrink: 0; width: 10px; height: 10px; border-radius: 50%; margin-top: 8px; }
-        .taller-indicador.bici { background: #3498db; }
-        .taller-indicador.vmp { background: #9b59b6; }
-        .taller-indicador.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
-        .badge-ambos { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: linear-gradient(135deg, #3498db, #9b59b6); color: #fff; vertical-align: middle; margin-left: 4px; }
-        .taller-header-texto { flex: 1; }
-        .taller-name { font-size: 1.2rem; color: #2c3e50; font-weight: bold; margin-bottom: 3px; }
-        .taller-zone { font-size: 0.85rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        .taller-direccion { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
-
-        .taller-body p { font-size: 0.9rem; color: #555; margin-bottom: 15px; }
-
-        /* Etiquetas de Especialidad */
-        .tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-        .tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; background: #f1f5f9; color: #475569; }
-        .tag.special { background: #e0f2fe; color: #0369a1; }
-
-        /* Botones de Acción */
-        .taller-actions { display: flex; flex-wrap: wrap; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
-        .btn-action { flex: 1; min-width: 100px; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; font-family: inherit; }
-        .btn-map { background: #f1f5f9; color: #334155; }
-        .btn-map:hover { background: #e2e8f0; }
-        .btn-call { background: #2ecc71; color: white; }
-        .btn-call:hover { background: #27ae60; }
     </style>
 
     <!-- Marcado Schema.org FAQPage -->
@@ -232,15 +232,9 @@
             <p>Encuentra talleres especializados en reparación y mantenimiento de bicicletas y patinetas eléctricas (VMP) en Las Palmas de Gran Canaria. Consulta su ubicación, teléfono y cómo llegar.</p>
         </header>
 
-        <section style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:22px; margin-bottom:30px;">
-            <p style="margin:0; color:#555; line-height:1.8;">
-                <strong>BiciLPA</strong> reúne los principales <strong>talleres de bicicletas y patinetes eléctricos en Las Palmas de Gran Canaria</strong> para que encuentres fácilmente dónde reparar tu vehículo, realizar el mantenimiento periódico, comprar recambios o acudir a un servicio técnico especializado. Consulta la ubicación de cada taller sobre el mapa, descubre qué servicios ofrece, encuentra su teléfono y obtén indicaciones para llegar con un solo clic. Tanto si buscas un <strong>taller de bicicletas</strong> como un <strong>taller de patinetes eléctricos (VMP)</strong>, aquí encontrarás una selección de establecimientos especializados en la ciudad.
-            </p>
-        </section>
-
-        <!-- H2 SEO y Filtros de categoría -->
+               <!-- H2 SEO y Filtros de categoría -->
         <div style="margin-bottom: 20px; text-align: center;">
-            <h2 class="section-title">Mapa de talleres de bicicletas y patinetes eléctricos</h2>
+            <h2 class="section-title">Mapa de talleres de bicicletas y patinetas eléctricas</h2>
             <p style="color: #64748b; font-size: 0.95rem;">Explora los talleres sobre el mapa o filtra según el tipo de vehículo que necesites reparar:</p>
         </div>
 
@@ -261,7 +255,10 @@
             </div>
         </div>
 
-        <!-- Preguntas Frecuentes (FAQ) -->
+        <!-- Listado de Tarjetas -->
+        <div class="talleres-grid" id="talleres-grid"></div>
+
+        <!-- Preguntas Frecuentes (FAQ) - Al final de la página -->
         <section class="faq-section">
             <h2>Preguntas frecuentes sobre talleres de bicicletas y patinetes eléctricos</h2>
 
@@ -315,9 +312,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Listado de Tarjetas -->
-        <div class="talleres-grid" id="talleres-grid"></div>
     </div>
 
     <!-- Leaflet JS -->
@@ -325,7 +319,7 @@
 
     <script>
         // =========================================================================
-        // FUENTE ÚNICA DE DATOS: Nombres limpios sin emojis
+        // FUENTE ÚNICA DE DATOS
         // =========================================================================
         const talleresData = [
             {
