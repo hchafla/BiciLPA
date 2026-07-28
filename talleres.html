@@ -23,10 +23,17 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; }
 
         /* Navegación superior común */
-        nav { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
-        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        nav { background: #2c3e50; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; flex-wrap: wrap; gap: 8px; }
+        nav a { color: #bdc3c7; text-decoration: none; font-weight: 500; font-size: 0.95rem; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+        .nav-slogan { color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px; }
+        /* Grupo de enlaces de la derecha: envuelve y centra en vez de desbordar como texto suelto */
+        .nav-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 20px; }
+        @media (max-width: 768px) {
+            .nav-slogan { display: none; }
+            nav a { font-size: 0.9rem; }
+        }
 
         /* Contenedor de Contenido */
         .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
@@ -214,11 +221,13 @@
 <body>
     <!-- Menú de Navegación -->
     <nav>
-        <a href="index.html" class="logo">BiciLPA</a>
-        <span class="nav-slogan">
-            Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
-        </span>
-        <div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" class="logo">🚲 BiciLPA</a>
+            <span class="nav-slogan">
+                Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
+            </span>
+        </div>
+        <div class="nav-links">
             <a href="index.html">Mapa en Vivo</a>
             <a href="rutas.html">Rutas Recomendadas</a>
             <a href="normativa.html">Normativa</a>
