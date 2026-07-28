@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BiciLPA · Rutas</title>
+    <title>Rutas en bicicleta por Las Palmas de Gran Canaria | BiciLPA</title>
+    <meta name="description" content="Descubre rutas en bicicleta por Las Palmas de Gran Canaria. Recorridos urbanos clasificados por dificultad, distancia y desnivel para moverte por la ciudad.">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -477,6 +478,10 @@
                 50% { transform: translateX(5px); opacity: 0.5; }
             }
         }
+        .sr-only {
+    position: absolute;
+    left: -9999px;
+}
     </style>
 </head>
 <body>
@@ -492,6 +497,12 @@
             <a href="talleres.html">Talleres</a>
         </div>
     </nav>
+      <h1 class="sr-only">
+        Rutas en bicicleta por Las Palmas de Gran Canaria
+    </h1>
+
+    <div class="map-container">
+        ...
     <div class="map-container">
         <div class="selector-ejes" id="selector-ejes">
             <button class="eje-btn" data-eje="este" onclick="filtrarEje('este')">Eje Este</button>
@@ -517,6 +528,36 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="datos/manifest.js"></script>
+        <script>
+(function () {
+
+    if (typeof rutasManifest === "undefined") return;
+
+    const rutas = Object.values(rutasManifest);
+
+    const jsonLD = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "Rutas en bicicleta por Las Palmas de Gran Canaria",
+        "description": "Selección de rutas urbanas para desplazarse en bicicleta por Las Palmas de Gran Canaria, clasificadas por dificultad, distancia y desnivel.",
+        "url": "https://hchafla.github.io/bicilpa/rutas.html",
+        "numberOfItems": rutas.length,
+        "itemListElement": rutas.map((ruta, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "name": ruta.titulo,
+            "description": ruta.subtitulo || ruta.descripcion || ""
+        }))
+    };
+
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(jsonLD);
+
+    document.head.appendChild(script);
+
+})();
+</script>
     
     <script>
         // CAPAS BASE DE MAPAS
