@@ -6,13 +6,13 @@
     <title>Mapa de Carriles Bici y Sítycleta en Las Palmas de Gran Canaria | BiciLPA</title>
     <meta name="description" content="Mapa interactivo de carriles bici, ciclovías y estaciones Sítycleta en Las Palmas de Gran Canaria, con disponibilidad de bicis en tiempo real.">
     <!-- ⚠️ Sustituye por tu dominio real antes de publicar -->
-    <link rel="canonical" href="https://hchafla.github.io/BiciLPA/index.html">
+    <link rel="canonical" href="https://TU-DOMINIO-AQUI/index.html">
 
     <!-- Open Graph -->
     <meta property="og:title" content="Mapa de carriles bici y Sítycleta en Las Palmas de Gran Canaria">
     <meta property="og:description" content="Mapa interactivo de carriles bici, ciclovías y estaciones Sítycleta en Las Palmas de Gran Canaria, con disponibilidad de bicis en tiempo real.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://hchafla.github.io/BiciLPA/">
+    <meta property="og:url" content="https://TU-DOMINIO-AQUI/">
     <meta property="og:locale" content="es_ES">
     <meta property="og:site_name" content="BiciLPA">
 
@@ -22,7 +22,7 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "BiciLPA",
-      "url": "https://hchafla.github.io/BiciLPA/",
+      "url": "https://TU-DOMINIO-AQUI/",
       "applicationCategory": "MapsApplication",
       "operatingSystem": "Web",
       "description": "Mapa interactivo de carriles bici, ciclovías y estaciones Sítycleta en Las Palmas de Gran Canaria, con disponibilidad de bicis en tiempo real.",
@@ -92,10 +92,12 @@
         body.dark-theme nav {
             background: #111a22;
         }
-        nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 0.95rem; }
+        nav a { color: #bdc3c7; text-decoration: none; font-weight: 500; font-size: 0.95rem; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
         .nav-slogan { color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px; }
+        /* Grupo de enlaces de la derecha: envuelve y centra en vez de desbordar como texto suelto */
+        .nav-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 20px; }
         /* Contenedor del Mapa */
         #app-container {
             display: flex;
@@ -274,7 +276,7 @@
         /* Comportamiento Móvil */
         @media (max-width: 768px) {
             .nav-slogan { display: none; }
-            nav a { margin: 0 8px; font-size: 0.9rem; }
+            nav a { font-size: 0.9rem; }
             .geoloc-btn { bottom: 20px; right: 16px; width: 46px; height: 46px; font-size: 1.25rem; }
             
             .custom-layer-control {
@@ -302,7 +304,7 @@
                 Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
             </h1>
         </div>
-        <div>
+        <div class="nav-links">
             <a href="index.html" class="active">Mapa en Vivo</a>
             <a href="rutas.html">Rutas Recomendadas</a>
             <a href="normativa.html">Normativa</a>
