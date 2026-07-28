@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiciLPA · Talleres y tiendas</title>
+    <title>Talleres de Bicicletas y Patinetas Eléctricas en Las Palmas de Gran Canaria | BiciLPA</title>
+
+    <!-- Meta Description & Canonical -->
+    <meta name="description" content="Encuentra talleres de bicicletas y patinetes eléctricos en Las Palmas de Gran Canaria. Consulta ubicación, teléfono, servicios y cómo llegar a cada taller especializado.">
+    <link rel="canonical" href="https://hchafla.github.io/bicilpa/talleres.html">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Talleres de Bicicletas y Patinetas Eléctricas | BiciLPA">
+    <meta property="og:description" content="Mapa de talleres especializados en bicicletas y patinetas eléctricas en Las Palmas de Gran Canaria.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hchafla.github.io/bicilpa/talleres.html">
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -25,6 +35,9 @@
         header h1 { color: #2c3e50; font-size: 2rem; margin-bottom: 10px; }
         header p { color: #7f8c8d; font-size: 1.1rem; }
 
+        /* Encabezados de sección */
+        .section-title { color: #2c3e50; font-size: 1.5rem; margin-bottom: 10px; }
+
         /* Barra de Filtros */
         .filter-bar { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
         .filter-btn { background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
@@ -42,7 +55,7 @@
         .legend-dot.vmp { background: #9b59b6; }
         .legend-dot.ambos { background: linear-gradient(135deg, #3498db 50%, #9b59b6 50%); }
 
-        /* Marcadores personalizados (sin numeración: solo color + icono por categoría) */
+        /* Marcadores personalizados */
         .marker-taller { width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 2px solid #fff; }
         .marker-taller span { transform: rotate(45deg); font-size: 0.85rem; line-height: 1; }
         .marker-taller.bici { background: #3498db; }
@@ -64,6 +77,57 @@
         .popup-actions a { flex: 1; text-align: center; padding: 6px; border-radius: 6px; text-decoration: none; font-size: 0.78rem; font-weight: 600; }
         .popup-actions .btn-map { background: #f1f5f9; color: #334155; }
         .popup-actions .btn-call { background: #2ecc71; color: white; }
+
+        /* Sección FAQ */
+        .faq-section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 35px;
+        }
+
+        .faq-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 10px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #edf2f7;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: #2d3748;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-answer {
+            display: none;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #4a5568;
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        .faq-item.open .faq-question {
+            color: #3498db;
+        }
 
         /* Rejilla de Talleres */
         .talleres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
@@ -96,14 +160,64 @@
         .btn-call { background: #2ecc71; color: white; }
         .btn-call:hover { background: #27ae60; }
     </style>
+
+    <!-- Marcado Schema.org FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Dónde puedo reparar una bicicleta en Las Palmas de Gran Canaria?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "En BiciLPA encontrarás una selección de talleres de bicicletas repartidos por diferentes zonas de Las Palmas de Gran Canaria. Podrás consultar su ubicación en el mapa, los servicios que ofrecen, su teléfono y cómo llegar para encontrar el taller más cercano."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué talleres reparan patinetes eléctricos en Las Palmas de Gran Canaria?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "El directorio incluye talleres especializados en reparación y mantenimiento de patinetes eléctricos (VMP), así como establecimientos que ofrecen servicio tanto para bicicletas como para patinetes. Puedes utilizar los filtros para mostrar únicamente los talleres especializados en VMP."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué servicios ofrecen los talleres de bicicletas?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Dependiendo del establecimiento, podrás encontrar servicios de reparación, mantenimiento, revisiones, cambio de neumáticos, frenos, transmisión, montaje de componentes, venta de recambios, accesorios, bicicletas eléctricas y servicio técnico especializado."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo puedo encontrar el taller más cercano?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Utiliza el mapa interactivo para localizar los talleres de bicicletas y patinetes eléctricos disponibles en la ciudad. Al seleccionar uno podrás consultar su ubicación exacta, obtener indicaciones mediante Google Maps o llamar directamente desde la ficha del establecimiento."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué diferencia hay entre un taller de bicicletas y un servicio técnico oficial?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un taller de bicicletas puede realizar reparaciones y mantenimiento de múltiples marcas, mientras que un servicio técnico oficial está autorizado para trabajar con fabricantes concretos y suele disponer de recambios originales y procedimientos específicos para esas marcas."
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 <body>
-    <!-- Menú de Navegación del Modelo Multi-página -->
+    <!-- Menú de Navegación -->
     <nav>
-        <a href="index.html" class="logo">🚲 BiciLPA</a>
-         <span class="nav-slogan">
-                Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
-            </span>
+        <a href="index.html" class="logo">BiciLPA</a>
+        <span class="nav-slogan">
+            Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
+        </span>
         <div>
             <a href="index.html">Mapa en Vivo</a>
             <a href="rutas.html">Rutas Recomendadas</a>
@@ -111,13 +225,25 @@
             <a href="talleres.html" class="active">Talleres</a>
         </div>
     </nav>
+
     <div class="container">
         <header>
-            <h1>Talleres y Soporte Técnico</h1>
-            <p>Servicios locales de confianza para reparar, poner a punto o equipar tu bici o patineta eléctrica.</p>
+            <h1>Talleres de Bicicletas y Patinetas Eléctricas en Las Palmas de Gran Canaria</h1>
+            <p>Encuentra talleres especializados en reparación y mantenimiento de bicicletas y patinetas eléctricas (VMP) en Las Palmas de Gran Canaria. Consulta su ubicación, teléfono y cómo llegar.</p>
         </header>
 
-        <!-- Filtros de categoría -->
+        <section style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:22px; margin-bottom:30px;">
+            <p style="margin:0; color:#555; line-height:1.8;">
+                <strong>BiciLPA</strong> reúne los principales <strong>talleres de bicicletas y patinetes eléctricos en Las Palmas de Gran Canaria</strong> para que encuentres fácilmente dónde reparar tu vehículo, realizar el mantenimiento periódico, comprar recambios o acudir a un servicio técnico especializado. Consulta la ubicación de cada taller sobre el mapa, descubre qué servicios ofrece, encuentra su teléfono y obtén indicaciones para llegar con un solo clic. Tanto si buscas un <strong>taller de bicicletas</strong> como un <strong>taller de patinetes eléctricos (VMP)</strong>, aquí encontrarás una selección de establecimientos especializados en la ciudad.
+            </p>
+        </section>
+
+        <!-- H2 SEO y Filtros de categoría -->
+        <div style="margin-bottom: 20px; text-align: center;">
+            <h2 class="section-title">Mapa de talleres de bicicletas y patinetes eléctricos</h2>
+            <p style="color: #64748b; font-size: 0.95rem;">Explora los talleres sobre el mapa o filtra según el tipo de vehículo que necesites reparar:</p>
+        </div>
+
         <div class="filter-bar">
             <button class="filter-btn active" data-filtro="all" onclick="filtrarTalleres('all')">Todos</button>
             <button class="filter-btn" data-filtro="bici" onclick="filtrarTalleres('bici')">Bicicletas</button>
@@ -135,6 +261,61 @@
             </div>
         </div>
 
+        <!-- Preguntas Frecuentes (FAQ) -->
+        <section class="faq-section">
+            <h2>Preguntas frecuentes sobre talleres de bicicletas y patinetes eléctricos</h2>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    ¿Dónde puedo reparar una bicicleta en Las Palmas de Gran Canaria?
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    En BiciLPA encontrarás una selección de talleres de bicicletas repartidos por diferentes zonas de Las Palmas de Gran Canaria. Podrás consultar su ubicación en el mapa, los servicios que ofrecen, su teléfono y cómo llegar para encontrar el taller más cercano.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    ¿Qué talleres reparan patinetes eléctricos en Las Palmas de Gran Canaria?
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    El directorio incluye talleres especializados en reparación y mantenimiento de patinetes eléctricos (VMP), así como establecimientos que ofrecen servicio tanto para bicicletas como para patinetes. Puedes utilizar los filtros para mostrar únicamente los talleres especializados en VMP.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    ¿Qué servicios ofrecen los talleres de bicicletas?
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    Dependiendo del establecimiento, podrás encontrar servicios de reparación, mantenimiento, revisiones, cambio de neumáticos, frenos, transmisión, montaje de componentes, venta de recambios, accesorios, bicicletas eléctricas y servicio técnico especializado.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    ¿Cómo puedo encontrar el taller más cercano?
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    Utiliza el mapa interactivo para localizar los talleres de bicicletas y patinetes eléctricos disponibles en la ciudad. Al seleccionar uno podrás consultar su ubicación exacta, obtener indicaciones mediante Google Maps o llamar directamente desde la ficha del establecimiento.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    ¿Qué diferencia hay entre un taller de bicicletas y un servicio técnico oficial?
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    Un taller de bicicletas puede realizar reparaciones y mantenimiento de múltiples marcas, mientras que un servicio técnico oficial está autorizado para trabajar con fabricantes concretos y suele disponer de recambios originales y procedimientos específicos para esas marcas.
+                </div>
+            </div>
+        </section>
+
         <!-- Listado de Tarjetas -->
         <div class="talleres-grid" id="talleres-grid"></div>
     </div>
@@ -144,10 +325,8 @@
 
     <script>
         // =========================================================================
-        // FUENTE ÚNICA DE DATOS: listado y mapa se generan a partir de este array
+        // FUENTE ÚNICA DE DATOS: Nombres limpios sin emojis
         // =========================================================================
-        // NOTA: el "id" es solo una clave interna para relacionar tarjeta <-> marcador,
-        // no se muestra en pantalla (a propósito, para no dar sensación de ranking).
         const talleresData = [
             {
                 id: 1,
@@ -157,9 +336,9 @@
                 direccion: 'Calle Churruca, 36',
                 tags: [
                     { text: 'Patinetas Eléctricas', special: true },
-                    { text: 'Reparación' }
+                    { text: 'Reparación de patinetes' }
                 ],
-                descripcion: 'Tienda y taller especializado en reparación de patinetas eléctricas.',
+                descripcion: 'Taller especializado en reparación, mantenimiento y puesta a punto de patinetes eléctricos en Las Palmas de Gran Canaria. Servicio técnico, sustitución de baterías, neumáticos y componentes.',
                 lat: 28.133073437298474, lng: -15.438036306973316,
                 mapsUrl: 'https://maps.google.com/?cid=10540027036133289357',
                 tel: '928751075'
@@ -172,10 +351,10 @@
                 direccion: 'Calle Matías Padrón, 102',
                 tags: [
                     { text: 'Servicio Técnico', special: true },
-                    { text: 'Recambios' },
-                    { text: 'Accesorios' }
+                    { text: 'Recambios para bicicletas' },
+                    { text: 'Accesorios para bicicletas' }
                 ],
-                descripcion: 'Servicio técnico para bicicletas y patinetas eléctricas, venta de recambios y accesorios.',
+                descripcion: 'Taller especializado en reparación de bicicletas y patinetes eléctricos, con servicio técnico, venta de recambios, accesorios y mantenimiento para todo tipo de bicicletas, incluidas bicicletas eléctricas.',
                 lat: 28.11768341255938, lng: -15.423689891866726,
                 mapsUrl: 'https://maps.google.com/?cid=15160181432943207773',
                 tel: '928058119'
@@ -188,9 +367,9 @@
                 direccion: 'Calle León y Castillo, 145',
                 tags: [
                     { text: 'Movilidad Eléctrica', special: true },
-                    { text: 'Mantenimiento' }
+                    { text: 'Mantenimiento de patinetes' }
                 ],
-                descripcion: 'Especialistas en reparación y mantenimiento de movilidad eléctrica (patinetas).',
+                descripcion: 'Taller de reparación y mantenimiento de patinetes eléctricos en Las Palmas de Gran Canaria. Diagnóstico de averías, cambio de ruedas, frenos, baterías y componentes electrónicos.',
                 lat: 28.11675597681001, lng: -15.422133125509685,
                 mapsUrl: 'https://maps.google.com/?cid=7499556238619769686',
                 tel: '621663511'
@@ -206,7 +385,7 @@
                     { text: 'Cecotec' },
                     { text: 'Dualtron' }
                 ],
-                descripcion: 'Taller oficial de diversas marcas de patinetas (Cecotec, Dualtron, etc.) y venta especializada.',
+                descripcion: 'Servicio técnico especializado en patinetes eléctricos y taller oficial de marcas como Cecotec y Dualtron. Reparación, mantenimiento y venta de accesorios y recambios.',
                 lat: 28.113125059004098, lng: -15.42312800173588,
                 mapsUrl: 'https://maps.google.com/?cid=16393350585597107636',
                 tel: '655787300'
@@ -218,10 +397,10 @@
                 zona: 'Alcaravaneras',
                 direccion: 'Calle León y Castillo, 323',
                 tags: [
-                    { text: 'Alta Gama', special: true },
-                    { text: 'Alquiler' }
+                    { text: 'Bicicletas de alta gama', special: true },
+                    { text: 'Alquiler de bicicletas' }
                 ],
-                descripcion: 'Taller profesional de bicicletas, venta y alquiler de equipos de alta gama.',
+                descripcion: 'Taller de bicicletas especializado en mantenimiento, reparación y puesta a punto de bicicletas de carretera, montaña y eléctricas. También ofrece venta y alquiler de bicicletas.',
                 lat: 28.131025881985718, lng: -15.429707077392774,
                 mapsUrl: 'https://maps.google.com/?cid=17315208940678764260',
                 tel: '928290298'
@@ -233,10 +412,10 @@
                 zona: 'Siete Palmas',
                 direccion: 'Avenida Pintor Felo Monzón, 15',
                 tags: [
-                    { text: 'Personalización', special: true },
-                    { text: 'Baterías Litio' }
+                    { text: 'Personalización de patinetes', special: true },
+                    { text: 'Cambio de baterias' }
                 ],
-                descripcion: 'Reparación, mantenimiento, personalización de patinetas y baterías de litio.',
+                descripcion: 'Taller especializado en reparación y personalización de patinetes eléctricos, sustitución de baterías de litio, mantenimiento preventivo y mejora de componentes.',
                 lat: 28.10723486380286, lng: -15.450899722422582,
                 mapsUrl: 'https://maps.google.com/?cid=16084814369428931658',
                 tel: '609952071'
@@ -248,11 +427,11 @@
                 zona: 'Triana',
                 direccion: 'Calle Francisco Gourié, 4',
                 tags: [
-                    { text: 'Distribuidor Oficial', special: true },
-                    { text: 'Haibike' },
-                    { text: 'Giant' }
+                    { text: 'Reparación de bicicletas', special: true },
+                    { text: 'Accesorios de bicicletas' },
+                    { text: 'Puesta a punto de bicicletas' }
                 ],
-                descripcion: 'Taller, tienda especializada y distribuidor de bicicletas (Haibike, Giant, etc.).',
+                descripcion: 'Taller y tienda de bicicletas en Las Palmas de Gran Canaria. Servicio técnico, venta de bicicletas de montaña, carretera y eléctricas, además de accesorios, componentes y recambios.',
                 lat: 28.104583235218268, lng: -15.414007070242741,
                 mapsUrl: 'https://maps.google.com/?cid=2703504430876430202',
                 tel: '610707313'
@@ -266,7 +445,7 @@
                 tags: [
                     { text: 'Atención Personalizada', special: true }
                 ],
-                descripcion: 'Taller de reparación y mantenimiento de bicicletas con atención personalizada.',
+                descripcion: 'Taller de reparación de bicicletas especializado en mantenimiento, ajustes, cambios de transmisión, frenos y revisiones para bicicletas urbanas, de montaña y carretera.',
                 lat: 28.12943297606159, lng: -15.445087487818085,
                 mapsUrl: 'https://maps.google.com/?cid=16494121218347218625',
                 tel: '651340789'
@@ -278,11 +457,11 @@
                 zona: 'Santa Catalina',
                 direccion: 'Calle Veintinueve de Abril, 63',
                 tags: [
-                    { text: 'Alquiler', special: true },
-                    { text: 'Urbana' },
-                    { text: 'Carretera' }
+                    { text: 'Alquiler de biciletas', special: true },
+                    { text: 'Alquiler de patinetas' },
+                    { text: 'Movilidad urbana' }
                 ],
-                descripcion: 'Alquiler y taller de reparaciones para bicicletas urbanas y de ruta.',
+                descripcion: 'Taller de bicicletas y servicio de alquiler en Las Palmas de Gran Canaria. Reparación, mantenimiento y puesta a punto de bicicletas urbanas, de carretera y patinetes eléctricos.',
                 lat: 28.14122029237369, lng: -15.432271132606573,
                 mapsUrl: 'https://maps.google.com/?cid=341175293571142682',
                 tel: '928935411'
@@ -294,10 +473,10 @@
                 zona: 'El Sebadal',
                 direccion: 'Calle Sao Paulo esq. Calle Quito, 11, local 4',
                 tags: [
-                    { text: 'Reparación', special: true },
-                    { text: 'Mantenimiento' }
+                    { text: 'Reparación de bicicletas', special: true },
+                    { text: 'Mantenimiento de bicicletas' }
                 ],
-                descripcion: 'Taller de mantenimiento y reparación de bicicletas, venta de marcas y personalización de componentes.',
+                descripcion: 'Taller especializado en reparación, mantenimiento y personalización de bicicletas. Servicio técnico, montaje de componentes, revisiones y venta de accesorios para ciclistas.',
                 lat: 28.158406149135306, lng: -15.41846913704208,
                 mapsUrl: 'https://maps.app.goo.gl/cuGF4XdKcLq7rorr6',
                 tel: '615240265'
@@ -308,7 +487,7 @@
         // ESTADO GLOBAL
         // =========================================================================
         let filtroActual = 'all';
-        const marcadores = {}; // id -> instancia de L.marker
+        const marcadores = {};
 
         // =========================================================================
         // INICIALIZACIÓN DEL MAPA
@@ -318,8 +497,6 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // Deriva la clase visual (color) a partir del array de categorías:
-        // ['bici'] -> 'bici', ['vmp'] -> 'vmp', ['bici','vmp'] -> 'ambos'
         function claseCategoria(taller) {
             return taller.categorias.length > 1 ? 'ambos' : taller.categorias[0];
         }
@@ -364,10 +541,18 @@
                 const marker = L.marker([taller.lat, taller.lng], { icon: crearIconoTaller(taller) })
                     .addTo(map)
                     .bindPopup(generarPopupHTML(taller));
-                // Al abrir el popup desde el mapa, resalta también la tarjeta del listado
                 marker.on('click', () => resaltarTarjeta(taller.id));
                 marcadores[taller.id] = marker;
             });
+        }
+
+        // =========================================================================
+        // LÓGICA DE ACCORDEÓN (FAQ)
+        // =========================================================================
+        function toggleFaq(elemento) {
+            elemento.classList.toggle('open');
+            const span = elemento.querySelector('.faq-question span');
+            span.textContent = elemento.classList.contains('open') ? '−' : '+';
         }
 
         // =========================================================================
@@ -404,13 +589,8 @@
         }
 
         // =========================================================================
-        // FILTRADO (sincroniza listado + mapa)
+        // FILTRADO
         // =========================================================================
-        // Un taller "coincide" con el filtro elegido si:
-        // - 'all'   -> siempre
-        // - 'bici'  -> hace bicicletas (incluye los que también hacen VMP)
-        // - 'vmp'   -> hace patinetas (incluye los que también hacen bicicletas)
-        // - 'ambos' -> hace las dos cosas exclusivamente (es el filtro "especialista en todo")
         function tallerCoincideConFiltro(taller, categoria) {
             if (categoria === 'all') return true;
             if (categoria === 'ambos') return taller.categorias.length > 1;
@@ -420,19 +600,16 @@
         function filtrarTalleres(categoria) {
             filtroActual = categoria;
 
-            // Botones de filtro activos
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-filtro') === categoria);
             });
 
-            // Tarjetas del listado
             talleresData.forEach(taller => {
                 const tarjeta = document.getElementById('tarjeta-' + taller.id);
                 if (!tarjeta) return;
                 tarjeta.style.display = tallerCoincideConFiltro(taller, categoria) ? 'flex' : 'none';
             });
 
-            // Marcadores del mapa
             talleresData.forEach(taller => {
                 const marker = marcadores[taller.id];
                 if (tallerCoincideConFiltro(taller, categoria)) {
@@ -452,7 +629,6 @@
             const marker = marcadores[id];
             if (!taller || !marker) return;
 
-            // Si el taller está oculto por el filtro actual, no tiene marcador en el mapa
             if (!map.hasLayer(marker)) return;
 
             document.getElementById('map-talleres').scrollIntoView({ behavior: 'smooth', block: 'center' });
