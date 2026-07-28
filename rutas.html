@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rutas en bicicleta por Las Palmas de Gran Canaria | BiciLPA</title>
     <meta name="description" content="Descubre rutas en bicicleta por Las Palmas de Gran Canaria. Recorridos urbanos clasificados por dificultad, distancia y desnivel para moverte por la ciudad.">
-    
+    <link rel="canonical" href="https://hchafla.github.io/bicilpa/rutas.html">
+
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -19,6 +20,9 @@
             --border-color: #e2e8f0;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            /* Alturas fijas del sidebar móvil (en vez de porcentajes frágiles) */
+            --sidebar-peek: 260px;
+            --sidebar-minimized: 75px;
         }
         * {
             box-sizing: border-box;
@@ -55,7 +59,17 @@
         nav a { color: #bdc3c7; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 0.95rem; }
         nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
         .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
-        
+        .nav-slogan {
+            color: #bdc3c7;
+            font-size: 0.85rem;
+            font-weight: 400;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
         .map-container {
             position: relative;
             width: 100%;
@@ -67,7 +81,7 @@
             height: 100%;
             z-index: 1;
         }
-        
+
         /* HEADER / SELECTOR DE EJES (Flotante) */
         .selector-ejes {
             position: absolute;
@@ -112,7 +126,6 @@
         .eje-btn[data-eje="norte"].active { background-color: #2ECC40; }
         .eje-btn[data-eje="baja-alta"].active { background-color: #FF851B; }
         .eje-btn[data-eje="alta-baja"].active { background-color: #B10DC9; }
-
         /* CARRUSEL HORIZONTAL DE RUTAS */
         .rutas-carrusel {
             position: absolute;
@@ -141,15 +154,21 @@
             white-space: nowrap;
             border: 1px solid var(--border-color);
             transition: var(--transition);
+            appearance: none;
+            font-family: inherit;
+            color: var(--text-dark);
         }
         .carrusel-item:hover {
             transform: translateY(-2px);
+        }
+        .carrusel-item:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
         }
         .carrusel-item.active[data-eje-grupo="este"] { background: #0074D9; color: white; border-color: #0074D9; }
         .carrusel-item.active[data-eje-grupo="norte"] { background: #2ECC40; color: white; border-color: #2ECC40; }
         .carrusel-item.active[data-eje-grupo="baja-alta"] { background: #FF851B; color: white; border-color: #FF851B; }
         .carrusel-item.active[data-eje-grupo="alta-baja"] { background: #B10DC9; color: white; border-color: #B10DC9; }
-
         /* BARRA LATERAL (SIDEBAR / BOTTOM SHEET) */
         .rutas-sidebar {
             position: absolute;
@@ -263,7 +282,6 @@
         .ruta-card[data-eje="norte"] .indicaciones { border-left-color: #2ECC40; }
         .ruta-card[data-eje="baja-alta"] .indicaciones { border-left-color: #FF851B; }
         .ruta-card[data-eje="alta-baja"] .indicaciones { border-left-color: #B10DC9; }
-
         .marcador-punto-icono-interior {
             width: 34px;
             height: 34px;
@@ -276,7 +294,6 @@
             font-size: 1.1rem;
             box-shadow: var(--shadow);
         }
-
         /* BOTÓN FLOTANTE DE GEOLOCALIZACIÓN */
         .geoloc-btn {
             position: absolute;
@@ -305,7 +322,6 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-
         .marcador-ubicacion-usuario-wrap { position: relative; width: 18px; height: 18px; }
         .marcador-ubicacion-usuario-dot {
             position: absolute;
@@ -330,7 +346,6 @@
             0% { transform: scale(1); opacity: 0.65; }
             100% { transform: scale(3); opacity: 0; }
         }
-
         /* CONTROL DE CAPAS DESPLEGABLE (Idéntico a index.html) */
         .custom-layer-control {
             background: rgba(255, 255, 255, 0.95) !important;
@@ -341,7 +356,6 @@
             overflow: hidden;
             transition: var(--transition);
         }
-
         .layer-toggle-btn {
             background: transparent;
             border: none;
@@ -355,7 +369,6 @@
             color: var(--text-dark);
             width: 100%;
         }
-
         .layer-options {
             display: none;
             padding: 8px 12px 12px 12px;
@@ -363,11 +376,9 @@
             flex-direction: column;
             gap: 8px;
         }
-
         .layer-options.open {
             display: flex;
         }
-
         .layer-option-btn {
             background: var(--bg-light);
             border: 1px solid var(--border-color);
@@ -380,14 +391,15 @@
             text-align: left;
             transition: var(--transition);
         }
-
         .layer-option-btn.active {
             background: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
         }
-
         @media (max-width: 768px) {
+            .nav-slogan {
+                display: none;
+            }
             .geoloc-btn {
                 bottom: 20px;
                 right: 16px;
@@ -395,13 +407,11 @@
                 height: 46px;
                 font-size: 1.25rem;
             }
-
             /* Ajuste de posición justo debajo del menú superior en móvil */
             .leaflet-top.leaflet-right {
                 top: 85px !important;
                 right: 10px !important;
             }
-
             .selector-ejes {
                 top: 10px;
                 padding: 6px;
@@ -428,13 +438,13 @@
                 border-top: 1px solid var(--border-color);
             }
             .rutas-sidebar.visible {
-                transform: translateY(55%);
+                transform: translateY(calc(100% - var(--sidebar-peek)));
             }
             .rutas-sidebar.expanded {
                 transform: translateY(0%) !important;
             }
             .rutas-sidebar.minimized {
-                transform: translateY(calc(100% - 75px)) !important;
+                transform: translateY(calc(100% - var(--sidebar-minimized))) !important;
             }
             .drag-handle {
                 display: block;
@@ -448,7 +458,6 @@
             .sidebar-content {
                 padding: 10px 20px 30px 20px;
             }
-
             .selector-ejes::after {
                 content: '›';
                 position: absolute;
@@ -479,17 +488,17 @@
             }
         }
         .sr-only {
-    position: absolute;
-    left: -9999px;
-}
+            position: absolute;
+            left: -9999px;
+        }
     </style>
 </head>
 <body>
     <nav>
         <a href="index.html" class="logo">🚲 BiciLPA</a>
-         <span class="nav-slogan">
-                Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
-            </span>
+        <span class="nav-slogan">
+            Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
+        </span>
         <div>
             <a href="index.html">Mapa en Vivo</a>
             <a href="rutas.html" class="active">Rutas Recomendadas</a>
@@ -497,12 +506,9 @@
             <a href="talleres.html">Talleres</a>
         </div>
     </nav>
-      <h1 class="sr-only">
+    <h1 class="sr-only">
         Rutas en bicicleta por Las Palmas de Gran Canaria
     </h1>
-
-    <div class="map-container">
-        ...
     <div class="map-container">
         <div class="selector-ejes" id="selector-ejes">
             <button class="eje-btn" data-eje="este" onclick="filtrarEje('este')">Eje Este</button>
@@ -510,12 +516,12 @@
             <button class="eje-btn" data-eje="baja-alta" onclick="filtrarEje('baja-alta')">Conexión Baja-Alta</button>
             <button class="eje-btn" data-eje="alta-baja" onclick="filtrarEje('alta-baja')">Conexión Alta-Baja</button>
         </div>
-        
+
         <div class="rutas-carrusel" id="rutas-carrusel"></div>
         <div id="map-rutas"></div>
-        
+
         <button class="geoloc-btn" id="btn-geoloc" onclick="alternarGeolocalizacion()" title="Ver mi ubicación en el mapa" aria-label="Ver mi ubicación en el mapa">📍</button>
-        
+
         <div class="rutas-sidebar" id="rutas-sidebar">
             <div class="drag-handle" id="drag-handle"></div>
             <div class="sidebar-header">
@@ -524,17 +530,13 @@
             <div class="sidebar-content" id="contenedor-tarjetas"></div>
         </div>
     </div>
-
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="datos/manifest.js"></script>
-        <script>
+    <script>
 (function () {
-
     if (typeof rutasManifest === "undefined") return;
-
     const rutas = Object.values(rutasManifest);
-
     const jsonLD = {
         "@context": "https://schema.org",
         "@type": "ItemList",
@@ -549,16 +551,13 @@
             "description": ruta.subtitulo || ruta.descripcion || ""
         }))
     };
-
     const script = document.createElement("script");
     script.type = "application/ld+json";
     script.textContent = JSON.stringify(jsonLD);
-
     document.head.appendChild(script);
-
 })();
 </script>
-    
+
     <script>
         // CAPAS BASE DE MAPAS
         const mapaClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -566,33 +565,28 @@
             subdomains: 'abcd',
             maxZoom: 20
         });
-
         const mapaOscuro = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 20
         });
-
         const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
             attribution: '&copy; Google Maps',
             maxZoom: 20
         });
-
         const map = L.map('map-rutas', {
             center: [28.128, -15.432],
             zoom: 13,
             layers: [mapaClaro]
         });
-
         // CONTROL DE CAPAS DESPLEGABLE PERSONALIZADO
         const CustomLayerControl = L.Control.extend({
             options: { position: 'topright' },
             onAdd: function() {
                 const container = L.DomUtil.create('div', 'custom-layer-control leaflet-bar');
-                
+
                 L.DomEvent.disableClickPropagation(container);
                 L.DomEvent.disableScrollPropagation(container);
-
                 container.innerHTML = `
                     <button class="layer-toggle-btn" id="layer-toggle-btn" title="Cambiar mapa base">
                         🗺️ <span style="font-size: 0.85rem;">Capas</span>
@@ -603,66 +597,52 @@
                         <button class="layer-option-btn" data-layer="satelite">🛰️ Satélite</button>
                     </div>
                 `;
-
                 return container;
             }
         });
-
         map.addControl(new CustomLayerControl());
-
         // LÓGICA DE APERTURA/CIERRE DEL DESPLEGABLE
         document.addEventListener('click', (e) => {
             const toggleBtn = e.target.closest('#layer-toggle-btn');
             const optionBtn = e.target.closest('.layer-option-btn');
             const layerOptions = document.getElementById('layer-options');
-
             if (toggleBtn) {
                 if (layerOptions) layerOptions.classList.toggle('open');
                 return;
             }
-
             if (optionBtn) {
                 const layerType = optionBtn.getAttribute('data-layer');
-
                 map.removeLayer(mapaClaro);
                 map.removeLayer(mapaOscuro);
                 map.removeLayer(mapaSatelite);
-
                 if (layerType === 'claro') mapaClaro.addTo(map);
                 if (layerType === 'oscuro') mapaOscuro.addTo(map);
                 if (layerType === 'satelite') mapaSatelite.addTo(map);
-
                 document.querySelectorAll('.layer-option-btn').forEach(btn => btn.classList.remove('active'));
                 optionBtn.classList.add('active');
-
                 if (layerOptions) layerOptions.classList.remove('open');
                 return;
             }
-
             if (layerOptions && !e.target.closest('.custom-layer-control')) {
                 layerOptions.classList.remove('open');
             }
         });
-
         let capasPreview = L.layerGroup().addTo(map);
         let rutasCache = {};
         let capasRutas = {};
         let ejeActual = null;
         let idRutaSeleccionada = null;
-
         // GEOLOCALIZACIÓN
         let siguiendoUbicacion = false;
         let esperandoPrimerFix = true;
         let marcadorUbicacion = null;
         let circuloPrecision = null;
-
         const iconoUbicacion = L.divIcon({
             className: 'marcador-ubicacion-usuario-wrap',
             html: '<div class="marcador-ubicacion-usuario-pulso"></div><div class="marcador-ubicacion-usuario-dot"></div>',
             iconSize: [18, 18],
             iconAnchor: [9, 9]
         });
-
         function alternarGeolocalizacion() {
             if (siguiendoUbicacion) {
                 detenerGeolocalizacion();
@@ -677,7 +657,6 @@
             document.getElementById('btn-geoloc').classList.add('buscando');
             map.locate({ watch: true, enableHighAccuracy: true, setView: false, maximumAge: 5000 });
         }
-
         function detenerGeolocalizacion() {
             siguiendoUbicacion = false;
             esperandoPrimerFix = true;
@@ -693,12 +672,10 @@
                 circuloPrecision = null;
             }
         }
-
         map.on('locationfound', function (e) {
             const btn = document.getElementById('btn-geoloc');
             btn.classList.remove('buscando');
             btn.classList.add('activo');
-
             if (!marcadorUbicacion) {
                 marcadorUbicacion = L.marker(e.latlng, {
                     icon: iconoUbicacion,
@@ -708,7 +685,6 @@
             } else {
                 marcadorUbicacion.setLatLng(e.latlng);
             }
-
             if (!circuloPrecision) {
                 circuloPrecision = L.circle(e.latlng, {
                     radius: e.accuracy,
@@ -722,26 +698,22 @@
                 circuloPrecision.setLatLng(e.latlng);
                 circuloPrecision.setRadius(e.accuracy);
             }
-
             if (esperandoPrimerFix) {
                 map.setView(e.latlng, Math.max(map.getZoom(), 15));
                 esperandoPrimerFix = false;
             }
         });
-
         map.on('locationerror', function (e) {
             console.error('Error de geolocalización:', e.message);
             alert('No se ha podido acceder a tu ubicación. Comprueba que le has dado permiso al navegador y que la página se sirve por HTTPS.');
             detenerGeolocalizacion();
         });
-
         const coloresEjes = {
-            'este': '#0074D9',   
-            'norte': '#2ECC40',     
-            'baja-alta': '#FF851B', 
-            'alta-baja': '#B10DC9'  
+            'este': '#0074D9',
+            'norte': '#2ECC40',
+            'baja-alta': '#FF851B',
+            'alta-baja': '#B10DC9'
         };
-
         window.addEventListener("load", () => {
             if (typeof rutasManifest !== 'undefined') {
                 precargarTodaLaRed();
@@ -750,7 +722,6 @@
                 console.error("Error crítico: 'rutasManifest' no está definido.");
             }
         });
-
         async function precargarTodaLaRed() {
             const todosLosIds = Object.keys(rutasManifest);
             for (const idRuta of todosLosIds) {
@@ -764,35 +735,29 @@
                 }
             }
         }
-
         function filtrarEje(ejeId) {
             document.querySelectorAll('.eje-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
             });
-
             ejeActual = ejeId;
-
             const carrusel = document.getElementById('rutas-carrusel');
             carrusel.innerHTML = '';
             carrusel.style.display = 'flex';
-
             if (typeof rutasManifest === 'undefined') {
                 carrusel.style.display = 'none';
                 return;
             }
-
             const idsDelEje = Object.keys(rutasManifest).filter(idRuta =>
                 String(rutasManifest[idRuta].eje).trim().toLowerCase() === String(ejeId).trim().toLowerCase()
             );
-
             if (idsDelEje.length === 0) {
                 carrusel.style.display = 'none';
                 return;
             }
-
             idsDelEje.forEach(idRuta => {
                 const infoSimplificada = rutasManifest[idRuta];
-                const item = document.createElement('div');
+                const item = document.createElement('button');
+                item.type = 'button';
                 item.className = 'carrusel-item';
                 item.setAttribute('data-id-ruta', idRuta);
                 item.setAttribute('data-eje-grupo', ejeId);
@@ -803,10 +768,8 @@
                 item.onclick = () => seleccionarRuta(idRuta);
                 carrusel.appendChild(item);
             });
-
             requestAnimationFrame(actualizarPistaScrollCarrusel);
         }
-
         function cargarDatosRuta(idRuta) {
             return new Promise((resolve, reject) => {
                 if (rutasCache[idRuta]) {
@@ -815,7 +778,6 @@
                 }
                 const script = document.createElement('script');
                 script.src = `datos/rutas/${idRuta}.js`;
-
                 script.onload = () => {
                     if (window.rutaActivaDatos && window.rutaActivaDatos.id === idRuta) {
                         rutasCache[idRuta] = window.rutaActivaDatos;
@@ -834,44 +796,34 @@
                 document.body.appendChild(script);
             });
         }
-
         async function seleccionarRuta(idRuta) {
             document.querySelectorAll('.carrusel-item').forEach(item => {
                 item.classList.toggle('active', item.getAttribute('data-id-ruta') === idRuta);
             });
-
             const idPrevio = idRutaSeleccionada;
             idRutaSeleccionada = idRuta;
-
             try {
                 const datos = await cargarDatosRuta(idRuta);
-
                 if (idPrevio && idPrevio !== idRuta && rutasCache[idPrevio]) {
                     renderizarCapaRuta(idPrevio, false);
                 }
-
                 renderizarCapaRuta(idRuta, true);
                 mostrarInfoRuta(datos);
             } catch (err) {
                 console.error(err.message);
             }
         }
-
         function renderizarCapaRuta(idRuta, seleccionada) {
             const datos = rutasCache[idRuta];
             if (!datos) return;
-
             if (capasRutas[idRuta]) {
                 capasPreview.removeLayer(capasRutas[idRuta]);
             }
-
             const colorTrazado = coloresEjes[datos.eje] || '#3498db';
             const estiloLinea = seleccionada
                 ? { color: colorTrazado, weight: 6, opacity: 0.90 }
                 : { color: colorTrazado, weight: 4, opacity: 0.30 };
-
             const grupoRuta = L.featureGroup();
-
             const capa = L.geoJSON(datos.geojson, {
                 filter: function(feature) {
                     const props = feature.properties || {};
@@ -926,12 +878,10 @@
                     }
                 }
             });
-
             grupoRuta.addLayer(capa);
             capasRutas[idRuta] = grupoRuta;
             capasPreview.addLayer(grupoRuta);
         }
-
         function mostrarInfoRuta(datos) {
             const contenedor = document.getElementById('contenedor-tarjetas');
             contenedor.innerHTML = '';
@@ -948,7 +898,6 @@
             const HTMLconsejos = datos.consejos ? datos.consejos.map(c => `
                 ${c.icono || '👉'} <strong>${c.titulo}:</strong> ${c.texto}.<br>
             `).join('\n') : '';
-
             const card = document.createElement('div');
             card.className = 'ruta-card';
             card.setAttribute('data-eje', datos.eje);
@@ -971,19 +920,17 @@
                 </div>
             `;
             contenedor.appendChild(card);
-
             const sidebar = document.getElementById('rutas-sidebar');
             if (esDispositivoMovil()) {
                 sidebar.classList.remove('expanded', 'minimized');
                 sidebar.classList.add('visible');
-                sidebar.style.transform = 'translateY(55%)'; 
+                sidebar.style.transform = '';
             } else {
                 sidebar.classList.remove('minimized', 'expanded');
                 sidebar.classList.add('visible');
-                sidebar.style.transform = ''; 
+                sidebar.style.transform = '';
             }
         }
-
         function cerrarSidebar() {
             const sidebar = document.getElementById('rutas-sidebar');
             sidebar.classList.remove('visible', 'expanded', 'minimized');
@@ -993,14 +940,13 @@
                 sidebar.style.transform = 'translateX(120%)';
             }
         }
-
         function toggleMinimizar() {
             const sidebar = document.getElementById('rutas-sidebar');
             if (sidebar.classList.contains('minimized')) {
                 sidebar.classList.remove('minimized');
                 if (esDispositivoMovil()) {
                     sidebar.classList.remove('expanded');
-                    sidebar.style.transform = 'translateY(55%)';
+                    sidebar.style.transform = '';
                 } else {
                     sidebar.style.transform = '';
                 }
@@ -1008,17 +954,23 @@
                 sidebar.classList.add('minimized');
                 sidebar.classList.remove('expanded');
                 if (esDispositivoMovil()) {
-                    sidebar.style.transform = 'translateY(calc(100% - 75px))'; 
+                    sidebar.style.transform = '';
                 }
             }
         }
-
         // GESTIÓN TÁCTIL SIDEBAR
         const sidebar = document.getElementById('rutas-sidebar');
         let startY = 0, currentY = 0, isDragging = false;
         let modoArrastre = null;
         function esDispositivoMovil() { return window.innerWidth <= 768; }
-
+        function alturaSidebarPeekPx() {
+            const valor = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-peek');
+            return parseFloat(valor) || 260;
+        }
+        function alturaSidebarMinimizadoPx() {
+            const valor = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-minimized');
+            return parseFloat(valor) || 75;
+        }
         sidebar.addEventListener('touchstart', (e) => {
             if (!esDispositivoMovil()) return;
             const enCabecera = e.target.id === 'drag-handle' || !!e.target.closest('.sidebar-header');
@@ -1033,7 +985,6 @@
                 modoArrastre = null;
             }
         });
-
         sidebar.addEventListener('touchmove', (e) => {
             if (!esDispositivoMovil()) return;
             currentY = e.touches[0].clientY;
@@ -1050,27 +1001,28 @@
             }
             if (!isDragging) return;
             if (e.cancelable) e.preventDefault();
+            const peekPx = alturaSidebarPeekPx();
+            const minPx = alturaSidebarMinimizadoPx();
             if (sidebar.classList.contains('expanded')) {
                 sidebar.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
             } else if (sidebar.classList.contains('minimized')) {
-                sidebar.style.transform = `translateY(calc(100% - 75px + ${deltaY}px))`;
+                sidebar.style.transform = `translateY(calc(100% - ${minPx}px + ${deltaY}px))`;
             } else {
-                sidebar.style.transform = `translateY(calc(55% + ${deltaY}px))`;
+                sidebar.style.transform = `translateY(calc(100% - ${peekPx}px + ${deltaY}px))`;
             }
         }, { passive: false });
-
         sidebar.addEventListener('touchend', () => {
             modoArrastre = null;
             if (!isDragging) return;
             isDragging = false;
             sidebar.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94)';
-            
+
             const deltaY = currentY - startY;
             if (Math.abs(deltaY) > 70) {
                 if (deltaY < 0) {
                     if (sidebar.classList.contains('minimized')) {
                         sidebar.classList.remove('minimized');
-                        sidebar.style.transform = 'translateY(55%)';
+                        sidebar.style.transform = '';
                     } else {
                         sidebar.classList.add('expanded');
                         sidebar.style.transform = 'translateY(0%)';
@@ -1078,23 +1030,22 @@
                 } else {
                     if (sidebar.classList.contains('expanded')) {
                         sidebar.classList.remove('expanded');
-                        sidebar.style.transform = 'translateY(55%)';
+                        sidebar.style.transform = '';
                     } else {
                         sidebar.classList.add('minimized');
-                        sidebar.style.transform = 'translateY(calc(100% - 75px))';
+                        sidebar.style.transform = '';
                     }
                 }
             } else {
                 if (sidebar.classList.contains('expanded')) {
                     sidebar.style.transform = 'translateY(0%)';
                 } else if (sidebar.classList.contains('minimized')) {
-                    sidebar.style.transform = 'translateY(calc(100% - 75px))';
+                    sidebar.style.transform = '';
                 } else {
-                    sidebar.style.transform = 'translateY(55%)';
+                    sidebar.style.transform = '';
                 }
             }
         });
-
         const selectorEjes = document.getElementById('selector-ejes');
         function actualizarPistaScrollCarrusel() {
             const alFinal = selectorEjes.scrollLeft + selectorEjes.clientWidth >= selectorEjes.scrollWidth - 5;
