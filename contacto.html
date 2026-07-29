@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto | BiciLPA</title>
+    <meta name="description" content="Contacta con BiciLPA para reportar un error en el mapa, sugerir una mejora o resolver dudas sobre el proyecto.">
+    <link rel="canonical" href="https://hchafla.github.io/BiciLPA/contacto.html">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Contacto | BiciLPA">
+    <meta property="og:description" content="Contacta con BiciLPA para reportar un error en el mapa, sugerir una mejora o resolver dudas sobre el proyecto.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hchafla.github.io/BiciLPA/contacto.html">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; overflow-x: hidden; }
+
+        /* Navegación superior común */
+        nav { background: #2c3e50; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; flex-wrap: wrap; gap: 8px; }
+        nav a { color: #bdc3c7; text-decoration: none; font-weight: 500; font-size: 0.95rem; }
+        nav a:hover, nav a.active { color: #fff; border-bottom: 2px solid #2ecc71; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #fff; text-decoration: none; }
+        .nav-slogan { color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px; }
+        /* Grupo de enlaces de la derecha: envuelve y centra en vez de desbordar como texto suelto */
+        .nav-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 20px; }
+        @media (max-width: 768px) {
+            .nav-slogan { display: none; }
+            nav a { font-size: 0.9rem; }
+        }
+
+        /* Footer común */
+        .site-footer { background: #2c3e50; color: #bdc3c7; margin-top: 40px; padding: 28px 20px 22px; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; }
+        .footer-desc { font-size: 0.9rem; line-height: 1.5; margin-bottom: 14px; max-width: 640px; color: #d5dbdb; }
+        .footer-links { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-bottom: 14px; }
+        .footer-links a { color: #fff; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+        .footer-links a:hover { text-decoration: underline; }
+        .footer-legal { font-size: 0.78rem; line-height: 1.6; margin-bottom: 6px; color: #95a5a6; }
+        .footer-legal a { color: #95a5a6; text-decoration: underline; }
+        .footer-legal a:hover { color: #fff; }
+        .footer-attrib { font-size: 0.72rem; color: #7f8c8d; }
+
+        /* Contenido de la página */
+        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; }
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { color: #2c3e50; font-size: 2rem; margin-bottom: 10px; }
+        header p { color: #7f8c8d; font-size: 1.05rem; }
+
+        .form-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-weight: 600; color: #2d3748; font-size: 0.9rem; margin-bottom: 6px; }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: #333;
+            background: #f8f9fa;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background: #fff;
+        }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+
+        .btn-submit {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .btn-submit:hover { background: #2980b9; }
+
+        .form-nota { font-size: 0.82rem; color: #7f8c8d; margin-top: 14px; }
+
+        .form-feedback { display: none; margin-top: 16px; padding: 12px 14px; border-radius: 6px; font-size: 0.88rem; }
+        .form-feedback.visible { display: block; }
+        .form-feedback.ok { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
+        .form-feedback.error { background: #fdecea; color: #c0392b; border: 1px solid #f5b7b1; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" class="logo">🚲 BiciLPA</a>
+            <span class="nav-slogan">
+                Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
+            </span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Mapa en Vivo</a>
+            <a href="rutas.html">Rutas Recomendadas</a>
+            <a href="normativa.html">Normativa</a>
+            <a href="talleres.html">Talleres</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Contacto</h1>
+            <p>¿Un carril mal marcado, una estación que ya no existe o alguna sugerencia? Cuéntanoslo.</p>
+        </header>
+
+        <div class="form-card">
+            <form id="form-contacto" novalidate>
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" autocomplete="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="asunto">Asunto</label>
+                    <select id="asunto" name="asunto">
+                        <option value="Error en el mapa">Error en el mapa</option>
+                        <option value="Sugerencia de ruta">Sugerencia de ruta</option>
+                        <option value="Información de un taller o normativa">Información de un taller o normativa</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mensaje">Mensaje</label>
+                    <textarea id="mensaje" name="mensaje" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Enviar mensaje</button>
+                <p class="form-nota">
+                    Al enviar se abrirá tu aplicación de correo con el mensaje ya redactado.
+                    Si prefieres, puedes escribirnos directamente a
+                    <strong>chafla@gmail.com</strong>.
+                </p>
+                <div class="form-feedback" id="form-feedback"></div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p class="footer-desc">BiciLPA es un mapa ciclista de Las Palmas de Gran Canaria con carriles bici, estaciones Sítycleta, rutas recomendadas y recursos para moverte en bicicleta por la ciudad.</p>
+            <nav class="footer-links" aria-label="Enlaces del pie de página">
+                <a href="index.html">Mapa en Vivo</a>
+                <a href="rutas.html">Rutas Recomendadas</a>
+                <a href="normativa.html">Normativa</a>
+                <a href="talleres.html">Talleres</a>
+            </nav>
+            <p class="footer-legal">
+                BiciLPA es un proyecto independiente y no está afiliado al Ayuntamiento de Las Palmas de Gran Canaria ni a Sítycleta.<br>
+                <a href="contacto.html" class="active">Contacto</a> · <a href="aviso-legal.html">Aviso legal</a> · <a href="privacidad.html">Privacidad</a> · © 2026 BiciLPA
+            </p>
+            <p class="footer-attrib">Datos de OpenStreetMap, CARTO, Sítycleta (Nextbike) y Google Maps.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ⚠️ Sustituye por tu email real antes de publicar
+        const EMAIL_CONTACTO = 'chafla@gmail.com';
+
+        document.getElementById('form-contacto').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const asunto = document.getElementById('asunto').value;
+            const mensaje = document.getElementById('mensaje').value.trim();
+            const feedback = document.getElementById('form-feedback');
+
+            if (!nombre || !email || !mensaje) {
+                feedback.textContent = 'Por favor, rellena nombre, email y mensaje antes de enviar.';
+                feedback.className = 'form-feedback visible error';
+                return;
+            }
+
+            const cuerpo = `Nombre: ${nombre}\nEmail: ${email}\n\n${mensaje}`;
+            const mailtoUrl = `mailto:${EMAIL_CONTACTO}?subject=${encodeURIComponent('[BiciLPA] ' + asunto)}&body=${encodeURIComponent(cuerpo)}`;
+
+            window.location.href = mailtoUrl;
+
+            feedback.textContent = 'Se ha abierto tu aplicación de correo con el mensaje redactado. Si no ves nada, escríbenos directamente a ' + EMAIL_CONTACTO + '.';
+            feedback.className = 'form-feedback visible ok';
+        });
+    </script>
+</body>
+</html>
