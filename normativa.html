@@ -16,6 +16,17 @@
         .nav-slogan { color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px; }
         /* Grupo de enlaces de la derecha: envuelve y centra en vez de desbordar como texto suelto */
         .nav-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 20px; }
+        /* Footer común */
+        .site-footer { background: #2c3e50; color: #bdc3c7; margin-top: 40px; padding: 28px 20px 22px; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; }
+        .footer-desc { font-size: 0.9rem; line-height: 1.5; margin-bottom: 14px; max-width: 640px; color: #d5dbdb; }
+        .footer-links { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-bottom: 14px; }
+        .footer-links a { color: #fff; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+        .footer-links a:hover { text-decoration: underline; }
+        .footer-legal { font-size: 0.78rem; line-height: 1.6; margin-bottom: 6px; color: #95a5a6; }
+        .footer-legal a { color: #95a5a6; text-decoration: underline; }
+        .footer-legal a:hover { color: #fff; }
+        .footer-attrib { font-size: 0.72rem; color: #7f8c8d; }
         @media (max-width: 768px) {
             .nav-slogan { display: none; }
             nav a { font-size: 0.9rem; }
@@ -307,6 +318,23 @@
             </div>
         </div>
     </div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p class="footer-desc">BiciLPA es un mapa ciclista de Las Palmas de Gran Canaria con carriles bici, estaciones Sítycleta, rutas recomendadas y recursos para moverte en bicicleta por la ciudad.</p>
+            <nav class="footer-links" aria-label="Enlaces del pie de página">
+                <a href="index.html">Mapa en Vivo</a>
+                <a href="rutas.html">Rutas Recomendadas</a>
+                <a href="normativa.html">Normativa</a>
+                <a href="talleres.html">Talleres</a>
+            </nav>
+            <p class="footer-legal">
+                BiciLPA es un proyecto independiente y no está afiliado al Ayuntamiento de Las Palmas de Gran Canaria ni a Sítycleta.<br>
+                <a href="contacto.html">Contacto</a> · <a href="aviso-legal.html">Aviso legal</a> · <a href="privacidad.html">Privacidad</a> · © 2026 BiciLPA
+            </p>
+            <p class="footer-attrib">Datos de OpenStreetMap, CARTO, Sítycleta (Nextbike) y Google Maps.</p>
+        </div>
+    </footer>
 
     <script>
         // Función para abrir/cerrar los acordeones de la normativa
