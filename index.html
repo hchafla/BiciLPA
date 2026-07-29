@@ -87,6 +87,7 @@
             flex-wrap: wrap;
             gap: 8px;
             z-index: 2000;
+            position: relative;
             transition: background 0.3s ease;
         }
         body.dark-theme nav {
@@ -98,6 +99,33 @@
         .nav-slogan { color: #bdc3c7; font-size: 0.85rem; font-weight: 400; border-left: 1px solid #34495e; padding-left: 15px; }
         /* Grupo de enlaces de la derecha: envuelve y centra en vez de desbordar como texto suelto */
         .nav-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 20px; }
+        /* Botón e info del footer (desplegable, no resta espacio al mapa) */
+        .nav-info-btn { background: none; border: none; color: #bdc3c7; font-size: 1.05rem; line-height: 1; padding: 0; cursor: pointer; display: flex; align-items: center; }
+        .nav-info-btn:hover { color: #fff; }
+        .footer-info-panel {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 70vh;
+            overflow-y: auto;
+            background: #2c3e50;
+            color: #bdc3c7;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            padding: 20px 24px;
+            z-index: 1999;
+            transform: translateY(-8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        body.dark-theme .footer-info-panel { background: #111a22; }
+        .footer-info-panel.abierto { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        .footer-info-panel .footer-desc { font-size: 0.9rem; line-height: 1.5; margin-bottom: 14px; max-width: 640px; color: #d5dbdb; }
+        .footer-info-panel .footer-legal { font-size: 0.78rem; line-height: 1.6; margin-bottom: 6px; color: #95a5a6; }
+        .footer-info-panel .footer-legal a { color: #95a5a6; text-decoration: underline; }
+        .footer-info-panel .footer-legal a:hover { color: #fff; }
+        .footer-info-panel .footer-attrib { font-size: 0.72rem; color: #7f8c8d; }
         /* Contenedor del Mapa */
         #app-container {
             display: flex;
@@ -303,12 +331,21 @@
             <h1 class="nav-slogan">
                 Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria
             </h1>
+            <button class="nav-info-btn" id="btn-footer-toggle" title="Información, aviso legal y contacto" aria-label="Mostrar información del sitio">ℹ️</button>
         </div>
         <div class="nav-links">
             <a href="index.html" class="active">Mapa en Vivo</a>
             <a href="rutas.html">Rutas Recomendadas</a>
             <a href="normativa.html">Normativa</a>
             <a href="talleres.html">Talleres</a>
+        </div>
+        <div class="footer-info-panel" id="footer-info-panel">
+            <p class="footer-desc">BiciLPA es un mapa ciclista de Las Palmas de Gran Canaria con carriles bici, estaciones Sítycleta, rutas recomendadas y recursos para moverte en bicicleta por la ciudad.</p>
+            <p class="footer-legal">
+                BiciLPA es un proyecto independiente y no está afiliado al Ayuntamiento de Las Palmas de Gran Canaria ni a Sítycleta.<br>
+                <a href="contacto.html">Contacto</a> · <a href="aviso-legal.html">Aviso legal</a> · <a href="privacidad.html">Privacidad</a> · © 2026 BiciLPA
+            </p>
+            <p class="footer-attrib">Datos de OpenStreetMap, CARTO, Sítycleta (Nextbike) y Google Maps.</p>
         </div>
     </nav>
     <div id="app-container">
@@ -579,6 +616,27 @@
             chkCiclovia.addEventListener('change', (e) => { toggleLayer(cicloviasLayer, e.target.checked); actualizarGrupoVias(); guardarPreferencias(); });
         }
         vincularControles();
+        // ==========================================
+        // 3b. PANEL DE INFORMACIÓN DEL FOOTER
+        // ==========================================
+        function vincularFooterInfo() {
+            const btn = document.getElementById('btn-footer-toggle');
+            const panel = document.getElementById('footer-info-panel');
+            if (!btn || !panel) return;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                panel.classList.toggle('abierto');
+            });
+            document.addEventListener('pointerdown', (e) => {
+                if (panel.classList.contains('abierto') && !panel.contains(e.target) && e.target !== btn) {
+                    panel.classList.remove('abierto');
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') panel.classList.remove('abierto');
+            });
+        }
+        vincularFooterInfo();
         // ==========================================
         // 4. ICONOS EMOJI
         // ==========================================
