@@ -26,6 +26,10 @@ const rutasManifest = {
     "titulo": "CC Las Arenas ⮕ Hoya de la Plata",
     "eje": "este"
   },
+  "manuel-becerra-las-arenas": {
+    "titulo": "Plaza Manuel Becerra ⮕ CC Las Arenas",
+    "eje": "norte"
+  },
   "las-arenas-belen-maria": {
     "titulo": "CC Las Arenas ⮕ Belén María",
     "eje": "norte"
