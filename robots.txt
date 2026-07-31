@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hchafla.github.io/BiciLPA/sitemap.xml
