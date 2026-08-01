@@ -1,0 +1,26 @@
+{
+  "name": "BiciLPA — Rutas en bicicleta por Las Palmas de Gran Canaria",
+  "short_name": "BiciLPA",
+  "description": "Mapa, rutas y servicios para moverte en bici por Las Palmas de Gran Canaria",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f8f9fa",
+  "theme_color": "#2c3e50",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "favicon/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
