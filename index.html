@@ -26,6 +26,13 @@
 <meta name="twitter:title" content="Mapa de Carriles Bici y Sítycleta en Las Palmas de Gran Canaria | BiciLPA">
 <meta name="twitter:description" content="Mapa interactivo de carriles bici, ciclovías y estaciones Sítycleta en Las Palmas de Gran Canaria, con disponibilidad de bicis en tiempo real.">
 <meta name="twitter:image" content="https://hchafla.github.io/BiciLPA/og-image.png">
+
+    <!-- App -->
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#2c3e50">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BiciLPA">
  
 
     <!-- Datos estructurados -->
@@ -813,5 +820,16 @@
         setInterval(actualizarSitycleta, 60000);
         window.addEventListener('resize', () => map.invalidateSize());
     </script>
+  
+    <!-- App -->
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => {
+            console.error('Error al registrar el Service Worker:', err);
+        });
+    });
+}
+</script>
 </body>
 </html>
