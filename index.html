@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mapa de Carriles Bici y Sítycleta en Las Palmas de Gran Canaria | BiciLPA</title>
+    <title>BiciLPA | Mapa de Carriles Bici y Sítycleta en Las Palmas de Gran Canaria</title>
     <meta name="description" content="Mapa interactivo de carriles bici, ciclovías y estaciones Sítycleta en Las Palmas de Gran Canaria, con disponibilidad de bicis en tiempo real.">
     <!-- ⚠️ Sustituye por tu dominio real antes de publicar -->
     <link rel="canonical" href="https://hchafla.github.io/BiciLPA/index.html">
@@ -488,6 +488,11 @@
             }
         });
         map.addControl(new CustomLayerControl());
+        function enviarEvento(nombre, parametros) {
+            if (typeof gtag === 'function') {
+                gtag('event', nombre, parametros);
+            }
+        }
         function cambiarMapaBase(tipo) {
             [mapaClaro, mapaOscuro, mapaSatelite].forEach(m => {
                 if (map.hasLayer(m)) map.removeLayer(m);
@@ -604,6 +609,7 @@
             });
             // 5. Escuchadores de eventos
             selectBasemap.addEventListener('change', (e) => {
+                enviarEvento('cambiar_capa_base', { capa: e.target.value });
                 cambiarMapaBase(e.target.value);
                 guardarPreferencias();
             });
@@ -693,10 +699,12 @@
             }
             siguiendoUbicacion = true;
             esperandoPrimerFix = true;
+            enviarEvento('usar_geolocalizacion', { accion: 'activar' });
             document.getElementById('btn-geoloc').classList.add('buscando');
             map.locate({ watch: true, enableHighAccuracy: true, setView: false, maximumAge: 5000 });
         }
         function detenerGeolocalizacion() {
+            enviarEvento('usar_geolocalizacion', { accion: 'desactivar' });
             siguiendoUbicacion = false;
             esperandoPrimerFix = true;
             map.stopLocate();
