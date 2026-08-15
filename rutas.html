@@ -700,10 +700,12 @@
             }
             siguiendoUbicacion = true;
             esperandoPrimerFix = true;
+            enviarEvento('usar_geolocalizacion', { accion: 'activar' });
             document.getElementById('btn-geoloc').classList.add('buscando');
             map.locate({ watch: true, enableHighAccuracy: true, setView: false, maximumAge: 5000 });
         }
         function detenerGeolocalizacion() {
+            enviarEvento('usar_geolocalizacion', { accion: 'desactivar' });
             siguiendoUbicacion = false;
             esperandoPrimerFix = true;
             map.stopLocate();
@@ -754,6 +756,11 @@
             alert('No se ha podido acceder a tu ubicación. Comprueba que le has dado permiso al navegador y que la página se sirve por HTTPS.');
             detenerGeolocalizacion();
         });
+        function enviarEvento(nombre, parametros) {
+            if (typeof gtag === 'function') {
+                gtag('event', nombre, parametros);
+            }
+        }
         const coloresEjes = {
             'este': '#0074D9',
             'norte': '#2ECC40',
@@ -782,6 +789,7 @@
             }
         }
         function filtrarEje(ejeId) {
+            enviarEvento('seleccionar_eje', { eje: ejeId });
             document.querySelectorAll('.eje-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-eje') === ejeId);
             });
@@ -929,6 +937,12 @@
             capasPreview.addLayer(grupoRuta);
         }
         function mostrarInfoRuta(datos) {
+            enviarEvento('ver_ruta', {
+                ruta_id: datos.id,
+                ruta_nombre: datos.titulo,
+                eje: datos.eje,
+                dificultad: datos.dificultad
+            });
             const contenedor = document.getElementById('contenedor-tarjetas');
             contenedor.innerHTML = '';
             let claseDificultad = 'facil';
